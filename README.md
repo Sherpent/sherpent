@@ -1,4 +1,13 @@
 # Sherpent – Équipe #3
+## S.H.E.R.P.E.N.T.
+Système
+Hybride
+Exploratoire
+Robotique
+Prototypé
+Et
+Navigation
+Tout-terrain
 
 ## 🌐 Projet: Sherpent – Robot Tout-Terrain Inspiré des Serpents
 
@@ -9,9 +18,6 @@
 - **Mathieu Durand** (durm1207)
 - **Renaud Gagnon** (gegr1618)
 - **Maxime Boucher** (boom0704)
-
-### 📷 Photos des Membres
-(*Ajouter ici les photos des membres avec leurs noms respectifs pour personnaliser davantage le README*)
 
 ---
 
@@ -83,8 +89,7 @@ Le projet sera développé en utilisant la méthodologie Agile, avec des livrabl
    ├── elec/       # Fichiers électroniques (PCB, schémas, etc.)
    ├── mec/        # Fichiers mécaniques (CAD, modèles 3D, etc.)
    ├── code/       # Fichiers de code (Python, firmware, etc.)
-   ├── docs/       # Documentation et rapports
-   └── planning/   # Planning Agile et gestion de projet
+   └── docs/       # Documentation et rapports
    ```
 
 2. **Outils GitHub :**
