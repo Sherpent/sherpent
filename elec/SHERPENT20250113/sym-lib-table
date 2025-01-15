@@ -1,7 +1,10 @@
 (sym_lib_table
   (version 7)
   (lib (name "WROOOOOOM")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ESP32_WROOM_32E_N8/KiCADv6/2025-01-13_20-01-15.kicad_sym")(options "")(descr ""))
-  (lib (name "MCP73831T_2ACI_MC")(type "KiCad")(uri "${KIPRJMOD}/Librairie/MCP73831T_2ACI_MC/KiCADv6/2025-01-11_21-19-55.kicad_sym")(options "")(descr ""))
   (lib (name "TPS630702RNMR")(type "KiCad")(uri "${KIPRJMOD}/Librairie/TPS630702RNMR/KiCADv6/2025-01-13_20-53-34.kicad_sym")(options "")(descr ""))
   (lib (name "TPS7A2633DRVR")(type "KiCad")(uri "${KIPRJMOD}/Librairie/TPS7A2633DRVR/TPS7A2633DRVR.kicad_sym")(options "")(descr ""))
+  (lib (name "LM66200DRLR")(type "KiCad")(uri "${KIPRJMOD}/Librairie/LM66200DRLR/KiCADv6/2025-01-15_14-37-23.kicad_sym")(options "")(descr ""))
+  (lib (name "2137160001")(type "KiCad")(uri "${KIPRJMOD}/Librairie/2137160001/2137160001.kicad_sym")(options "")(descr ""))
+  (lib (name "MCP73831T_2ACI_OT")(type "KiCad")(uri "${KIPRJMOD}/Librairie/MCP73831T_2ACI_OT/MCP73831T-2ACI_OT.kicad_sym")(options "")(descr ""))
+  (lib (name "TPS61288LRQQR")(type "KiCad")(uri "${KIPRJMOD}/Librairie/TPS61288LRQQR/KiCADv6/2025-01-15_20-48-17.kicad_sym")(options "")(descr ""))
 )
