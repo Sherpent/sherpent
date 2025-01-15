@@ -3387,16 +3387,6 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 147.32) (xy 130.81 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "11a3bdd5-7ec5-43f5-a0a2-19323822ed09")
-	)
-	(wire
-		(pts
 			(xy 44.45 154.94) (xy 50.8 154.94)
 		)
 		(stroke
@@ -3897,6 +3887,16 @@
 	)
 	(wire
 		(pts
+			(xy 119.38 147.32) (xy 134.62 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "de2a7f06-b9ef-4a24-90ce-34311173444e")
+	)
+	(wire
+		(pts
 			(xy 264.16 38.1) (xy 205.74 38.1)
 		)
 		(stroke
@@ -4135,14 +4135,13 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100k"
+		(property "Value" "523k"
 			(at 120.65 152.146 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Footprint" ""
@@ -4744,7 +4743,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 130.81 154.94 0)
+		(at 134.62 154.94 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4752,7 +4751,7 @@
 		(dnp no)
 		(uuid "2a747cfa-b83d-4ea3-9ce5-1cb4562062d4")
 		(property "Reference" "#PWR06"
-			(at 130.81 161.29 0)
+			(at 134.62 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4761,7 +4760,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 133.858 158.242 0)
+			(at 137.668 158.242 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4769,7 +4768,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 130.81 154.94 0)
+			(at 134.62 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4778,7 +4777,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 130.81 154.94 0)
+			(at 134.62 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4787,7 +4786,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 130.81 154.94 0)
+			(at 134.62 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7120,14 +7119,13 @@
 				(justify left)
 			)
 		)
-		(property "Value" "100k"
+		(property "Value" "48.7k"
 			(at 120.65 159.766 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify left)
-				(hide yes)
 			)
 		)
 		(property "Footprint" ""
@@ -7555,7 +7553,7 @@
 	)
 	(symbol
 		(lib_id "Device:C")
-		(at 130.81 151.13 0)
+		(at 134.62 151.13 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7563,7 +7561,7 @@
 		(dnp no)
 		(uuid "fae31a27-2f8e-4e11-a408-42d50a0369ae")
 		(property "Reference" "C6"
-			(at 124.46 149.86 0)
+			(at 128.27 149.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7571,8 +7569,8 @@
 				(justify left)
 			)
 		)
-		(property "Value" "22u"
-			(at 124.46 152.4 0)
+		(property "Value" "47u"
+			(at 128.27 152.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7581,7 +7579,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 131.7752 154.94 0)
+			(at 135.5852 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7590,7 +7588,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 130.81 151.13 0)
+			(at 134.62 151.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7599,7 +7597,7 @@
 			)
 		)
 		(property "Description" "Unpolarized capacitor"
-			(at 130.81 151.13 0)
+			(at 134.62 151.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
