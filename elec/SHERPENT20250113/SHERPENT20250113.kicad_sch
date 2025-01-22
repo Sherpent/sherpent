@@ -595,6 +595,168 @@
 				)
 			)
 		)
+		(symbol "Connector:Conn_01x02_Socket"
+			(pin_names
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x02_Socket"
+				(at 0 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x02, script generated"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x02_Socket_1_1"
+				(arc
+					(start 0 -2.032)
+					(mid -0.5058 -2.54)
+					(end 0 -3.048)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -2.54) (xy -0.508 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0) (xy -0.508 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 0.508)
+					(mid -0.5058 0)
+					(end 0 -0.508)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Connector:TestPoint"
 			(pin_numbers hide)
 			(pin_names
@@ -5437,10 +5599,10 @@
 		(uuid "675049e8-7157-4311-9984-bc332beb326b")
 	)
 	(junction
-		(at 544.83 95.25)
+		(at 534.67 92.71)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "6910bd02-c534-47b8-b3ad-d8600a7acf73")
+		(uuid "685e3f4b-a7ee-4b93-8b6d-51a944c0cb23")
 	)
 	(junction
 		(at 500.38 77.47)
@@ -5459,12 +5621,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "74b68a36-9297-46ec-9ac1-bb0f4ee7d1ee")
-	)
-	(junction
-		(at 542.925 92.71)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "774aced5-dcdc-403a-a896-0f9c5d2a1be9")
 	)
 	(junction
 		(at 541.02 76.2)
@@ -5525,6 +5681,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a9135e68-9990-4a81-908f-d24dc5151be5")
+	)
+	(junction
+		(at 534.67 95.25)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b59d3f75-4dbf-4606-93f8-4fb532976fdb")
 	)
 	(junction
 		(at 426.085 90.17)
@@ -5649,6 +5811,16 @@
 			(type default)
 		)
 		(uuid "009cd52c-07bb-4831-864d-a63508937665")
+	)
+	(wire
+		(pts
+			(xy 534.67 95.25) (xy 534.67 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "00a1339a-fd1b-4c21-836b-3f20b8a78217")
 	)
 	(wire
 		(pts
@@ -5882,16 +6054,6 @@
 	)
 	(wire
 		(pts
-			(xy 495.3 92.71) (xy 542.925 92.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2598f9d3-ecf0-4c0a-840c-db0e8043a15f")
-	)
-	(wire
-		(pts
 			(xy 497.205 102.87) (xy 495.3 102.87)
 		)
 		(stroke
@@ -6122,7 +6284,7 @@
 	)
 	(wire
 		(pts
-			(xy 542.925 92.71) (xy 549.275 92.71)
+			(xy 495.3 92.71) (xy 534.67 92.71)
 		)
 		(stroke
 			(width 0)
@@ -6192,6 +6354,16 @@
 	)
 	(wire
 		(pts
+			(xy 534.67 92.71) (xy 549.275 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "577596e3-3b67-42cd-8760-423cd4a4f5de")
+	)
+	(wire
+		(pts
 			(xy 85.09 328.93) (xy 100.33 328.93)
 		)
 		(stroke
@@ -6219,6 +6391,16 @@
 			(type default)
 		)
 		(uuid "5a4e3e89-8ee2-486c-96c7-82880ff76dbc")
+	)
+	(wire
+		(pts
+			(xy 534.67 95.25) (xy 553.72 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5e35611d-1687-453e-95ff-dc9e1947c90d")
 	)
 	(wire
 		(pts
@@ -6592,16 +6774,6 @@
 	)
 	(wire
 		(pts
-			(xy 495.3 95.25) (xy 544.83 95.25)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "93a418e7-2681-44ae-9d0d-02000c0b0b47")
-	)
-	(wire
-		(pts
 			(xy 116.84 387.35) (xy 107.95 387.35)
 		)
 		(stroke
@@ -6792,7 +6964,7 @@
 	)
 	(wire
 		(pts
-			(xy 544.83 95.25) (xy 553.72 95.25)
+			(xy 495.3 95.25) (xy 534.67 95.25)
 		)
 		(stroke
 			(width 0)
@@ -7169,6 +7341,16 @@
 			(type default)
 		)
 		(uuid "f84b71df-9a91-4594-bb5d-2eaa5822ee37")
+	)
+	(wire
+		(pts
+			(xy 534.67 92.71) (xy 534.67 93.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fba42eaf-8936-4991-b141-c5ed9c1f95c4")
 	)
 	(wire
 		(pts
@@ -10881,72 +11063,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 502.92 90.17 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "46f5b0e5-283a-4812-9004-f170f6236fbe")
-		(property "Reference" "TP6"
-			(at 507.4921 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "TestPoint"
-			(at 504.444 80.899 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.54mm_Drill1.5mm_Beaded"
-			(at 502.92 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 502.92 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 502.92 90.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8d228f6f-cca2-4f8e-b9bf-95007c11c3aa")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "TP6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 66.04 137.16 0)
 		(unit 1)
@@ -11413,6 +11529,76 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "Y1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x02_Socket")
+		(at 539.75 93.98 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "59ab692d-2a27-4130-a85e-d898c3308bfa")
+		(property "Reference" "J4"
+			(at 541.02 93.9799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x02_Socket"
+			(at 541.02 96.5199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical"
+			(at 539.75 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 539.75 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x02, script generated"
+			(at 539.75 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e8ebdc20-6220-4d1f-b3ee-5bdda76155ff")
+		)
+		(pin "2"
+			(uuid "f742b93d-d08e-41ad-b1c5-a454ef50cfa2")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "J4")
 					(unit 1)
 				)
 			)
@@ -12318,6 +12504,76 @@
 			(project ""
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "BT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x02_Socket")
+		(at 508 87.63 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "713742c9-a76c-4f90-b069-8cd7e47f37f9")
+		(property "Reference" "J2"
+			(at 509.27 87.6299 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x02_Socket"
+			(at 509.27 90.1699 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical"
+			(at 508 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 508 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x02, script generated"
+			(at 508 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "93288177-1723-41a0-9a39-5b252cbc9b19")
+		)
+		(pin "2"
+			(uuid "cba01865-85a1-4d57-a37a-01f6f8bf256d")
+		)
+		(instances
+			(project ""
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "J2")
 					(unit 1)
 				)
 			)
@@ -13985,6 +14241,74 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x02_Socket")
+		(at 424.18 105.41 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9abee668-56e7-4aa7-954a-649d768162be")
+		(property "Reference" "J3"
+			(at 424.815 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x02_Socket"
+			(at 424.815 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x02_P2.54mm_Vertical"
+			(at 424.18 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 424.18 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x02, script generated"
+			(at 424.18 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a3e56d3e-52c6-43b7-b550-35bfd7e96795")
+		)
+		(pin "2"
+			(uuid "d8cff6d7-1dfe-474d-868a-f3e0c17b73b5")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 347.98 46.99 0)
 		(unit 1)
@@ -14441,72 +14765,6 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "L2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 542.925 92.71 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "a3beace4-159c-4c72-886d-805cc2e9765d")
-		(property "Reference" "TP3"
-			(at 545.465 88.1379 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "TestPoint"
-			(at 533.654 91.186 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.54mm_Drill1.5mm_Beaded"
-			(at 548.005 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 548.005 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 542.925 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "35fcfcd2-0ac3-45d9-baf0-fa0d6999e19b")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "TP3")
 					(unit 1)
 				)
 			)
@@ -15072,72 +15330,6 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "#PWR018")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 502.92 87.63 270)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "acaa9c7e-aa7d-48ae-a6bc-be74ab37c3d9")
-		(property "Reference" "TP5"
-			(at 507.4921 90.17 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "TestPoint"
-			(at 504.444 78.359 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.54mm_Drill1.5mm_Beaded"
-			(at 502.92 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 502.92 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 502.92 87.63 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9749a47c-68fb-47fb-9733-2c991f2baa92")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "TP5")
 					(unit 1)
 				)
 			)
@@ -15734,72 +15926,6 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "#PWR013")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 544.83 95.25 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c306c4e0-21db-4095-84da-c1435b9beb40")
-		(property "Reference" "TP4"
-			(at 547.37 90.6779 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "TestPoint"
-			(at 540.385 97.155 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.54mm_Drill1.5mm_Beaded"
-			(at 549.91 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 549.91 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 544.83 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1870682e-eefc-49aa-bddd-dcc9df40fad9")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "TP4")
 					(unit 1)
 				)
 			)
