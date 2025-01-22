@@ -7,4 +7,8 @@
   (lib (name "2137160001")(type "KiCad")(uri "${KIPRJMOD}/Librairie/2137160001/2137160001.kicad_sym")(options "")(descr ""))
   (lib (name "MCP73831T_2ACI_OT")(type "KiCad")(uri "${KIPRJMOD}/Librairie/MCP73831T_2ACI_OT/MCP73831T-2ACI_OT.kicad_sym")(options "")(descr ""))
   (lib (name "TPS61288LRQQR")(type "KiCad")(uri "${KIPRJMOD}/Librairie/TPS61288LRQQR/KiCADv6/2025-01-15_20-48-17.kicad_sym")(options "")(descr ""))
+  (lib (name "830059627")(type "KiCad")(uri "${KIPRJMOD}/Librairie/830059627/KiCADv6/2024-09-14_12-25-36.kicad_sym")(options "")(descr ""))
+  (lib (name "ESP32_C3")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ESP32_C3/KiCADv6/2024-09-14_14-41-07.kicad_sym")(options "")(descr ""))
+  (lib (name "W25Q128JVSIQ")(type "KiCad")(uri "${KIPRJMOD}/Librairie/W25Q128JVSIQ/KiCADv6/2024-09-14_11-21-08.kicad_sym")(options "")(descr ""))
+  (lib (name "CS1213AGF160")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ul_CS1213AGF160/KiCADv6/2024-10-05_16-48-49.kicad_sym")(options "")(descr ""))
 )
