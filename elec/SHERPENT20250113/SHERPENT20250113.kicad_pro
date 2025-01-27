@@ -483,13 +483,13 @@
   },
   "pcbnew": {
     "last_paths": {
-      "gencad": "",
-      "idf": "",
+      "gencad": "SHERPENT20250113.cad",
+      "idf": "SHERPENT20250113.emn",
       "netlist": "",
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "SHERPENT20250113.step",
+      "step": "../../../../../../../../usr/share/kicad/3dmodels/SHERPENT20250113.step",
       "svg": "",
       "vrml": ""
     },
