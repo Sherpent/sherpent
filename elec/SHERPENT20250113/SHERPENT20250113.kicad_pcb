@@ -26151,6 +26151,18 @@
 		(layer "Edge.Cuts")
 		(uuid "ecd15ba9-349e-47af-b2bf-569cc0d2d97b")
 	)
+	(gr_rect
+		(start 91 91.7)
+		(end 161 114.25)
+		(locked yes)
+		(stroke
+			(width 0.2)
+			(type default)
+		)
+		(fill none)
+		(layer "User.1")
+		(uuid "fcf3bfc5-f47a-4297-803e-af26380698f5")
+	)
 	(segment
 		(start 155.876652 112.944548)
 		(end 155.5241 113.2971)
@@ -30888,6 +30900,34 @@
 		(uuid "acd7d684-fd83-4601-b10b-6c61a3968ad7")
 	)
 	(zone
+		(net 0)
+		(net_name "")
+		(layer "F.Cu")
+		(uuid "7387cf3b-2bab-4fae-abc3-5b4287a06721")
+		(hatch edge 0.5)
+		(connect_pads
+			(clearance 0)
+		)
+		(min_thickness 0.25)
+		(filled_areas_thickness no)
+		(keepout
+			(tracks allowed)
+			(vias allowed)
+			(pads allowed)
+			(copperpour allowed)
+			(footprints not_allowed)
+		)
+		(fill
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+		)
+		(polygon
+			(pts
+				(xy 77.8 85.6) (xy 131.4 85.6) (xy 131.4 120.2) (xy 77.7 120.4)
+			)
+		)
+	)
+	(zone
 		(net 67)
 		(net_name "/VDIODE")
 		(layer "F.Cu")
@@ -31664,6 +31704,34 @@
 				(xy 153.441299 90.746365) (xy 153.340186 90.759677) (xy 153.27115 90.748912) (xy 153.218894 90.702532)
 				(xy 153.2 90.636738) (xy 153.2 87.602) (xy 153.219685 87.534961) (xy 153.272489 87.489206) (xy 153.324 87.478)
 				(xy 153.475237 87.478)
+			)
+		)
+	)
+	(zone
+		(net 0)
+		(net_name "")
+		(layer "B.Cu")
+		(uuid "4374b304-186e-4eb9-a64a-d55c956e57f4")
+		(hatch edge 0.5)
+		(connect_pads
+			(clearance 0)
+		)
+		(min_thickness 0.25)
+		(filled_areas_thickness no)
+		(keepout
+			(tracks allowed)
+			(vias allowed)
+			(pads allowed)
+			(copperpour allowed)
+			(footprints not_allowed)
+		)
+		(fill
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+		)
+		(polygon
+			(pts
+				(xy 91 91.7) (xy 161 91.7) (xy 161 114.2) (xy 91 114.2)
 			)
 		)
 	)
