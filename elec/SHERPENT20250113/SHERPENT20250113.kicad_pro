@@ -48,7 +48,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.2
+          "min_clearance": 0.3
         }
       },
       "diff_pair_dimensions": [
@@ -181,7 +181,8 @@
         0.0,
         0.15,
         0.3,
-        0.45
+        0.45,
+        1.0
       ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
@@ -217,6 +218,10 @@
         {
           "diameter": 0.45,
           "drill": 0.3
+        },
+        {
+          "diameter": 1.0,
+          "drill": 0.5
         }
       ],
       "zones_allow_external_fillets": false
@@ -489,7 +494,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "../../../../../../../../usr/share/kicad/3dmodels/SHERPENT20250113.step",
+      "step": "SHERPENT20250113.step",
       "svg": "",
       "vrml": ""
     },
