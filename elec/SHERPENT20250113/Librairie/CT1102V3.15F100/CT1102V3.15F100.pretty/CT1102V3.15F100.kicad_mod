@@ -254,4 +254,15 @@
 		(remove_unused_layers no)
 		(uuid "f75112c8-e2a5-4537-a1e6-5accecdf21e9")
 	)
+	(model "${KIPRJMOD}/Librairie/CT1102V3.15F100/CT1102V3.85F160.stp"
+		(offset
+			(xyz 3.5 -5 4)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
 )
