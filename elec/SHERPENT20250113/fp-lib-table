@@ -13,4 +13,5 @@
   (lib (name "W25Q128JVSIQ")(type "KiCad")(uri "${KIPRJMOD}/Librairie/W25Q128JVSIQ/KiCADv6/footprints.pretty")(options "")(descr ""))
   (lib (name "CS1213AGF160")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ul_CS1213AGF160/KiCADv6/footprints.pretty")(options "")(descr ""))
   (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/Librairie/WS2812B4020/Library.pretty")(options "")(descr ""))
+  (lib (name "LDL212PV33R")(type "KiCad")(uri "${KIPRJMOD}/Librairie/LDL212PV33R")(options "")(descr ""))
 )
