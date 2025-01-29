@@ -12,5 +12,9 @@
   (lib (name "W25Q128JVSIQ")(type "KiCad")(uri "${KIPRJMOD}/Librairie/W25Q128JVSIQ/KiCADv6/2024-09-14_11-21-08.kicad_sym")(options "")(descr ""))
   (lib (name "CS1213AGF160")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ul_CS1213AGF160/KiCADv6/2024-10-05_16-48-49.kicad_sym")(options "")(descr ""))
   (lib (name "WS2812B4020")(type "KiCad")(uri "${KIPRJMOD}/Librairie/WS2812B4020/WS2812B4020.kicad_sym")(options "")(descr ""))
+<<<<<<< HEAD
   (lib (name "CT1102V3")(type "KiCad")(uri "${KIPRJMOD}/Librairie/CT1102V3.15F100/CT1102V3.15F100.kicad_sym")(options "")(descr ""))
+=======
+  (lib (name "LDL212PV33R")(type "KiCad")(uri "${KIPRJMOD}/Librairie/LDL212PV33R/LDL212PV33R.kicad_sym")(options "")(descr ""))
+>>>>>>> origin/main
 )
