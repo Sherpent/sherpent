@@ -590,6 +590,18 @@
       {
         "netclass": "Signal_Long_Range",
         "pattern": "/NEO*"
+      },
+      {
+        "netclass": "Signal_Long_Range",
+        "pattern": "/USB_ESP32?"
+      },
+      {
+        "netclass": "Signal_Long_Range",
+        "pattern": "Net-(D??-DIN)"
+      },
+      {
+        "netclass": "Signal_Long_Range",
+        "pattern": "Net-(D?-DOUT)"
       }
     ]
   },

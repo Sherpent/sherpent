@@ -3493,6 +3493,151 @@
 				)
 			)
 		)
+		(symbol "Jumper:Jumper_2_Bridged"
+			(pin_numbers hide)
+			(pin_names
+				(offset 0) hide)
+			(exclude_from_sim yes)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "JP"
+				(at 0 1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Jumper_2_Bridged"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Jumper, 2-pole, closed/bridged"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Jumper SPST"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Jumper* TestPoint*2Pads* TestPoint*Bridge*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Jumper_2_Bridged_0_0"
+				(circle
+					(center -2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Jumper_2_Bridged_0_1"
+				(arc
+					(start 1.524 0.254)
+					(mid 0 0.762)
+					(end -1.524 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Jumper_2_Bridged_1_1"
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "Jumper:SolderJumper_2_Open"
 			(pin_numbers hide)
 			(pin_names
@@ -6581,6 +6726,12 @@
 		(uuid "2a4b4977-be69-42a0-b2f5-02f6ec232f66")
 	)
 	(junction
+		(at 440.69 100.33)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2ae85574-0120-4b88-a76d-23f1c5fddbf1")
+	)
+	(junction
 		(at 443.23 298.45)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6633,6 +6784,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "3ef047ff-29b7-48d3-97b7-2b66b0f23635")
+	)
+	(junction
+		(at 100.33 336.55)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "416cae92-067a-4303-8d62-ada9aee2ea5e")
 	)
 	(junction
 		(at 76.2 346.71)
@@ -7347,6 +7504,16 @@
 			(type default)
 		)
 		(uuid "10b17ae9-0d46-48a1-a4f2-1381ef7e31aa")
+	)
+	(wire
+		(pts
+			(xy 448.31 100.33) (xy 454.66 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "138a4ada-e4dd-4f95-8b2e-9408c050c074")
 	)
 	(wire
 		(pts
@@ -8370,6 +8537,16 @@
 	)
 	(wire
 		(pts
+			(xy 420.37 100.33) (xy 440.69 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6a77da78-8d77-4260-953c-43b2138ae487")
+	)
+	(wire
+		(pts
 			(xy 514.35 316.23) (xy 514.35 298.45)
 		)
 		(stroke
@@ -8377,6 +8554,16 @@
 			(type default)
 		)
 		(uuid "6bda7468-4971-431b-9de8-328b03f0aec0")
+	)
+	(wire
+		(pts
+			(xy 177.8 262.89) (xy 187.96 262.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6be47ac2-9870-4c13-9501-f5584b5284ec")
 	)
 	(wire
 		(pts
@@ -8930,6 +9117,16 @@
 	)
 	(wire
 		(pts
+			(xy 100.33 331.47) (xy 100.33 336.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a5cfa4b5-a0e2-40ff-b673-e081c45f6e59")
+	)
+	(wire
+		(pts
 			(xy 494.03 267.97) (xy 496.57 267.97)
 		)
 		(stroke
@@ -8987,6 +9184,16 @@
 			(type default)
 		)
 		(uuid "ac594186-4032-4b96-8779-c0ff816a1cb1")
+	)
+	(wire
+		(pts
+			(xy 157.48 262.89) (xy 167.64 262.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ac8e3af9-a10f-4224-9b5b-6958c7cda61c")
 	)
 	(wire
 		(pts
@@ -9070,6 +9277,16 @@
 	)
 	(wire
 		(pts
+			(xy 90.17 331.47) (xy 90.17 336.55)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b83f7cc1-5f7b-4c0e-8dde-30aa81f047a5")
+	)
+	(wire
+		(pts
 			(xy 405.13 267.97) (xy 407.67 267.97)
 		)
 		(stroke
@@ -9080,13 +9297,13 @@
 	)
 	(wire
 		(pts
-			(xy 420.37 100.33) (xy 434.34 100.33)
+			(xy 99.06 331.47) (xy 100.33 331.47)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "b9d9c44a-a64d-4c8a-bca1-b3a4567f1f74")
+		(uuid "b99f5fad-986e-4ff7-84f6-71f92b982efd")
 	)
 	(wire
 		(pts
@@ -9267,6 +9484,16 @@
 			(type default)
 		)
 		(uuid "cc0f1600-8074-40a8-af6e-fb626cd4117a")
+	)
+	(wire
+		(pts
+			(xy 91.44 331.47) (xy 90.17 331.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cc8d6f2f-99c6-4317-bdb1-055e49a07a23")
 	)
 	(wire
 		(pts
@@ -9818,16 +10045,6 @@
 		)
 		(uuid "135c02c4-4478-47c9-88d2-00a03e01e451")
 	)
-	(text "!! Placer Button sur un GPIO !!"
-		(exclude_from_sim no)
-		(at 396.24 137.16 0)
-		(effects
-			(font
-				(size 2.54 2.54)
-			)
-		)
-		(uuid "2119cb8c-c098-4a1e-84b6-121a800ed920")
-	)
 	(text "Decoupling capacitor for ESP32-C3"
 		(exclude_from_sim no)
 		(at 278.13 125.095 0)
@@ -9900,6 +10117,16 @@
 			(justify left bottom)
 		)
 		(uuid "66f4ac82-6b9d-4daf-877b-6a80de18f83f")
+	)
+	(text "Ajouter une fuse entre les deux cellules?\n"
+		(exclude_from_sim no)
+		(at 182.118 79.756 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "688de286-0ca5-4c85-a00e-71a3bf660692")
 	)
 	(text "VDD3P3_CPU"
 		(exclude_from_sim no)
@@ -10056,6 +10283,17 @@
 		)
 		(uuid "0ea25b01-0a5b-46d5-8d25-9a6a1e2dab22")
 	)
+	(label "VUSB"
+		(at 157.48 262.89 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "17ba2849-f9a8-4953-a5f6-c0d354bf3e84")
+	)
 	(label "SQPI_VDD_ESP"
 		(at 434.34 123.19 180)
 		(fields_autoplaced yes)
@@ -10111,17 +10349,6 @@
 		)
 		(uuid "3226e323-7915-4689-a309-0259093a6515")
 	)
-	(label "DIODE_STATE"
-		(at 341.63 102.87 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "4e4eccdf-d18c-4d0c-bfce-0a870b282866")
-	)
 	(label "Moteur1_PWM"
 		(at 341.63 113.03 0)
 		(fields_autoplaced yes)
@@ -10165,6 +10392,17 @@
 			(justify left bottom)
 		)
 		(uuid "5971bf82-bcee-4203-b5c3-21b65bd334ba")
+	)
+	(label "VBATT"
+		(at 187.96 262.89 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5c1cd438-3a89-4252-b7fc-f18f66c6a99b")
 	)
 	(label "VDIODE"
 		(at 295.91 270.51 180)
@@ -10420,7 +10658,7 @@
 		(uuid "e87acd38-4d6d-422d-adf4-55ec0d2e1533")
 	)
 	(label "Button"
-		(at 378.46 140.97 0)
+		(at 341.63 102.87 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -10431,7 +10669,7 @@
 		(uuid "edbb5a78-5b2d-47d2-8475-d2c999f41bb6")
 	)
 	(label "VBATT"
-		(at 434.34 100.33 180)
+		(at 454.66 100.33 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -20145,6 +20383,73 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
+		(at 440.69 104.14 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8a2cf2fb-2ba0-4581-b54b-68d14d35c57d")
+		(property "Reference" "R28"
+			(at 446.532 103.886 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100k 0.1%"
+			(at 446.4685 105.9815 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 439.674 103.886 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 440.69 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 440.69 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a5cfdae0-a4da-45d0-82f8-62d159d7176b")
+		)
+		(pin "2"
+			(uuid "6e9c643b-e205-4bb3-9879-5958c70732e1")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "R28")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
 		(at 346.075 120.65 270)
 		(unit 1)
 		(exclude_from_sim no)
@@ -22592,6 +22897,74 @@
 		)
 	)
 	(symbol
+		(lib_id "Jumper:Jumper_2_Bridged")
+		(at 172.72 262.89 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b39f2684-b62b-4f15-a677-db351742b45e")
+		(property "Reference" "JP19"
+			(at 172.72 257.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Jumper_2_Bridged"
+			(at 172.72 260.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_2Pads_Pitch2.54mm_Drill0.8mm"
+			(at 172.72 262.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 172.72 262.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Jumper, 2-pole, closed/bridged"
+			(at 172.72 262.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "617aac9b-2c8e-4d9d-a5f4-ce3d56360787")
+		)
+		(pin "1"
+			(uuid "897b1b41-714e-485c-abc9-2978c6035dbd")
+		)
+		(instances
+			(project ""
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "JP19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 521.97 306.07 0)
 		(unit 1)
@@ -23488,6 +23861,73 @@
 			(project ""
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 444.5 100.33 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "c103bb8e-4d9f-49fa-b1c1-ccc65a5256f2")
+		(property "Reference" "R27"
+			(at 444.5 96.393 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "27.3k 0.1%"
+			(at 444.246 98.552 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 444.754 99.314 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 444.5 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 444.5 100.33 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fe864544-4808-45f9-91d1-e08226d0efe8")
+		)
+		(pin "2"
+			(uuid "75a6ef39-ec65-47c8-b7d2-93a885d40155")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "R27")
 					(unit 1)
 				)
 			)
@@ -25145,6 +25585,75 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R_US")
+		(at 95.25 331.47 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d6bcffbe-05cd-4911-9b3a-d4830827d9ec")
+		(property "Reference" "R26"
+			(at 93.726 326.898 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "0"
+			(at 93.726 328.93 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 95.504 330.454 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 95.25 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor, US symbol"
+			(at 95.25 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "2e69bd2a-037b-4293-b794-1fbd39f9be48")
+		)
+		(pin "1"
+			(uuid "7e7b76b1-354c-4233-a3bc-3fa73609d4f4")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "R26")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 433.07 275.59 0)
 		(unit 1)
@@ -26282,6 +26791,71 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "R13")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 440.69 107.95 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e9a652d9-83e5-4c53-8841-3f776833f29a")
+		(property "Reference" "#PWR0119"
+			(at 440.69 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 443.865 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 440.69 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 440.69 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 440.69 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cb60a4ee-c1dc-4f2f-a730-7a5ac521c343")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "#PWR0119")
 					(unit 1)
 				)
 			)
@@ -27712,7 +28286,7 @@
 		(dnp no)
 		(uuid "fbfe9cb8-6fcc-4df8-bce3-844d51218ca6")
 		(property "Reference" "Q4"
-			(at 95.25 330.2 90)
+			(at 100.076 339.344 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -27720,7 +28294,7 @@
 			)
 		)
 		(property "Value" "PMOS"
-			(at 95.25 332.74 90)
+			(at 100.076 341.884 90)
 			(effects
 				(font
 					(size 1.27 1.27)
