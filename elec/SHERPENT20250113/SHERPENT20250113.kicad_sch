@@ -6485,12 +6485,6 @@
 		(uuid "06688601-2cd4-4058-ae0d-5846d0dbf289")
 	)
 	(junction
-		(at 76.2 323.85)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "0aa80c05-5b0a-46bf-baae-cca98e01646e")
-	)
-	(junction
 		(at 275.59 321.31)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6701,7 +6695,7 @@
 		(uuid "64654ec9-bdc5-4591-a6d0-bc2e9fc7690f")
 	)
 	(junction
-		(at 157.48 76.2)
+		(at 157.48 69.85)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "64e34617-0012-4add-a81b-4170d8e9d923")
@@ -6711,6 +6705,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "675049e8-7157-4311-9984-bc332beb326b")
+	)
+	(junction
+		(at 76.2 323.85)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "6a449965-6e7f-41c5-a877-f386884b4295")
 	)
 	(junction
 		(at 372.11 298.45)
@@ -7100,7 +7100,7 @@
 	)
 	(wire
 		(pts
-			(xy 167.64 76.2) (xy 170.18 76.2)
+			(xy 167.64 69.85) (xy 173.99 69.85)
 		)
 		(stroke
 			(width 0)
@@ -7130,7 +7130,7 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 76.2) (xy 160.02 76.2)
+			(xy 157.48 69.85) (xy 160.02 69.85)
 		)
 		(stroke
 			(width 0)
@@ -7510,7 +7510,7 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 76.2) (xy 157.48 80.01)
+			(xy 157.48 69.85) (xy 157.48 73.66)
 		)
 		(stroke
 			(width 0)
@@ -8250,7 +8250,7 @@
 	)
 	(wire
 		(pts
-			(xy 151.13 76.2) (xy 151.13 80.01)
+			(xy 151.13 69.85) (xy 151.13 73.66)
 		)
 		(stroke
 			(width 0)
@@ -8890,7 +8890,7 @@
 	)
 	(wire
 		(pts
-			(xy 157.48 87.63) (xy 157.48 88.9)
+			(xy 157.48 81.28) (xy 157.48 82.55)
 		)
 		(stroke
 			(width 0)
@@ -8900,7 +8900,7 @@
 	)
 	(wire
 		(pts
-			(xy 151.13 76.2) (xy 157.48 76.2)
+			(xy 151.13 69.85) (xy 157.48 69.85)
 		)
 		(stroke
 			(width 0)
@@ -9340,7 +9340,7 @@
 	)
 	(wire
 		(pts
-			(xy 151.13 88.9) (xy 151.13 87.63)
+			(xy 151.13 82.55) (xy 151.13 81.28)
 		)
 		(stroke
 			(width 0)
@@ -9420,7 +9420,7 @@
 	)
 	(wire
 		(pts
-			(xy 59.69 323.85) (xy 76.2 323.85)
+			(xy 40.64 323.85) (xy 76.2 323.85)
 		)
 		(stroke
 			(width 0)
@@ -9851,7 +9851,7 @@
 	)
 	(text "Battery"
 		(exclude_from_sim no)
-		(at 161.29 64.77 0)
+		(at 161.29 58.42 0)
 		(effects
 			(font
 				(size 5.08 5.08)
@@ -10067,8 +10067,8 @@
 		)
 		(uuid "1fcc93d5-396b-45b0-8b78-6fd062657dce")
 	)
-	(label "I2C_DO"
-		(at 434.34 100.33 180)
+	(label "VBATT"
+		(at 173.99 69.85 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -10076,7 +10076,7 @@
 			)
 			(justify right bottom)
 		)
-		(uuid "22bb375e-e1ca-4d3f-ac72-0f316ce766cf")
+		(uuid "2a42ba8f-c033-419e-952f-b7cbc8b56a41")
 	)
 	(label "SQPI_SD0_ESP"
 		(at 434.34 107.95 180)
@@ -10178,7 +10178,7 @@
 		(uuid "5e048b13-c04a-4961-a8d6-05c22c751d83")
 	)
 	(label "VBATT"
-		(at 59.69 323.85 0)
+		(at 40.64 323.85 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -10430,27 +10430,16 @@
 		)
 		(uuid "edbb5a78-5b2d-47d2-8475-d2c999f41bb6")
 	)
-	(global_label "VBATT"
-		(shape input)
-		(at 170.18 76.2 0)
+	(label "VBATT"
+		(at 434.34 100.33 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left)
+			(justify right bottom)
 		)
-		(uuid "af700387-7af2-4cbe-a701-e8308c2364bd")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 178.5476 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
+		(uuid "fd80dfb3-6da4-44d7-aa60-8b69ee460f19")
 	)
 	(symbol
 		(lib_id "Device:R_US")
@@ -14494,7 +14483,7 @@
 	)
 	(symbol
 		(lib_id "Device:Fuse")
-		(at 163.83 76.2 90)
+		(at 163.83 69.85 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -14503,7 +14492,7 @@
 		(fields_autoplaced yes)
 		(uuid "3ee57751-7f1a-43d3-bae9-a1f615288a6b")
 		(property "Reference" "F1"
-			(at 163.83 69.85 90)
+			(at 163.83 63.5 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14511,7 +14500,7 @@
 			)
 		)
 		(property "Value" "10A"
-			(at 163.83 72.39 90)
+			(at 163.83 66.04 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14519,7 +14508,7 @@
 			)
 		)
 		(property "Footprint" "Fuse:Fuse_0603_1608Metric"
-			(at 163.83 77.978 90)
+			(at 163.83 71.628 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14528,7 +14517,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 163.83 76.2 0)
+			(at 163.83 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14537,7 +14526,7 @@
 			)
 		)
 		(property "Description" "Fuse"
-			(at 163.83 76.2 0)
+			(at 163.83 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14562,7 +14551,7 @@
 	)
 	(symbol
 		(lib_id "Device:Battery_Cell")
-		(at 157.48 85.09 0)
+		(at 157.48 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -14570,7 +14559,7 @@
 		(dnp no)
 		(uuid "3f556ad6-3fa6-407c-a378-f4e4d8307ba3")
 		(property "Reference" "BT2"
-			(at 162.56 81.28 0)
+			(at 162.56 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14578,7 +14567,7 @@
 			)
 		)
 		(property "Value" "Battery_Cell"
-			(at 152.4 83.2485 90)
+			(at 152.4 76.8985 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14587,7 +14576,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 157.48 83.566 90)
+			(at 157.48 77.216 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14596,7 +14585,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 157.48 83.566 90)
+			(at 157.48 77.216 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14605,7 +14594,7 @@
 			)
 		)
 		(property "Description" "Single-cell battery"
-			(at 157.48 85.09 0)
+			(at 157.48 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15124,7 +15113,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 151.13 88.9 0)
+		(at 151.13 82.55 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -15132,7 +15121,7 @@
 		(dnp no)
 		(uuid "48313476-8eb4-4bcc-8cea-28e4f0dffde7")
 		(property "Reference" "#PWR024"
-			(at 151.13 95.25 0)
+			(at 151.13 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15141,7 +15130,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 151.13 92.71 0)
+			(at 151.13 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15149,7 +15138,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 151.13 88.9 0)
+			(at 151.13 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15158,7 +15147,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 151.13 88.9 0)
+			(at 151.13 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15167,7 +15156,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 151.13 88.9 0)
+			(at 151.13 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16340,7 +16329,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 157.48 88.9 0)
+		(at 157.48 82.55 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -16348,7 +16337,7 @@
 		(dnp no)
 		(uuid "5a2b9709-673d-42b5-9ecd-18300cbb34ef")
 		(property "Reference" "#PWR029"
-			(at 157.48 95.25 0)
+			(at 157.48 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16357,7 +16346,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 157.48 92.71 0)
+			(at 157.48 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16365,7 +16354,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 157.48 88.9 0)
+			(at 157.48 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16374,7 +16363,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 157.48 88.9 0)
+			(at 157.48 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16383,7 +16372,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 157.48 88.9 0)
+			(at 157.48 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18319,7 +18308,7 @@
 	)
 	(symbol
 		(lib_id "Device:Battery_Cell")
-		(at 151.13 85.09 0)
+		(at 151.13 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -18327,7 +18316,7 @@
 		(dnp no)
 		(uuid "70575afa-13dc-49dc-ab24-2465adc708db")
 		(property "Reference" "BT1"
-			(at 148.59 81.28 0)
+			(at 148.59 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18335,7 +18324,7 @@
 			)
 		)
 		(property "Value" "Battery_Cell"
-			(at 162.56 83.82 90)
+			(at 162.56 77.47 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18344,7 +18333,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical"
-			(at 151.13 83.566 90)
+			(at 151.13 77.216 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18353,7 +18342,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 151.13 83.566 90)
+			(at 151.13 77.216 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18362,7 +18351,7 @@
 			)
 		)
 		(property "Description" "Single-cell battery"
-			(at 151.13 85.09 0)
+			(at 151.13 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
