@@ -24047,6 +24047,17 @@
 			(pintype "power_out")
 			(uuid "ec83973f-900e-43bc-bb1d-9f7e0f474505")
 		)
+		(model "/home/user/Downloads/ESP32-C3.STEP"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -90 0 0)
+			)
+		)
 	)
 	(footprint "MCP73831T_2ACI_OT:SOT95P280X145-5N"
 		(layer "F.Cu")
@@ -38880,6 +38891,44 @@
 		)
 	)
 	(zone
+		(net 41)
+		(net_name "/NEOPX")
+		(layer "F.Cu")
+		(uuid "2f54500a-f9d3-4e17-8b27-841f7dc8ffee")
+		(name "$teardrop_padvia$")
+		(hatch full 0.1)
+		(priority 30000)
+		(attr
+			(teardrop
+				(type padvia)
+			)
+		)
+		(connect_pads yes
+			(clearance 0)
+		)
+		(min_thickness 0.0254)
+		(filled_areas_thickness no)
+		(fill yes
+			(thermal_gap 0.5)
+			(thermal_bridge_width 0.5)
+			(island_removal_mode 1)
+			(island_area_min 10)
+		)
+		(polygon
+			(pts
+				(xy 200.291662 82.977363) (xy 200.397728 82.871297) (xy 200.2472 82.77918) (xy 199.916293 82.852394)
+				(xy 200.2472 82.980101)
+			)
+		)
+		(filled_polygon
+			(layer "F.Cu")
+			(pts
+				(xy 200.291662 82.977363) (xy 200.397728 82.871297) (xy 200.2472 82.77918) (xy 199.916293 82.852394)
+				(xy 200.2472 82.980101)
+			)
+		)
+	)
+	(zone
 		(net 5)
 		(net_name "+3.3V")
 		(layer "F.Cu")
@@ -39389,46 +39438,6 @@
 				(xy 199.085175 79.807482) (xy 199.082567 79.79437) (xy 199.082566 79.794369) (xy 199.082221 79.793853)
 				(xy 199.053503 79.750873) (xy 199.051635 79.742819) (xy 199.108021 79.322444) (xy 199.112516 79.314701)
 				(xy 199.115999 79.312874) (xy 199.468391 79.198531)
-			)
-		)
-	)
-	(zone
-		(net 41)
-		(net_name "/NEOPX")
-		(layer "F.Cu")
-		(uuid "ac724a21-1c4d-4769-94a1-5c48af4cea14")
-		(name "$teardrop_padvia$")
-		(hatch full 0.1)
-		(priority 30027)
-		(attr
-			(teardrop
-				(type padvia)
-			)
-		)
-		(connect_pads yes
-			(clearance 0)
-		)
-		(min_thickness 0.0254)
-		(filled_areas_thickness no)
-		(fill yes
-			(thermal_gap 0.5)
-			(thermal_bridge_width 0.5)
-			(island_removal_mode 1)
-			(island_area_min 10)
-		)
-		(polygon
-			(pts
-				(xy 200.291662 82.977363) (xy 200.397728 82.871297) (xy 200.2472 82.77918) (xy 199.916293 82.852394)
-				(xy 200.2472 82.980101)
-			)
-		)
-		(filled_polygon
-			(layer "F.Cu")
-			(pts
-				(xy 200.251224 82.781642) (xy 200.34678 82.840118) (xy 200.38506 82.863545) (xy 200.390328 82.870787)
-				(xy 200.388933 82.879632) (xy 200.387226 82.881798) (xy 200.294794 82.97423) (xy 200.28724 82.977635)
-				(xy 200.249748 82.979944) (xy 200.244816 82.979181) (xy 199.95247 82.866355) (xy 199.945986 82.86018)
-				(xy 199.945768 82.851227) (xy 199.951943 82.844743) (xy 199.954146 82.844018) (xy 200.242592 82.780199)
 			)
 		)
 	)
