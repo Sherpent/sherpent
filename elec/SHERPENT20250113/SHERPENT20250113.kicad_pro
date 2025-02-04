@@ -602,6 +602,10 @@
       {
         "netclass": "Signal_Long_Range",
         "pattern": "Net-(D?-DOUT)"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/VBATT"
       }
     ]
   },
