@@ -13,4 +13,5 @@
   (lib (name "CS1213AGF160")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ul_CS1213AGF160/KiCADv6/2024-10-05_16-48-49.kicad_sym")(options "")(descr ""))
   (lib (name "WS2812B4020")(type "KiCad")(uri "${KIPRJMOD}/Librairie/WS2812B4020/WS2812B4020.kicad_sym")(options "")(descr ""))
   (lib (name "CT1120V3.15F100")(type "KiCad")(uri "${KIPRJMOD}/Librairie/CT1102V3.15F100/CT1102V3.15F100.kicad_sym")(options "")(descr ""))
+  (lib (name "TP4056")(type "KiCad")(uri "${KIPRJMOD}/Librairie/TP4056/TP4056.kicad_sym")(options "")(descr ""))
 )
