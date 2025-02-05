@@ -441,7 +441,7 @@
       "no_connect_dangling": "warning",
       "pin_not_connected": "error",
       "pin_not_driven": "error",
-      "pin_to_pin": "warning",
+      "pin_to_pin": "error",
       "power_pin_not_driven": "error",
       "similar_labels": "warning",
       "simulation_model_issue": "ignore",
@@ -607,6 +607,18 @@
       {
         "netclass": "Power",
         "pattern": "/VBATT"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "/VBAT_LOAD"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "Net-(D29-K)"
+      },
+      {
+        "netclass": "Default",
+        "pattern": ""
       }
     ]
   },
