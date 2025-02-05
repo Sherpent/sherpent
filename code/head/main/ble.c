@@ -12,6 +12,8 @@
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 #include "communication.h"
+#include "target.h"
+#include "utils.h"
 
 #include "sdkconfig.h"
 
@@ -37,12 +39,29 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
 #define INVALID_HANDLE   0
 
 /* ============================== TYPE DEFINITIONS =============================== */
-typedef void (*message_handler_t)(struct Message*);
+struct ble_scan_result_t {
+    char name[32];          // Human-readable name
+    uint8_t mac[6];         // MAC address
+    int rssi;               // Signal strength
+    uint8_t adv_type;       // Advertisement type
+    uint8_t phy_primary;    // Primary PHY
+    uint8_t phy_secondary;  // Secondary PHY
+    uint16_t appearance;    // Device appearance (if present)
+    uint16_t service_uuid;  // First service UUID (if present)
+};
+
+typedef void (*message_handler_t)(struct Message*, enum Target from);
+typedef void (*scan_handler_t)(struct ble_scan_result_evt_param result);
+typedef void (*message_provider_t)(struct Message*, enum Target to);
 
 
 /* ============================== PRIVATE VARIABLES ============================== */
 static message_handler_t _message_handler = NULL;
+static scan_handler_t _scan_handler = NULL;
 static char _device_name[ESP_BLE_ADV_NAME_LEN_MAX];
+
+static optional_type(int16_t) front_module_id = {false, 0};
+static optional_type(int16_t) back_module_id = {false, 0};
 
 static uint8_t characteristic_value[] = {0x11, 0x22, 0x33};
 static esp_gatt_char_prop_t char_properties = 0;
@@ -53,7 +72,6 @@ static uint8_t service_uuid[32] = {
     0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00,
 };
 
-static char remote_device_name[ESP_BLE_ADV_NAME_LEN_MAX] = "ESP_GATTS_DEMO";
 static bool connect    = false;
 static bool get_server = false;
 static esp_gattc_char_elem_t *char_elem_result   = NULL;
@@ -167,6 +185,41 @@ typedef struct {
     int prepare_len;
 } prepare_buffer_t;
 
+void parse_advertising_data(uint8_t *adv_data, uint8_t adv_len, struct ble_scan_result_t *result) {
+    uint8_t index = 0;
+
+    while (index < adv_len) {
+        uint8_t length = adv_data[index];  // First byte = length of this field
+        if (length == 0) break;            // End of data
+        if (index + length >= adv_len) break;  // Prevent overflow
+
+        uint8_t type = adv_data[index + 1];  // Second byte = type
+        uint8_t *data = &adv_data[index + 2]; // Pointer to actual data
+
+        switch (type) {
+            case 0x09: // Complete Local Name
+            case 0x08: // Shortened Local Name
+                memset(result->name, 0, sizeof(result->name));
+                strncpy(result->name, (char *)data, length - 1);
+                break;
+
+            case 0x19: // Appearance
+                result->appearance = data[0] | (data[1] << 8);
+                break;
+
+            case 0x02: // Incomplete List of 16-bit Service UUIDs
+            case 0x03: // Complete List of 16-bit Service UUIDs
+                result->service_uuid = data[0] | (data[1] << 8);
+                break;
+
+            default:
+                break;
+        }
+
+        index += length + 1;  // Move to next field
+    }
+}
+
 static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
     uint8_t *adv_name = NULL;
     uint8_t adv_name_len = 0;
@@ -230,54 +283,74 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
             break;
         case ESP_GAP_BLE_SCAN_RESULT_EVT: {
             esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
-            switch (scan_result->scan_rst.search_evt) {
-                case ESP_GAP_SEARCH_INQ_RES_EVT:
-                    adv_name = esp_ble_resolve_adv_data_by_type(scan_result->scan_rst.ble_adv,
-                                                                scan_result->scan_rst.adv_data_len + scan_result->scan_rst.scan_rsp_len,
-                                                                ESP_BLE_AD_TYPE_NAME_CMPL,
-                                                                &adv_name_len);
+            struct ble_scan_result_evt_param scan = param->scan_rst;
+            if (scan.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {  // Device found
+                struct ble_scan_result_t result = {0};  // Initialize struct
 
-                    ESP_LOGI(GATTC_TAG, "Scan result, device "ESP_BD_ADDR_STR", name len %u", ESP_BD_ADDR_HEX(scan_result->scan_rst.bda), adv_name_len);
-                    ESP_LOG_BUFFER_CHAR(GATTC_TAG, adv_name, adv_name_len);
-                    /*
-                    if (adv_name != NULL) {
-                        if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {
-                            if (connect == false) {
-                                connect = true;
-                                ESP_LOGI(TAG, "connect to the remote device %s", remote_device_name);
-                                esp_ble_gap_stop_scanning();
+                //memcpy(result.mac, scan.bda, 6); // Copy MAC address
+                //result.rssi = scan.rssi;
+                //result.adv_type = scan.adv_type;
+                //result.phy_primary = scan.primary_phy;
+                //result.phy_secondary = scan.secondary_phy;
 
-                                // Initiate GATT connection with the remote device,
-                                // If ble physical connection is set up, ESP_GATTS_CONNECT_EVT and ESP_GATTC_CONNECT_EVT event will come
-                                esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
-                                memcpy(&creat_conn_params.remote_bda, scan_result->scan_rst.bda, ESP_BD_ADDR_LEN);
-                                creat_conn_params.remote_addr_type = scan_result->scan_rst.ble_addr_type;
-                                creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
-                                creat_conn_params.is_direct = true;
-                                creat_conn_params.is_aux = false;
-                                creat_conn_params.phy_mask = 0x0;
-                                esp_ble_gattc_enh_open(client_profile.gattc_if,
-                                                       &creat_conn_params);
+                // Parse advertising data
+                parse_advertising_data(scan.ble_adv, scan.adv_data_len, &result);
 
-                                // Update peer gatt server address
-                                //memcpy(peer_gatts_addr, scan_result->scan_rst.bda, sizeof(esp_bd_addr_t));
-                                //ESP_LOG_BUFFER_HEX("the remote device addr", peer_gatts_addr, sizeof(esp_bd_addr_t));
-                            }
+                adv_name = esp_ble_resolve_adv_data_by_type(scan_result->scan_rst.ble_adv,
+                                                            scan_result->scan_rst.adv_data_len +
+                                                            scan_result->scan_rst.scan_rsp_len,
+                                                            ESP_BLE_AD_TYPE_NAME_CMPL,
+                                                            &adv_name_len);
+
+                /*
+                if (adv_name != NULL) {
+                    if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {
+                        if (connect == false) {
+                            connect = true;
+                            ESP_LOGI(TAG, "connect to the remote device %s", remote_device_name);
+                            esp_ble_gap_stop_scanning();
+
+                            // Initiate GATT connection with the remote device,
+                            // If ble physical connection is set up, ESP_GATTS_CONNECT_EVT and ESP_GATTC_CONNECT_EVT event will come
+                            esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
+                            memcpy(&creat_conn_params.remote_bda, scan_result->scan_rst.bda, ESP_BD_ADDR_LEN);
+                            creat_conn_params.remote_addr_type = scan_result->scan_rst.ble_addr_type;
+                            creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
+                            creat_conn_params.is_direct = true;
+                            creat_conn_params.is_aux = false;
+                            creat_conn_params.phy_mask = 0x0;
+                            esp_ble_gattc_enh_open(client_profile.gattc_if,
+                                                   &creat_conn_params);
+
+                            // Update peer gatt server address
+                            //memcpy(peer_gatts_addr, scan_result->scan_rst.bda, sizeof(esp_bd_addr_t));
+                            //ESP_LOG_BUFFER_HEX("the remote device addr", peer_gatts_addr, sizeof(esp_bd_addr_t));
                         }
                     }
-                    */
-                    break;
-                case ESP_GAP_SEARCH_INQ_CMPL_EVT:
-                    ESP_LOGI(TAG, "ESP_GAP_SEARCH_INQ_CMPL_EVT, scan stop");
-                    break;
-                default:
-                    break;
+                }
+                */
             }
             break;
         }
         default:
             break;
     }
+}
+
+static void connect_device(esp_bd_addr_t address) {
+    esp_ble_conn_update_params_t conn_params = {0};
+    memcpy(conn_params.bda, address, sizeof(esp_bd_addr_t));
+    /* For the IOS system, please reference the apple official documents about the ble connection parameters restrictions. */
+    conn_params.latency = 0;
+    conn_params.max_int = 0x20;    // max_int = 0x20*1.25ms = 40ms
+    conn_params.min_int = 0x10;    // min_int = 0x10*1.25ms = 20ms
+    conn_params.timeout = 400;    // timeout = 400*10ms = 4000ms
+
+    //connection_params.remote_bda.con
+
+    //server_profile.conn_id = connection_params.conn_id;
+
+    esp_ble_gap_update_conn_params(&conn_params);
 }
 
 static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_interface, esp_ble_gatts_cb_param_t *param) {
@@ -333,7 +406,9 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
 
             struct Message *message = (struct Message*) malloc(param->write.value[0]);
             memcpy(message, param->write.value, param->write.value[0]);
-            _message_handler(message);
+
+            //param->write.conn_id
+            _message_handler(message, FRONT);
             break;
         }
         case ESP_GATTS_EXEC_WRITE_EVT:
@@ -394,18 +469,7 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
                      param->start.status, param->start.service_handle);
             break;
         case ESP_GATTS_CONNECT_EVT: {
-            esp_ble_conn_update_params_t conn_params = {0};
-            memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
-            /* For the IOS system, please reference the apple official documents about the ble connection parameters restrictions. */
-            conn_params.latency = 0;
-            conn_params.max_int = 0x20;    // max_int = 0x20*1.25ms = 40ms
-            conn_params.min_int = 0x10;    // min_int = 0x10*1.25ms = 20ms
-            conn_params.timeout = 400;    // timeout = 400*10ms = 4000ms
-            ESP_LOGI(TAG, "Connected, conn_id %u, remote "ESP_BD_ADDR_STR"",
-                     param->connect.conn_id, ESP_BD_ADDR_HEX(param->connect.remote_bda));
-            server_profile.conn_id = param->connect.conn_id;
-            //start sent the update connection parameters to the peer device.
-            esp_ble_gap_update_conn_params(&conn_params);
+            connect_device(param->connect.remote_bda);
             break;
         }
         case ESP_GATTS_DISCONNECT_EVT:
@@ -663,102 +727,6 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
     }
 }
 
-static void handle_client_general_access_profile_event(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
-{
-    uint8_t *adv_name = NULL;
-    uint8_t adv_name_len = 0;
-    switch (event) {
-        case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
-            //the unit of the duration is second
-            uint32_t duration = 2;
-            esp_ble_gap_start_scanning(duration);
-            break;
-        }
-        case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
-            //scan start complete event to indicate scan start successfully or failed
-            if (param->scan_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
-                ESP_LOGE(GATTC_TAG, "Scanning start failed, status %x", param->scan_start_cmpl.status);
-                break;
-            }
-            ESP_LOGI(GATTC_TAG, "Scanning start successfully");
-
-            break;
-        case ESP_GAP_BLE_SCAN_RESULT_EVT: {
-            esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
-            switch (scan_result->scan_rst.search_evt) {
-                case ESP_GAP_SEARCH_INQ_RES_EVT:
-                    adv_name = esp_ble_resolve_adv_data_by_type(scan_result->scan_rst.ble_adv,
-                                                                scan_result->scan_rst.adv_data_len + scan_result->scan_rst.scan_rsp_len,
-                                                                ESP_BLE_AD_TYPE_NAME_CMPL,
-                                                                &adv_name_len);
-                    ESP_LOGI(GATTC_TAG, "Scan result, device "ESP_BD_ADDR_STR", name len %u", ESP_BD_ADDR_HEX(scan_result->scan_rst.bda), adv_name_len);
-                    ESP_LOG_BUFFER_CHAR(GATTC_TAG, adv_name, adv_name_len);
-
-                    if (adv_name != NULL) {
-                        //if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {
-                        // Note: If there are multiple devices with the same device name, the device may connect to an unintended one.
-                        // It is recommended to change the default device name to ensure it is unique.
-                        ESP_LOGI(GATTC_TAG, "Device found %s", remote_device_name);
-                        /*
-                        if (connect == false) {
-                            connect = true;
-                            ESP_LOGI(GATTC_TAG, "Connect to the remote device");
-                            esp_ble_gap_stop_scanning();
-                            esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
-                            memcpy(&creat_conn_params.remote_bda, scan_result->scan_rst.bda, ESP_BD_ADDR_LEN);
-                            creat_conn_params.remote_addr_type = scan_result->scan_rst.ble_addr_type;
-                            creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
-                            creat_conn_params.is_direct = true;
-                            creat_conn_params.is_aux = false;
-                            creat_conn_params.phy_mask = 0x0;
-                            esp_ble_gattc_enh_open(client_profile.gattc_if,
-                                                   &creat_conn_params);
-                        }
-                        */
-                        //}
-                    }
-                    break;
-                case ESP_GAP_SEARCH_INQ_CMPL_EVT:
-                    break;
-                default:
-                    break;
-            }
-            break;
-        }
-
-        case ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT:
-            if (param->scan_stop_cmpl.status != ESP_BT_STATUS_SUCCESS){
-                ESP_LOGE(GATTC_TAG, "Scanning stop failed, status %x", param->scan_stop_cmpl.status);
-                break;
-            }
-            ESP_LOGI(GATTC_TAG, "Scanning stop successfully");
-            break;
-
-        case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
-            if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS){
-                ESP_LOGE(GATTC_TAG, "Advertising stop failed, status %x", param->adv_stop_cmpl.status);
-                break;
-            }
-            ESP_LOGI(GATTC_TAG, "Advertising stop successfully");
-            break;
-        case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
-            ESP_LOGI(GATTC_TAG, "Connection params update, status %d, conn_int %d, latency %d, timeout %d",
-                     param->update_conn_params.status,
-                     param->update_conn_params.conn_int,
-                     param->update_conn_params.latency,
-                     param->update_conn_params.timeout);
-            break;
-        case ESP_GAP_BLE_SET_PKT_LENGTH_COMPLETE_EVT:
-            ESP_LOGI(GATTC_TAG, "Packet length update, status %d, rx %d, tx %d",
-                     param->pkt_data_length_cmpl.status,
-                     param->pkt_data_length_cmpl.params.rx_len,
-                     param->pkt_data_length_cmpl.params.tx_len);
-            break;
-        default:
-            break;
-    }
-}
-
 static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t *param)
 {
     /* If event is register event, store the gattc_if for each profile */
@@ -776,9 +744,10 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t message_handler) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t message_handler, scan_handler_t scan_handler) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
     _message_handler = message_handler;
+    _scan_handler = scan_handler;
     
     esp_err_t ret;
 
