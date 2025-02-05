@@ -744,10 +744,10 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t message_handler, scan_handler_t scan_handler) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t message_handler) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
     _message_handler = message_handler;
-    _scan_handler = scan_handler;
+    //_scan_handler = scan_handler;
     
     esp_err_t ret;
 

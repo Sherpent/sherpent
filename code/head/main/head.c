@@ -8,7 +8,7 @@
 
 #include "sdkconfig.h"
 
-void parse_received_message(struct Message *message) {
+void parse_received_message(struct Message *message, enum Target from) {
     switch (message->msg_id) {
         case LOG: {
             struct Log *log = (struct Log*) message;
@@ -24,5 +24,6 @@ void parse_received_message(struct Message *message) {
 // send_message_backward
 
 void app_main(void) {
-    ble_main("SHERPANT_MODULE", parse_received_message);
+    char name[ESP_BLE_ADV_NAME_LEN_MAX] = "SHERPANT_MODULE";
+    ble_main(name, parse_received_message);
 }
