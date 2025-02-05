@@ -7142,12 +7142,6 @@
 		(uuid "2bb36427-a2c2-4014-b48d-2fad02194c56")
 	)
 	(junction
-		(at 469.9 105.41)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "2c8dc2ce-4581-4ada-aa60-c25857034764")
-	)
-	(junction
 		(at 156.21 69.85)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -7236,12 +7230,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "5d918ac3-8401-4293-abd8-47ca1bcf0829")
-	)
-	(junction
-		(at 467.36 102.87)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "5f56786c-0948-483d-821b-9724a0954669")
 	)
 	(junction
 		(at 511.81 298.45)
@@ -8719,7 +8707,7 @@
 	)
 	(wire
 		(pts
-			(xy 467.36 102.87) (xy 474.98 102.87)
+			(xy 420.37 102.87) (xy 474.98 102.87)
 		)
 		(stroke
 			(width 0)
@@ -8746,16 +8734,6 @@
 			(type default)
 		)
 		(uuid "4ea4966b-616a-4b4b-bb5f-fc3f5e5d13c5")
-	)
-	(wire
-		(pts
-			(xy 420.37 102.87) (xy 467.36 102.87)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4f8903ec-b287-41e2-9fa3-63f223521e2c")
 	)
 	(wire
 		(pts
@@ -9599,16 +9577,6 @@
 	)
 	(wire
 		(pts
-			(xy 420.37 105.41) (xy 469.9 105.41)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9803a997-8086-4eb7-bdff-5c1a9ea6c1de")
-	)
-	(wire
-		(pts
 			(xy 95.25 344.17) (xy 95.25 346.71)
 		)
 		(stroke
@@ -10089,7 +10057,7 @@
 	)
 	(wire
 		(pts
-			(xy 469.9 105.41) (xy 492.76 105.41)
+			(xy 420.37 105.41) (xy 492.76 105.41)
 		)
 		(stroke
 			(width 0)
@@ -11102,7 +11070,7 @@
 		)
 		(uuid "5971bf82-bcee-4203-b5c3-21b65bd334ba")
 	)
-	(label "VBATT"
+	(label "VBAT_LOAD"
 		(at 187.96 262.89 180)
 		(fields_autoplaced yes)
 		(effects
@@ -16693,72 +16661,6 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "R15")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 467.36 102.87 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "49f99508-154e-445e-9a1b-fc3436eac3ac")
-		(property "Reference" "TP3"
-			(at 467.868 98.298 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "USB_P"
-			(at 462.915 104.775 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.54mm_Drill1.5mm_Beaded"
-			(at 472.44 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 472.44 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 467.36 102.87 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "165a1d4e-2c4b-4a05-ab19-93455deb6ea2")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "TP3")
 					(unit 1)
 				)
 			)
@@ -25440,72 +25342,6 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "J3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Connector:TestPoint")
-		(at 469.9 105.41 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "c306c4e0-21db-4095-84da-c1435b9beb40")
-		(property "Reference" "TP5"
-			(at 470.408 100.584 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "USB_N"
-			(at 465.455 107.315 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "TestPoint:TestPoint_Loop_D2.54mm_Drill1.5mm_Beaded"
-			(at 474.98 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 474.98 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 469.9 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1870682e-eefc-49aa-bddd-dcc9df40fad9")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "TP5")
 					(unit 1)
 				)
 			)
