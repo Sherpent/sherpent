@@ -20,6 +20,9 @@ void parse_received_message(struct Message *message) {
     }
 }
 
+// send_message_forward
+// send_message_backward
+
 void app_main(void) {
     ble_main("SHERPANT_MODULE", parse_received_message);
 }
