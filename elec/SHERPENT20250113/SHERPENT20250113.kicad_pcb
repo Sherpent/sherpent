@@ -2315,7 +2315,7 @@
 		(descr "LED SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: http://www.tortai-tech.com/upload/download/2011102023233369053.pdf), generated with kicad-footprint-generator")
 		(tags "LED handsolder")
 		(property "Reference" "D3"
-			(at 0 -1.43 90)
+			(at 2.706945 0.964455 180)
 			(layer "F.SilkS")
 			(uuid "457881eb-6ee9-4cd4-9015-d55756b916ad")
 			(effects
@@ -2987,7 +2987,7 @@
 		(descr "Capacitor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor handsolder")
 		(property "Reference" "C4"
-			(at 0 -1.43 90)
+			(at 1.7512 1.900455 180)
 			(layer "F.SilkS")
 			(uuid "d5ed370e-6a6f-4923-8787-aeaff636c35d")
 			(effects
@@ -3840,7 +3840,7 @@
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R2"
-			(at 0.641545 1.4732 0)
+			(at -2.2508 0.2748 0)
 			(layer "F.SilkS")
 			(uuid "def55810-7cc6-4975-aecf-70d9bf4467b4")
 			(effects
@@ -4703,7 +4703,7 @@
 		(descr "wire loop with bead as test point, loop diameter2.548mm, hole diameter 1.5mm")
 		(tags "test point wire loop bead")
 		(property "Reference" "TP1"
-			(at 0.7 2.5 0)
+			(at 3.6728 -2.4676 0)
 			(layer "F.SilkS")
 			(uuid "49657375-2fa4-4d38-8465-95f7b081a134")
 			(effects
@@ -8574,7 +8574,7 @@
 		(descr "Resistor SMD 0603 (1608 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
 		(property "Reference" "R14"
-			(at 0 -1.43 90)
+			(at 2.2486 0.3298 180)
 			(layer "F.SilkS")
 			(uuid "03c628da-17ad-4d4c-83b4-84a0ef1ebd99")
 			(effects
@@ -15621,7 +15621,7 @@
 		(descr "Through hole straight pin header, 1x02, 2.54mm pitch, single row")
 		(tags "Through hole pin header THT 1x02 2.54mm single row")
 		(property "Reference" "BT1"
-			(at 2.746055 -1.087345 0)
+			(at 2.346055 -2.287345 0)
 			(layer "F.SilkS")
 			(uuid "82f706c7-2b28-4ea8-b776-5f47791436f4")
 			(effects
@@ -24558,7 +24558,7 @@
 		(descr "SOT, 3 Pin (JEDEC TO-236 Var AB https://www.jedec.org/document_search?search_api_views_fulltext=TO-236), generated with kicad-footprint-generator ipc_gullwing_generator.py")
 		(tags "SOT TO_SOT_SMD")
 		(property "Reference" "Q2"
-			(at 0 -2.4 90)
+			(at 1.553645 -1.6152 180)
 			(layer "F.SilkS")
 			(uuid "4880d7e9-0445-429e-9f73-4ea8872c15cb")
 			(effects
@@ -28043,7 +28043,7 @@
 		(uuid "e90e88be-60d6-49c4-a8ea-d6456155f3c4")
 		(at 158.775345 88.462945)
 		(property "Reference" "U1"
-			(at 0.45745 -2.92254 0)
+			(at -0.375345 -0.462945 0)
 			(layer "F.SilkS")
 			(uuid "01040795-8255-43af-991e-26b678758550")
 			(effects
