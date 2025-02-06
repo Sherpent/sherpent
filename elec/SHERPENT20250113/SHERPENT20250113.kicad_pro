@@ -627,7 +627,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "GERBER/02/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "SHERPENT20250113_4.step",
