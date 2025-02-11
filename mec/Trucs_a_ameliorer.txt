@@ -1,0 +1,4 @@
+- Mettre une clanche pour le cover de la batterie
+- Rétrécir les trous de M3 - Done
+- Voir truc cover où le servo - Done
+- Voir tolérance link
