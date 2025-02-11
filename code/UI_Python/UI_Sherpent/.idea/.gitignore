@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$PYTHONUPGRADE*
+
+# Virtual environment
+venv/
+env/
+*.venv
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Pytest cache
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+
+# IDE and editor-specific files
+.vscode/
+.idea/
+*.iml
+
+# Temporary files
+*.swp
+*.swo
+.DS_Store
+
+# XML files
+*.xml
