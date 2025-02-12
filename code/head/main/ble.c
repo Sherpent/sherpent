@@ -1,3 +1,4 @@
+#include "head.h"
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
@@ -29,9 +30,6 @@ static const uint16_t CHANNEL_CHARACTERISTIC_UUID = 0xFF01;
 static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 
 #define APP_ID 0x55
-#define NUM_HANDLES 4
-
-#define MAX_CHAR_VAL_LEN 0x40
 
 #define ADV_CONFIG_FLAG (1 << 0)
 #define SCAN_RSP_CONFIG_FLAG (1 << 1)
@@ -39,33 +37,21 @@ static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 #define GATTC_TAG "GATTC_DEMO"
 #define REMOTE_SERVICE_UUID        0x00FE
 #define REMOTE_NOTIFY_CHAR_UUID    0xFE01
-#define PROFILE_A_APP_ID 2
 #define INVALID_HANDLE   0
-#define SVC_INST_ID                 0
+#define SVC_INST_ID      0
 
 #define CHAR_VAL_LEN_MAX 500
 #define CHAR_DECLARATION_SIZE       (sizeof(uint8_t))
-
-/* ============================== TYPE DEFINITIONS =============================== */
-struct ble_scan_result_t {
-    char name[32];          // Human-readable name
-    uint8_t mac[6];         // MAC address
-    int rssi;               // Signal strength
-    uint8_t adv_type;       // Advertisement type
-    uint8_t phy_primary;    // Primary PHY
-    uint8_t phy_secondary;  // Secondary PHY
-    uint16_t appearance;    // Device appearance (if present)
-    uint16_t service_uuid;  // First service UUID (if present)
-};
-
-typedef void (*message_handler_t)(struct Message*, enum Target from);
-typedef void (*scan_handler_t)(struct ble_scan_result_evt_param result);
-typedef void (*message_provider_t)(struct Message*, enum Target to);
 
 
 /* ============================== PRIVATE VARIABLES ============================== */
 static message_handler_t message_handler = NULL;
 static scan_handler_t _scan_handler = NULL;
+static closure_t _on_scan_start = NULL;
+static closure_t _on_scan_stop = NULL;
+static closure_t _on_advertise_start = NULL;
+static closure_t _on_advertise_stop = NULL;
+
 static char _device_name[ESP_BLE_ADV_NAME_LEN_MAX];
 
 static uint8_t adv_config_done = 0;
@@ -221,31 +207,26 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
 
         case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
             adv_config_done &= (~ADV_CONFIG_FLAG);
-            if (adv_config_done == 0) {
-                esp_ble_gap_start_advertising(&advertisement_params);
-            }
+            start_advertising();
             break;
         case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
             adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
-            if (adv_config_done == 0) {
-                esp_ble_gap_start_advertising(&advertisement_params);
-            }
+            start_advertising();
             break;
         case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
             /* advertising start complete event to indicate advertising start successfully or failed */
             if (param->adv_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
                 ESP_LOGE(TAG, "advertising start failed");
-            }else{
-                ESP_LOGI(TAG, "advertising start successfully");
+                break;
             }
+            if (_on_advertise_start != NULL) _on_advertise_start();
             break;
         case ESP_GAP_BLE_ADV_STOP_COMPLETE_EVT:
             if (param->adv_stop_cmpl.status != ESP_BT_STATUS_SUCCESS) {
+                break;
                 ESP_LOGE(TAG, "Advertising stop failed");
             }
-            else {
-                ESP_LOGI(TAG, "Stop adv successfully");
-            }
+            if (_on_advertise_stop != NULL) _on_advertise_stop();
             break;
         case ESP_GAP_BLE_UPDATE_CONN_PARAMS_EVT:
             ESP_LOGI(TAG, "update connection params status = %d, conn_int = %d, latency = %d, timeout = %d",
@@ -259,7 +240,7 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
                 ESP_LOGE(TAG, "scan stop failed, error status = %x", param->scan_stop_cmpl.status);
                 break;
             }
-            ESP_LOGI(TAG, "ESP_GAP_BLE_SCAN_STOP_COMPLETE_EVT, stop scan successfully");
+            if (_on_scan_stop != NULL) _on_scan_stop();
             break;
         case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
             ESP_LOGI(TAG, "ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT, set scan sparameters complete");
@@ -273,23 +254,12 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
                 ESP_LOGE(TAG, "scan start failed, error status = %x", param->scan_start_cmpl.status);
                 break;
             }
-            ESP_LOGI(TAG, "ESP_GAP_BLE_SCAN_START_COMPLETE_EVT, scan start success");
+            if (_on_scan_start != NULL) _on_scan_start();
             break;
         case ESP_GAP_BLE_SCAN_RESULT_EVT: {
             esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
             struct ble_scan_result_evt_param scan = param->scan_rst;
             if (scan.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {  // Device found
-                struct ble_scan_result_t result = {0};  // Initialize struct
-
-                //memcpy(result.mac, scan.bda, 6); // Copy MAC address
-                //result.rssi = scan.rssi;
-                //result.adv_type = scan.adv_type;
-                //result.phy_primary = scan.primary_phy;
-                //result.phy_secondary = scan.secondary_phy;
-
-                // Parse advertising data
-                //parse_advertising_data(scan.ble_adv, scan.adv_data_len, &result);
-
                 adv_name = esp_ble_resolve_adv_data_by_type(scan_result->scan_rst.ble_adv,
                                                             scan_result->scan_rst.adv_data_len +
                                                             scan_result->scan_rst.scan_rsp_len,
@@ -412,10 +382,6 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
             //start sent the update connection parameters to the peer device.
             esp_ble_gap_update_conn_params(&conn_params);
             break;
-        case ESP_GATTS_DISCONNECT_EVT:
-            ESP_LOGI(TAG, "ESP_GATTS_DISCONNECT_EVT, reason = 0x%x", param->disconnect.reason);
-            esp_ble_gap_start_advertising(&advertisement_params);
-            break;
         case ESP_GATTS_CREAT_ATTR_TAB_EVT:{
             if (param->add_attr_tab.status != ESP_GATT_OK){
                 ESP_LOGE(TAG, "create attribute table failed, error code=0x%x", param->add_attr_tab.status);
@@ -427,6 +393,7 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
             }
             break;
         }
+        case ESP_GATTS_DISCONNECT_EVT:
         case ESP_GATTS_STOP_EVT:
         case ESP_GATTS_OPEN_EVT:
         case ESP_GATTS_CANCEL_OPEN_EVT:
@@ -696,10 +663,14 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
     message_handler = on_message;
-    //_scan_handler = scan_handler;
+
+    _on_scan_start = on_scan_start;
+    _on_scan_stop = on_scan_stop;
+    _on_advertise_start = on_advertise_start;
+    _on_advertise_stop = on_advertise_stop;
 
     esp_err_t ret;
 
@@ -772,4 +743,28 @@ void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_m
     if (local_mtu_ret) {
         ESP_LOGE(TAG, "set local  MTU failed, error code = %x", local_mtu_ret);
     }
+}
+
+bool is_advertisement_ready() {
+    return adv_config_done == 0;
+}
+
+bool start_advertising() {
+    if (!is_advertisement_ready()) return false;
+
+    return esp_ble_gap_start_advertising(&advertisement_params) == ESP_OK;
+}
+
+bool stop_advertising() {
+    if (!is_advertisement_ready()) return false;
+
+    return esp_ble_gap_stop_advertising() == ESP_OK;
+}
+
+bool start_scanning(uint32_t duration) {
+    return esp_ble_gap_start_scanning(duration) == ESP_OK;
+}
+
+bool stop_scanning() {
+    return esp_ble_gap_stop_advertising() == ESP_OK;
 }
