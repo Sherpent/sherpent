@@ -61,4 +61,11 @@ bool start_scanning(uint32_t duration);
  */
 bool stop_scanning();
 
+/**
+ * Connect a Public address type BLE server device
+ * @param duration address of the device to connect to
+ * @return True if successful and False is unsuccessful
+ */
+bool connect_device(esp_bd_addr_t address);
+
 #endif //SEGMENT_BLE_H

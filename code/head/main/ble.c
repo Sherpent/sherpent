@@ -305,22 +305,6 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
     }
 }
 
-static void connect_device(esp_bd_addr_t address) {
-    esp_ble_conn_update_params_t conn_params = {0};
-    memcpy(conn_params.bda, address, sizeof(esp_bd_addr_t));
-    /* For the IOS system, please reference the apple official documents about the ble connection parameters restrictions. */
-    conn_params.latency = 0;
-    conn_params.max_int = 0x20;    // max_int = 0x20*1.25ms = 40ms
-    conn_params.min_int = 0x10;    // min_int = 0x10*1.25ms = 20ms
-    conn_params.timeout = 400;    // timeout = 400*10ms = 4000ms
-
-    //connection_params.remote_bda.con
-
-    //server_profile.conn_id = connection_params.conn_id;
-
-    esp_ble_gap_update_conn_params(&conn_params);
-}
-
 static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_interface, esp_ble_gatts_cb_param_t *param) {
     switch (event) {
         case ESP_GATTS_REG_EVT:{
@@ -782,4 +766,15 @@ bool start_scanning(uint32_t duration) {
 
 bool stop_scanning() {
     return esp_ble_gap_stop_advertising() == ESP_OK;
+}
+
+bool connect_device(esp_bd_addr_t address) {
+    esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
+    memcpy(&creat_conn_params.remote_bda, address, ESP_BD_ADDR_LEN);
+    creat_conn_params.remote_addr_type = BLE_ADDR_TYPE_PUBLIC; // !TODO Actually handle the address type (Assuming public for our modules) but might be wrong if we expand to other devices
+    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
+    creat_conn_params.is_direct = true;
+    creat_conn_params.is_aux = false;
+    creat_conn_params.phy_mask = 0x0;
+    return esp_ble_gattc_enh_open(client_profile.gattc_if,&creat_conn_params) == ESP_OK;
 }
