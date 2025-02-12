@@ -51,6 +51,10 @@ static closure_t _on_scan_start = NULL;
 static closure_t _on_scan_stop = NULL;
 static closure_t _on_advertise_start = NULL;
 static closure_t _on_advertise_stop = NULL;
+static device_event_t _on_connection = NULL;
+static device_event_t _on_disconnection = NULL;
+static device_event_t _on_connect = NULL;
+static device_event_t _on_disconnect = NULL;
 
 static char _device_name[ESP_BLE_ADV_NAME_LEN_MAX];
 
@@ -372,6 +376,8 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
         case ESP_GATTS_CONNECT_EVT:
             ESP_LOGI(TAG, "ESP_GATTS_CONNECT_EVT, conn_id = %d", param->connect.conn_id);
             ESP_LOG_BUFFER_HEX(TAG, param->connect.remote_bda, 6);
+            if (_on_connection != NULL) _on_connection(param->connect.remote_bda);
+
             esp_ble_conn_update_params_t conn_params = {0};
             memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
             /* For the iOS system, please refer to Apple official documents about the BLE connection parameters restrictions. */
@@ -394,6 +400,7 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
             break;
         }
         case ESP_GATTS_DISCONNECT_EVT:
+            if (_on_disconnection != NULL) _on_disconnection(param->disconnect.remote_bda);
         case ESP_GATTS_STOP_EVT:
         case ESP_GATTS_OPEN_EVT:
         case ESP_GATTS_CANCEL_OPEN_EVT:
@@ -435,6 +442,9 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
         case ESP_GATTC_CONNECT_EVT:{
             ESP_LOGI(GATTC_TAG, "Connected, conn_id %d, remote "ESP_BD_ADDR_STR"", p_data->connect.conn_id,
                      ESP_BD_ADDR_HEX(p_data->connect.remote_bda));
+
+            if (_on_connect != NULL) _on_connect(param->connect.remote_bda);
+
             client_profile.conn_id = p_data->connect.conn_id;
             memcpy(client_profile.remote_bda, p_data->connect.remote_bda, sizeof(esp_bd_addr_t));
             esp_err_t mtu_ret = esp_ble_gattc_send_mtu_req (gattc_if, p_data->connect.conn_id);
@@ -638,6 +648,7 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
         case ESP_GATTC_DISCONNECT_EVT:
             connect = false;
             get_server = false;
+            if (_on_disconnect != NULL) _on_disconnect(param->disconnect.remote_bda);
             ESP_LOGI(GATTC_TAG, "Disconnected, remote "ESP_BD_ADDR_STR", reason 0x%02x",
                      ESP_BD_ADDR_HEX(p_data->disconnect.remote_bda), p_data->disconnect.reason);
             break;
@@ -663,7 +674,7 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop, device_event_t on_connection, device_event_t on_disconnection, device_event_t on_connect, device_event_t on_disconnect) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
     message_handler = on_message;
 
@@ -671,6 +682,10 @@ void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_m
     _on_scan_stop = on_scan_stop;
     _on_advertise_start = on_advertise_start;
     _on_advertise_stop = on_advertise_stop;
+    _on_connection = on_connection;
+    _on_disconnection = on_disconnection;
+    _on_connect = on_connect;
+    _on_disconnect = on_disconnect;
 
     esp_err_t ret;
 

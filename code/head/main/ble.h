@@ -27,6 +27,7 @@ enum
 typedef void (*message_handler_t)(struct Message*, enum Target from);
 typedef void (*scan_handler_t)(struct ble_scan_result_evt_param result);
 typedef void (*message_provider_t)(struct Message*, enum Target to);
+typedef void (*device_event_t)(esp_bd_addr_t address);
 typedef void (*closure_t)();
 
 /**
