@@ -24,6 +24,7 @@
 static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_interface, esp_ble_gatts_cb_param_t *param);
 static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
 
+static const uint16_t SERVICE_UUID = 0xFF00;
 static const uint16_t CHANNEL_CHARACTERISTIC_UUID = 0xFF01;
 static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 
@@ -68,7 +69,7 @@ static scan_handler_t _scan_handler = NULL;
 static char _device_name[ESP_BLE_ADV_NAME_LEN_MAX];
 
 static uint8_t adv_config_done = 0;
-static uint8_t service_uuid[32] = {
+static const uint8_t service_uuid[32] = {
     0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xEE, 0x00, 0x00, 0x00,
     0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00,
 };
@@ -189,7 +190,7 @@ static const esp_gatts_attr_db_t gatt_db[HRS_IDX_NB] =
         // Service Declaration
         [IDX_SVC]        =
                 {{ESP_GATT_AUTO_RSP}, {ESP_UUID_LEN_16, (uint8_t *)&primary_service_uuid, ESP_GATT_PERM_READ,
-                        sizeof(uint16_t), sizeof(service_uuid), (uint8_t *)&service_uuid}},
+                        sizeof(uint16_t), sizeof(SERVICE_UUID), (uint8_t *)&SERVICE_UUID}},
 
         /* Characteristic Declaration */
         [IDX_CHAR_CHANNEL]      =
