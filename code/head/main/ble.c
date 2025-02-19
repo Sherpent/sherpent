@@ -85,11 +85,11 @@ static esp_bt_uuid_t notify_descr_uuid = {
 };
 
 static esp_ble_scan_params_t ble_scan_params = {
-        .scan_type              = BLE_SCAN_TYPE_ACTIVE,
+        .scan_type              = BLE_SCAN_TYPE_PASSIVE,
         .own_addr_type          = BLE_ADDR_TYPE_PUBLIC,
         .scan_filter_policy     = BLE_SCAN_FILTER_ALLOW_ALL,
-        .scan_interval          = 0x50,
-        .scan_window            = 0x30,
+        .scan_interval          = 0x50,  // Adjust as needed
+        .scan_window            = 0x30,  // Must be <= scan_interval
         .scan_duplicate         = BLE_SCAN_DUPLICATE_DISABLE
 };
 
@@ -753,7 +753,7 @@ bool connect_device(esp_bd_addr_t address, esp_ble_addr_type_t address_type) {
     esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
     memcpy(&creat_conn_params.remote_bda, address, ESP_BD_ADDR_LEN);
     creat_conn_params.remote_addr_type = address_type;
-    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_RANDOM; // True for an ESP-32 but for a register product it could be different
+    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC; // True for an ESP-32 but for a register product it could be different
     creat_conn_params.is_direct = true;
     creat_conn_params.is_aux = false;
     creat_conn_params.phy_mask = 0x0;
