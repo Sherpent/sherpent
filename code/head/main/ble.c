@@ -13,7 +13,6 @@
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 #include "communication.h"
-#include "target.h"
 #include "utils.h"
 
 #include "sdkconfig.h"
@@ -45,7 +44,8 @@ static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 
 
 /* ============================== PRIVATE VARIABLES ============================== */
-static message_handler_t _on_message = NULL;
+static message_handler_t _on_message_from_server = NULL;
+static message_handler_t _on_message_from_client = NULL;
 static scan_handler_t _on_scan_result = NULL;
 static closure_t _on_scan_start = NULL;
 static closure_t _on_scan_stop = NULL;
@@ -318,7 +318,7 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
                 if (param->write.value[0] == param->write.len) {
                     struct Message *message = (struct Message *) malloc(param->write.value[0]);
                     memcpy(message, param->write.value, param->write.value[0]);
-                    if (_on_message != NULL) _on_message(message, FRONT);
+                    if (_on_message_from_client != NULL) _on_message_from_client(message);
                 } else {
                     ESP_LOGE(GATTC_TAG, "Mismatched reported message length and actual length");
                 }
@@ -579,7 +579,7 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
             if (p_data->notify.value[0] == p_data->notify.value_len) {
                 struct Message *message = (struct Message *) malloc(p_data->notify.value[0]);
                 memcpy(message, p_data->notify.value, p_data->notify.value[0]);
-                if (_on_message != NULL) _on_message(message, BACK);
+                if (_on_message_from_server != NULL) _on_message_from_server(message);
             } else {
                 ESP_LOGE(GATTC_TAG, "Mismatched reported message length and actual length");
             }
@@ -646,9 +646,10 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, scan_handler_t on_scan_result, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message_from_server, message_handler_t on_message_from_client, closure_t on_scan_start, closure_t on_scan_stop, scan_handler_t on_scan_result, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
-    _on_message = on_message;
+    _on_message_from_server = on_message_from_server;
+    _on_message_from_client = on_message_from_client;
 
     _on_scan_start = on_scan_start;
     _on_scan_stop = on_scan_stop;
