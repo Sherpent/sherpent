@@ -146,18 +146,41 @@
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_6">
-              <item>
-               <widget class="QLineEdit" name="commandsLine"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="sendBtn">
-                <property name="text">
-                 <string>Send</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QWidget" name="commandWidget" native="true">
+              <layout class="QVBoxLayout" name="commandWidgetVerticalLayout">
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="xPosLabel">
+                 <property name="text">
+                  <string>Position en X</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="xPosSpinBox">
+                 <property name="displayIntegerBase">
+                  <number>10</number>
+                 </property>
+                </widget>
+               </item>
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="yPosLabel">
+                 <property name="text">
+                  <string>Position en Y</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="yPosSpinBox"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="sendBtn">
+              <property name="text">
+               <string>Send</string>
+              </property>
+             </widget>
             </item>
             <item>
              <spacer name="verticalSpacer">

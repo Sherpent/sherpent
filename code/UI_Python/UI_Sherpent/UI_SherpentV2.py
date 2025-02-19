@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'UI_SherpentV1.ui'
+# Form implementation generated from reading ui file 'UI_SherpentV2.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -68,15 +68,27 @@ class Ui_MainWindow(object):
         self.label_2 = QtWidgets.QLabel(self.widget_2)
         self.label_2.setObjectName("label_2")
         self.verticalLayout_2.addWidget(self.label_2, 0, QtCore.Qt.AlignHCenter)
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        self.commandsLine = QtWidgets.QLineEdit(self.widget_2)
-        self.commandsLine.setObjectName("commandsLine")
-        self.horizontalLayout_6.addWidget(self.commandsLine)
+        self.commandWidget = QtWidgets.QWidget(self.widget_2)
+        self.commandWidget.setObjectName("commandWidget")
+        self.commandWidgetVerticalLayout = QtWidgets.QVBoxLayout(self.commandWidget)
+        self.commandWidgetVerticalLayout.setObjectName("commandWidgetVerticalLayout")
+        self.xPosLabel = QtWidgets.QLabel(self.commandWidget)
+        self.xPosLabel.setObjectName("xPosLabel")
+        self.commandWidgetVerticalLayout.addWidget(self.xPosLabel, 0, QtCore.Qt.AlignHCenter)
+        self.xPosSpinBox = QtWidgets.QSpinBox(self.commandWidget)
+        self.xPosSpinBox.setDisplayIntegerBase(10)
+        self.xPosSpinBox.setObjectName("xPosSpinBox")
+        self.commandWidgetVerticalLayout.addWidget(self.xPosSpinBox)
+        self.yPosLabel = QtWidgets.QLabel(self.commandWidget)
+        self.yPosLabel.setObjectName("yPosLabel")
+        self.commandWidgetVerticalLayout.addWidget(self.yPosLabel, 0, QtCore.Qt.AlignHCenter)
+        self.yPosSpinBox = QtWidgets.QSpinBox(self.commandWidget)
+        self.yPosSpinBox.setObjectName("yPosSpinBox")
+        self.commandWidgetVerticalLayout.addWidget(self.yPosSpinBox)
+        self.verticalLayout_2.addWidget(self.commandWidget)
         self.sendBtn = QtWidgets.QPushButton(self.widget_2)
         self.sendBtn.setObjectName("sendBtn")
-        self.horizontalLayout_6.addWidget(self.sendBtn)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
+        self.verticalLayout_2.addWidget(self.sendBtn)
         spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem3)
         self.horizontalLayout_2.addWidget(self.widget_2)
@@ -102,6 +114,8 @@ class Ui_MainWindow(object):
         self.stopBtn.setText(_translate("MainWindow", "Stop"))
         self.label.setText(_translate("MainWindow", "Nombre de module"))
         self.label_2.setText(_translate("MainWindow", "Commandes de positions"))
+        self.xPosLabel.setText(_translate("MainWindow", "Position en X"))
+        self.yPosLabel.setText(_translate("MainWindow", "Position en Y"))
         self.sendBtn.setText(_translate("MainWindow", "Send"))
 
 
