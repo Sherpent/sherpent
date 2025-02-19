@@ -51,10 +51,10 @@ static closure_t _on_scan_start = NULL;
 static closure_t _on_scan_stop = NULL;
 static closure_t _on_advertise_start = NULL;
 static closure_t _on_advertise_stop = NULL;
-static device_event_t _on_connection = NULL;
-static device_event_t _on_disconnection = NULL;
-static device_event_t _on_connect = NULL;
-static device_event_t _on_disconnect = NULL;
+static connect_event_t _on_connection = NULL;
+static disconnect_event_t _on_disconnection = NULL;
+static connect_event_t _on_connect = NULL;
+static disconnect_event_t _on_disconnect = NULL;
 
 static char _device_name[ESP_BLE_ADV_NAME_LEN_MAX];
 
@@ -360,7 +360,7 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
         case ESP_GATTS_CONNECT_EVT:
             ESP_LOGI(TAG, "ESP_GATTS_CONNECT_EVT, conn_id = %d", param->connect.conn_id);
             ESP_LOG_BUFFER_HEX(TAG, param->connect.remote_bda, 6);
-            if (_on_connection != NULL) _on_connection(param->connect.remote_bda);
+            if (_on_connection != NULL) _on_connection(param->connect.remote_bda, param->connect.ble_addr_type);
 
             esp_ble_conn_update_params_t conn_params = {0};
             memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
@@ -427,7 +427,7 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
             ESP_LOGI(GATTC_TAG, "Connected, conn_id %d, remote "ESP_BD_ADDR_STR"", p_data->connect.conn_id,
                      ESP_BD_ADDR_HEX(p_data->connect.remote_bda));
 
-            if (_on_connect != NULL) _on_connect(param->connect.remote_bda);
+            if (_on_connect != NULL) _on_connect(param->connect.remote_bda, param->connect.ble_addr_type);
 
             client_profile.conn_id = p_data->connect.conn_id;
             memcpy(client_profile.remote_bda, p_data->connect.remote_bda, sizeof(esp_bd_addr_t));
@@ -658,7 +658,7 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop, device_event_t on_connection, device_event_t on_disconnection, device_event_t on_connect, device_event_t on_disconnect) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
     message_handler = on_message;
 
@@ -768,11 +768,11 @@ bool stop_scanning() {
     return esp_ble_gap_stop_advertising() == ESP_OK;
 }
 
-bool connect_device(esp_bd_addr_t address) {
+bool connect_device(esp_bd_addr_t address, esp_ble_addr_type_t address_type) {
     esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
     memcpy(&creat_conn_params.remote_bda, address, ESP_BD_ADDR_LEN);
-    creat_conn_params.remote_addr_type = BLE_ADDR_TYPE_PUBLIC; // !TODO Actually handle the address type (Assuming public for our modules) but might be wrong if we expand to other devices
-    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
+    creat_conn_params.remote_addr_type = address_type;
+    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_RANDOM; // True for an ESP-32 but for a register product it could be different
     creat_conn_params.is_direct = true;
     creat_conn_params.is_aux = false;
     creat_conn_params.phy_mask = 0x0;
