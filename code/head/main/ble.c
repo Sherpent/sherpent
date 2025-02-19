@@ -45,7 +45,7 @@ static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 
 
 /* ============================== PRIVATE VARIABLES ============================== */
-static message_handler_t message_handler = NULL;
+static message_handler_t _on_message = NULL;
 static scan_handler_t _on_scan_result = NULL;
 static closure_t _on_scan_start = NULL;
 static closure_t _on_scan_stop = NULL;
@@ -315,12 +315,12 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
             break;
         case ESP_GATTS_WRITE_EVT:
             if (!param->write.is_prep){
-                // the data length of gattc write  must be less than GATTS_DEMO_CHAR_VAL_LEN_MAX.
-                ESP_LOGI(TAG, "GATT_WRITE_EVT, handle = %d, value len = %d, value :", param->write.handle, param->write.len);
-                ESP_LOG_BUFFER_HEX(TAG, param->write.value, param->write.len);
-                /* send response when param->write.need_rsp is true*/
-                if (param->write.need_rsp){
-                    esp_ble_gatts_send_response(gatts_interface, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
+                if (param->write.value[0] == param->write.len) {
+                    struct Message *message = (struct Message *) malloc(param->write.value[0]);
+                    memcpy(message, param->write.value, param->write.value[0]);
+                    if (_on_message != NULL) _on_message(message, FRONT);
+                } else {
+                    ESP_LOGE(GATTC_TAG, "Mismatched reported message length and actual length");
                 }
             }
             break;
@@ -572,10 +572,18 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
         case ESP_GATTC_NOTIFY_EVT:
             if (p_data->notify.is_notify){
                 ESP_LOGI(GATTC_TAG, "Notification received");
-            }else{
+            } else {
                 ESP_LOGI(GATTC_TAG, "Indication received");
             }
-            ESP_LOG_BUFFER_HEX(GATTC_TAG, p_data->notify.value, p_data->notify.value_len);
+
+            if (p_data->notify.value[0] == p_data->notify.value_len) {
+                struct Message *message = (struct Message *) malloc(p_data->notify.value[0]);
+                memcpy(message, p_data->notify.value, p_data->notify.value[0]);
+                if (_on_message != NULL) _on_message(message, BACK);
+            } else {
+                ESP_LOGE(GATTC_TAG, "Mismatched reported message length and actual length");
+            }
+
             break;
         case ESP_GATTC_WRITE_DESCR_EVT:
             if (p_data->write.status != ESP_GATT_OK){
@@ -640,7 +648,7 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
 
 void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, scan_handler_t on_scan_result, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
-    message_handler = on_message;
+    _on_message = on_message;
 
     _on_scan_start = on_scan_start;
     _on_scan_stop = on_scan_stop;
