@@ -13,7 +13,6 @@
 #include "esp_bt_main.h"
 #include "esp_gatt_common_api.h"
 #include "communication.h"
-#include "target.h"
 #include "utils.h"
 
 #include "sdkconfig.h"
@@ -45,16 +44,17 @@ static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 
 
 /* ============================== PRIVATE VARIABLES ============================== */
-static message_handler_t message_handler = NULL;
-static scan_handler_t _scan_handler = NULL;
+static message_handler_t _on_message_from_server = NULL;
+static message_handler_t _on_message_from_client = NULL;
+static scan_handler_t _on_scan_result = NULL;
 static closure_t _on_scan_start = NULL;
 static closure_t _on_scan_stop = NULL;
 static closure_t _on_advertise_start = NULL;
 static closure_t _on_advertise_stop = NULL;
-static device_event_t _on_connection = NULL;
-static device_event_t _on_disconnection = NULL;
-static device_event_t _on_connect = NULL;
-static device_event_t _on_disconnect = NULL;
+static connect_event_t _on_connection = NULL;
+static disconnect_event_t _on_disconnection = NULL;
+static connect_event_t _on_connect = NULL;
+static disconnect_event_t _on_disconnect = NULL;
 
 static char _device_name[ESP_BLE_ADV_NAME_LEN_MAX];
 
@@ -94,7 +94,7 @@ static esp_ble_scan_params_t ble_scan_params = {
 };
 
 struct gattc_profile_inst {
-    uint16_t gattc_if;
+    uint16_t gattc_interface;
     uint16_t app_id;
     uint16_t conn_id;
     uint16_t service_start_handle;
@@ -103,9 +103,9 @@ struct gattc_profile_inst {
     esp_bd_addr_t remote_bda;
 };
 
-/* One gatt-based profile one app_id and one gattc_if, this array will store the gattc_if returned by ESP_GATTS_REG_EVT */
+/* One gatt-based profile one app_id and one gattc_interface, this array will store the gattc_interface returned by ESP_GATTS_REG_EVT */
 static struct gattc_profile_inst client_profile = {
-        .gattc_if = ESP_GATT_IF_NONE,       /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
+        .gattc_interface = ESP_GATT_IF_NONE,       /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
 };
 
 static esp_ble_adv_data_t advertisement_data = {
@@ -264,39 +264,19 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
             esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
             struct ble_scan_result_evt_param scan = param->scan_rst;
             if (scan.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {  // Device found
+
                 adv_name = esp_ble_resolve_adv_data_by_type(scan_result->scan_rst.ble_adv,
                                                             scan_result->scan_rst.adv_data_len +
                                                             scan_result->scan_rst.scan_rsp_len,
                                                             ESP_BLE_AD_TYPE_NAME_CMPL,
                                                             &adv_name_len);
 
-                /*
                 if (adv_name != NULL) {
-                    if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {
-                        if (connect == false) {
-                            connect = true;
-                            ESP_LOGI(TAG, "connect to the remote device %s", remote_device_name);
-                            esp_ble_gap_stop_scanning();
+                    char *device_name = malloc(adv_name_len);
+                    memcpy(device_name, adv_name, adv_name_len);
 
-                            // Initiate GATT connection with the remote device,
-                            // If ble physical connection is set up, ESP_GATTS_CONNECT_EVT and ESP_GATTC_CONNECT_EVT event will come
-                            esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
-                            memcpy(&creat_conn_params.remote_bda, scan_result->scan_rst.bda, ESP_BD_ADDR_LEN);
-                            creat_conn_params.remote_addr_type = scan_result->scan_rst.ble_addr_type;
-                            creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
-                            creat_conn_params.is_direct = true;
-                            creat_conn_params.is_aux = false;
-                            creat_conn_params.phy_mask = 0x0;
-                            esp_ble_gattc_enh_open(client_profile.gattc_if,
-                                                   &creat_conn_params);
-
-                            // Update peer gatt server address
-                            //memcpy(peer_gatts_addr, scan_result->scan_rst.bda, sizeof(esp_bd_addr_t));
-                            //ESP_LOG_BUFFER_HEX("the remote device addr", peer_gatts_addr, sizeof(esp_bd_addr_t));
-                        }
-                    }
+                    if (_on_scan_result != NULL) _on_scan_result(device_name, adv_name_len, scan_result->scan_rst.bda, scan_result->scan_rst.ble_addr_type);
                 }
-                */
             }
             break;
         }
@@ -335,12 +315,12 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
             break;
         case ESP_GATTS_WRITE_EVT:
             if (!param->write.is_prep){
-                // the data length of gattc write  must be less than GATTS_DEMO_CHAR_VAL_LEN_MAX.
-                ESP_LOGI(TAG, "GATT_WRITE_EVT, handle = %d, value len = %d, value :", param->write.handle, param->write.len);
-                ESP_LOG_BUFFER_HEX(TAG, param->write.value, param->write.len);
-                /* send response when param->write.need_rsp is true*/
-                if (param->write.need_rsp){
-                    esp_ble_gatts_send_response(gatts_interface, param->write.conn_id, param->write.trans_id, ESP_GATT_OK, NULL);
+                if (param->write.value[0] == param->write.len) {
+                    struct Message *message = (struct Message *) malloc(param->write.value[0]);
+                    memcpy(message, param->write.value, param->write.value[0]);
+                    if (_on_message_from_client != NULL) _on_message_from_client(message);
+                } else {
+                    ESP_LOGE(GATTC_TAG, "Mismatched reported message length and actual length");
                 }
             }
             break;
@@ -360,7 +340,7 @@ static void server_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts
         case ESP_GATTS_CONNECT_EVT:
             ESP_LOGI(TAG, "ESP_GATTS_CONNECT_EVT, conn_id = %d", param->connect.conn_id);
             ESP_LOG_BUFFER_HEX(TAG, param->connect.remote_bda, 6);
-            if (_on_connection != NULL) _on_connection(param->connect.remote_bda);
+            if (_on_connection != NULL) _on_connection(param->connect.remote_bda, param->connect.ble_addr_type, param->connect.conn_id);
 
             esp_ble_conn_update_params_t conn_params = {0};
             memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
@@ -417,7 +397,7 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
 
     switch (event) {
         case ESP_GATTC_REG_EVT:
-            ESP_LOGI(GATTC_TAG, "GATT client register, status %d, app_id %d, gattc_if %d", param->reg.status, param->reg.app_id, gattc_if);
+            ESP_LOGI(GATTC_TAG, "GATT client register, status %d, app_id %d, gattc_interface %d", param->reg.status, param->reg.app_id, gattc_if);
             esp_err_t scan_ret = esp_ble_gap_set_scan_params(&ble_scan_params);
             if (scan_ret){
                 ESP_LOGE(GATTC_TAG, "set scan params error, error code = %x", scan_ret);
@@ -427,7 +407,7 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
             ESP_LOGI(GATTC_TAG, "Connected, conn_id %d, remote "ESP_BD_ADDR_STR"", p_data->connect.conn_id,
                      ESP_BD_ADDR_HEX(p_data->connect.remote_bda));
 
-            if (_on_connect != NULL) _on_connect(param->connect.remote_bda);
+            if (_on_connect != NULL) _on_connect(param->connect.remote_bda, param->connect.ble_addr_type, param->connect.conn_id);
 
             client_profile.conn_id = p_data->connect.conn_id;
             memcpy(client_profile.remote_bda, p_data->connect.remote_bda, sizeof(esp_bd_addr_t));
@@ -592,10 +572,18 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
         case ESP_GATTC_NOTIFY_EVT:
             if (p_data->notify.is_notify){
                 ESP_LOGI(GATTC_TAG, "Notification received");
-            }else{
+            } else {
                 ESP_LOGI(GATTC_TAG, "Indication received");
             }
-            ESP_LOG_BUFFER_HEX(GATTC_TAG, p_data->notify.value, p_data->notify.value_len);
+
+            if (p_data->notify.value[0] == p_data->notify.value_len) {
+                struct Message *message = (struct Message *) malloc(p_data->notify.value[0]);
+                memcpy(message, p_data->notify.value, p_data->notify.value[0]);
+                if (_on_message_from_server != NULL) _on_message_from_server(message);
+            } else {
+                ESP_LOGE(GATTC_TAG, "Mismatched reported message length and actual length");
+            }
+
             break;
         case ESP_GATTC_WRITE_DESCR_EVT:
             if (p_data->write.status != ESP_GATT_OK){
@@ -643,10 +631,10 @@ static void client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc
 
 static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t *param)
 {
-    /* If event is register event, store the gattc_if for each profile */
+    /* If event is register event, store the gattc_interface for each profile */
     if (event == ESP_GATTC_REG_EVT) {
         if (param->reg.status == ESP_GATT_OK) {
-            client_profile.gattc_if = gattc_if;
+            client_profile.gattc_interface = gattc_if;
         } else {
             ESP_LOGI(GATTC_TAG, "reg app failed, app_id %04x, status %d",
                      param->reg.app_id,
@@ -658,12 +646,14 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop, device_event_t on_connection, device_event_t on_disconnection, device_event_t on_connect, device_event_t on_disconnect) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message_from_server, message_handler_t on_message_from_client, closure_t on_scan_start, closure_t on_scan_stop, scan_handler_t on_scan_result, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
-    message_handler = on_message;
+    _on_message_from_server = on_message_from_server;
+    _on_message_from_client = on_message_from_client;
 
     _on_scan_start = on_scan_start;
     _on_scan_stop = on_scan_stop;
+    _on_scan_result = on_scan_result;
     _on_advertise_start = on_advertise_start;
     _on_advertise_stop = on_advertise_stop;
     _on_connection = on_connection;
@@ -768,13 +758,21 @@ bool stop_scanning() {
     return esp_ble_gap_stop_advertising() == ESP_OK;
 }
 
-bool connect_device(esp_bd_addr_t address) {
+bool connect_device(esp_bd_addr_t address, esp_ble_addr_type_t address_type) {
     esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
     memcpy(&creat_conn_params.remote_bda, address, ESP_BD_ADDR_LEN);
-    creat_conn_params.remote_addr_type = BLE_ADDR_TYPE_PUBLIC; // !TODO Actually handle the address type (Assuming public for our modules) but might be wrong if we expand to other devices
-    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
+    creat_conn_params.remote_addr_type = address_type;
+    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_RANDOM; // True for an ESP-32 but for a register product it could be different
     creat_conn_params.is_direct = true;
     creat_conn_params.is_aux = false;
     creat_conn_params.phy_mask = 0x0;
-    return esp_ble_gattc_enh_open(client_profile.gattc_if,&creat_conn_params) == ESP_OK;
+    return esp_ble_gattc_enh_open(client_profile.gattc_interface, &creat_conn_params) == ESP_OK;
+}
+
+bool disconnect_device(uint16_t connection_id) {
+    return esp_ble_gattc_close(client_profile.gattc_interface, connection_id) == ESP_OK;
+}
+
+bool disconnect_remote_device(uint16_t connection_id) {
+    return esp_ble_gatts_close(server_profile.gatts_interface, connection_id) == ESP_OK;
 }

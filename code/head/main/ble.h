@@ -24,10 +24,11 @@ enum
 };
 
 /* ============================== TYPE DEFINITIONS =============================== */
-typedef void (*message_handler_t)(struct Message*, enum Target from);
-typedef void (*scan_handler_t)(struct ble_scan_result_evt_param result);
+typedef void (*message_handler_t)(struct Message*);
+typedef void (*scan_handler_t)(char *name, uint8_t name_length, esp_bd_addr_t address, esp_ble_addr_type_t address_type);
 typedef void (*message_provider_t)(struct Message*, enum Target to);
-typedef void (*device_event_t)(esp_bd_addr_t address);
+typedef void (*connect_event_t)(esp_bd_addr_t address, esp_ble_addr_type_t address_type, uint16_t connection_id);
+typedef void (*disconnect_event_t)(esp_bd_addr_t address);
 typedef void (*closure_t)();
 
 /**
@@ -63,9 +64,24 @@ bool stop_scanning();
 
 /**
  * Connect a Public address type BLE server device
- * @param duration address of the device to connect to
+ * @param address address of the device to connect to
+ * @param address_type type of the address either BLE_ADDR_TYPE_RANDOM or BLE_ADDR_TYPE_PUBLIC (comes with a fee)
  * @return True if successful and False is unsuccessful
  */
-bool connect_device(esp_bd_addr_t address);
+bool connect_device(esp_bd_addr_t address, esp_ble_addr_type_t address_type);
+
+/**
+ * Disconnect a from a device
+ * @param connection_id The server's connection id assigned by the client
+ * @return True if successful and False is unsuccessful
+ */
+bool disconnect_device(uint16_t connection_id);
+
+/**
+ * Disconnect a remote device
+ * @param connection_id The connection id assigned by the BLE server
+ * @return True if successful and False is unsuccessful
+ */
+bool disconnect_remote_device(uint16_t connection_id);
 
 #endif //SEGMENT_BLE_H
