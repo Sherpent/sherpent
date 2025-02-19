@@ -85,11 +85,11 @@ static esp_bt_uuid_t notify_descr_uuid = {
 };
 
 static esp_ble_scan_params_t ble_scan_params = {
-        .scan_type              = BLE_SCAN_TYPE_ACTIVE,
+        .scan_type              = BLE_SCAN_TYPE_PASSIVE,
         .own_addr_type          = BLE_ADDR_TYPE_PUBLIC,
         .scan_filter_policy     = BLE_SCAN_FILTER_ALLOW_ALL,
-        .scan_interval          = 0x50,
-        .scan_window            = 0x30,
+        .scan_interval          = 0x50,  // Adjust as needed
+        .scan_window            = 0x30,  // Must be <= scan_interval
         .scan_duplicate         = BLE_SCAN_DUPLICATE_DISABLE
 };
 
@@ -211,11 +211,9 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
 
         case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
             adv_config_done &= (~ADV_CONFIG_FLAG);
-            start_advertising();
             break;
         case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
             adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
-            start_advertising();
             break;
         case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
             /* advertising start complete event to indicate advertising start successfully or failed */
@@ -246,13 +244,6 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
             }
             if (_on_scan_stop != NULL) _on_scan_stop();
             break;
-        case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
-            ESP_LOGI(TAG, "ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT, set scan sparameters complete");
-            //the unit of the duration is second
-            uint32_t duration = 120;
-            esp_ble_gap_start_scanning(duration);
-            break;
-        }
         case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
             if (param->scan_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
                 ESP_LOGE(TAG, "scan start failed, error status = %x", param->scan_start_cmpl.status);
@@ -762,7 +753,7 @@ bool connect_device(esp_bd_addr_t address, esp_ble_addr_type_t address_type) {
     esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
     memcpy(&creat_conn_params.remote_bda, address, ESP_BD_ADDR_LEN);
     creat_conn_params.remote_addr_type = address_type;
-    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_RANDOM; // True for an ESP-32 but for a register product it could be different
+    creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC; // True for an ESP-32 but for a register product it could be different
     creat_conn_params.is_direct = true;
     creat_conn_params.is_aux = false;
     creat_conn_params.phy_mask = 0x0;
