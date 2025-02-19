@@ -46,7 +46,7 @@ static const uint16_t ID_CHARACTERISTIC_UUID = 0xFF02;
 
 /* ============================== PRIVATE VARIABLES ============================== */
 static message_handler_t message_handler = NULL;
-static scan_handler_t _scan_handler = NULL;
+static scan_handler_t _on_scan_result = NULL;
 static closure_t _on_scan_start = NULL;
 static closure_t _on_scan_stop = NULL;
 static closure_t _on_advertise_start = NULL;
@@ -264,39 +264,19 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
             esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
             struct ble_scan_result_evt_param scan = param->scan_rst;
             if (scan.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT) {  // Device found
+
                 adv_name = esp_ble_resolve_adv_data_by_type(scan_result->scan_rst.ble_adv,
                                                             scan_result->scan_rst.adv_data_len +
                                                             scan_result->scan_rst.scan_rsp_len,
                                                             ESP_BLE_AD_TYPE_NAME_CMPL,
                                                             &adv_name_len);
 
-                /*
                 if (adv_name != NULL) {
-                    if (strlen(remote_device_name) == adv_name_len && strncmp((char *)adv_name, remote_device_name, adv_name_len) == 0) {
-                        if (connect == false) {
-                            connect = true;
-                            ESP_LOGI(TAG, "connect to the remote device %s", remote_device_name);
-                            esp_ble_gap_stop_scanning();
+                    char *device_name = malloc(adv_name_len);
+                    memcpy(device_name, adv_name, adv_name_len);
 
-                            // Initiate GATT connection with the remote device,
-                            // If ble physical connection is set up, ESP_GATTS_CONNECT_EVT and ESP_GATTC_CONNECT_EVT event will come
-                            esp_ble_gatt_creat_conn_params_t creat_conn_params = {0};
-                            memcpy(&creat_conn_params.remote_bda, scan_result->scan_rst.bda, ESP_BD_ADDR_LEN);
-                            creat_conn_params.remote_addr_type = scan_result->scan_rst.ble_addr_type;
-                            creat_conn_params.own_addr_type = BLE_ADDR_TYPE_PUBLIC;
-                            creat_conn_params.is_direct = true;
-                            creat_conn_params.is_aux = false;
-                            creat_conn_params.phy_mask = 0x0;
-                            esp_ble_gattc_enh_open(client_profile.gattc_interface,
-                                                   &creat_conn_params);
-
-                            // Update peer gatt server address
-                            //memcpy(peer_gatts_addr, scan_result->scan_rst.bda, sizeof(esp_bd_addr_t));
-                            //ESP_LOG_BUFFER_HEX("the remote device addr", peer_gatts_addr, sizeof(esp_bd_addr_t));
-                        }
-                    }
+                    if (_on_scan_result != NULL) _on_scan_result(device_name, adv_name_len, scan_result->scan_rst.bda, scan_result->scan_rst.ble_addr_type);
                 }
-                */
             }
             break;
         }
@@ -658,12 +638,13 @@ static void gattc_client_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     client_event_handler(event, gattc_if, param);
 }
 
-void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
+void ble_main(char device_name[ESP_BLE_ADV_NAME_LEN_MAX], message_handler_t on_message, closure_t on_scan_start, closure_t on_scan_stop, scan_handler_t on_scan_result, closure_t on_advertise_start, closure_t on_advertise_stop, connect_event_t on_connection, disconnect_event_t on_disconnection, connect_event_t on_connect, disconnect_event_t on_disconnect) {
     memcpy(_device_name, device_name, ESP_BLE_ADV_NAME_LEN_MAX);
     message_handler = on_message;
 
     _on_scan_start = on_scan_start;
     _on_scan_stop = on_scan_stop;
+    _on_scan_result = on_scan_result;
     _on_advertise_start = on_advertise_start;
     _on_advertise_stop = on_advertise_stop;
     _on_connection = on_connection;

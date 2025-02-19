@@ -25,7 +25,7 @@ enum
 
 /* ============================== TYPE DEFINITIONS =============================== */
 typedef void (*message_handler_t)(struct Message*, enum Target from);
-typedef void (*scan_handler_t)(struct ble_scan_result_evt_param result);
+typedef void (*scan_handler_t)(char *name, uint8_t name_length, esp_bd_addr_t address, esp_ble_addr_type_t address_type);
 typedef void (*message_provider_t)(struct Message*, enum Target to);
 typedef void (*connect_event_t)(esp_bd_addr_t address, esp_ble_addr_type_t address_type, uint16_t connection_id);
 typedef void (*disconnect_event_t)(esp_bd_addr_t address);
