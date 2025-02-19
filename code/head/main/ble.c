@@ -211,11 +211,9 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
 
         case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
             adv_config_done &= (~ADV_CONFIG_FLAG);
-            start_advertising();
             break;
         case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
             adv_config_done &= (~SCAN_RSP_CONFIG_FLAG);
-            start_advertising();
             break;
         case ESP_GAP_BLE_ADV_START_COMPLETE_EVT:
             /* advertising start complete event to indicate advertising start successfully or failed */
@@ -246,13 +244,6 @@ static void handle_general_access_profile_event(esp_gap_ble_cb_event_t event, es
             }
             if (_on_scan_stop != NULL) _on_scan_stop();
             break;
-        case ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT: {
-            ESP_LOGI(TAG, "ESP_GAP_BLE_SCAN_PARAM_SET_COMPLETE_EVT, set scan sparameters complete");
-            //the unit of the duration is second
-            uint32_t duration = 120;
-            esp_ble_gap_start_scanning(duration);
-            break;
-        }
         case ESP_GAP_BLE_SCAN_START_COMPLETE_EVT:
             if (param->scan_start_cmpl.status != ESP_BT_STATUS_SUCCESS) {
                 ESP_LOGE(TAG, "scan start failed, error status = %x", param->scan_start_cmpl.status);
