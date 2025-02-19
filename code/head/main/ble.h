@@ -27,7 +27,7 @@ enum
 typedef void (*message_handler_t)(struct Message*, enum Target from);
 typedef void (*scan_handler_t)(struct ble_scan_result_evt_param result);
 typedef void (*message_provider_t)(struct Message*, enum Target to);
-typedef void (*connect_event_t)(esp_bd_addr_t address, esp_ble_addr_type_t address_type);
+typedef void (*connect_event_t)(esp_bd_addr_t address, esp_ble_addr_type_t address_type, uint16_t connection_id);
 typedef void (*disconnect_event_t)(esp_bd_addr_t address);
 typedef void (*closure_t)();
 
@@ -69,5 +69,19 @@ bool stop_scanning();
  * @return True if successful and False is unsuccessful
  */
 bool connect_device(esp_bd_addr_t address, esp_ble_addr_type_t address_type);
+
+/**
+ * Disconnect a from a device
+ * @param connection_id The server's connection id assigned by the client
+ * @return True if successful and False is unsuccessful
+ */
+bool disconnect_device(uint16_t connection_id);
+
+/**
+ * Disconnect a remote device
+ * @param connection_id The connection id assigned by the BLE server
+ * @return True if successful and False is unsuccessful
+ */
+bool disconnect_remote_device(uint16_t connection_id);
 
 #endif //SEGMENT_BLE_H
