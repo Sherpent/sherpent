@@ -157,6 +157,9 @@
                </item>
                <item>
                 <widget class="QSpinBox" name="xPosSpinBox">
+                 <property name="maximum">
+                  <number>600</number>
+                 </property>
                  <property name="displayIntegerBase">
                   <number>10</number>
                  </property>
@@ -170,7 +173,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="yPosSpinBox"/>
+                <widget class="QSpinBox" name="yPosSpinBox">
+                 <property name="maximum">
+                  <number>600</number>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
