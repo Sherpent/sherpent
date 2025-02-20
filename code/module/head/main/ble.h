@@ -4,5 +4,5 @@
 
 #ifndef BLE_H
 #define BLE_H
-
+    void start_ble_server();
 #endif //BLE_H
