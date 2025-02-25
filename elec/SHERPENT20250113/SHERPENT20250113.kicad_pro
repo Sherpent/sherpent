@@ -58,27 +58,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        "clearance|171304800|75299200|0ab85445-fc45-4b57-9f85-d630e0f00214|38c5ad81-2349-4718-b54a-e7880a24450b",
-        "clearance|199434400|75016650|bf3da9ef-4da7-4806-8093-e575b2d0c0fb|00cbc9d7-0456-4c9a-842f-1521a28737bc",
-        "clearance|199487250|74963800|2c21a47b-c402-431b-a7b5-7578b9faf96c|00cbc9d7-0456-4c9a-842f-1521a28737bc",
-        "clearance|201587000|74638800|137600b7-acb5-4507-83ee-ea17257daec6|8afe3797-8b05-4c02-9efc-5404f266b160",
-        "courtyards_overlap|136353914|119333000|4c08b7b7-12cb-46f7-93c3-237b6a05958b|7369547f-2823-4e92-9e22-1f9af196e8d5",
-        "courtyards_overlap|136353914|83917800|566b4a16-4570-4cef-8de1-a47b0de15133|6142e271-c2bf-4e32-a825-7fb5dbf3d082",
-        "courtyards_overlap|136424763|80555000|33a39a41-cfc5-47b0-987d-b5e2f1f4570c|cf788d86-704e-4f50-9593-a53cb0e19c7e",
-        "courtyards_overlap|136434189|122755000|74bf4060-72b1-4201-8470-138708d9043a|ba596df3-7133-4c60-b3e6-4e0c8a97ad68",
-        "courtyards_overlap|146405114|74752200|020f2f27-3575-40c3-aabb-a2c4dcfd64f2|846c35bb-2078-4080-9c44-2495c27d470b",
-        "courtyards_overlap|146437514|128753600|1f53fe29-f4c7-44d0-a9f6-fcc5a86ec8ca|5362e628-f8e1-4c2a-8977-ba1ce42753b1",
-        "courtyards_overlap|179298114|124740400|a0c23210-c239-4ffd-a16a-1fef53c2ed5c|f5c7a54e-05d2-499d-9b68-703fa0c3a446",
-        "courtyards_overlap|179298114|78765400|05f63a89-59ff-4de8-9d0c-0ab4eef8cfa6|06f57945-6c35-4951-903d-9c1eae9b05e7",
-        "courtyards_overlap|201229914|122380000|46dc48c9-8da9-4cc4-b117-79e1ab18057b|d4323bfd-8ee4-44ea-acb9-5f9538f93ee1",
-        "courtyards_overlap|201229914|77103200|9141aada-0ffb-4f2a-8c86-6eb9f33191af|a4c7dc04-b2eb-4d0c-9eac-e1c86718c0ef",
-        "solder_mask_bridge|166354800|76362010|c421f4ca-fd8c-46ea-9ccb-f0ed33be41d3|5e94e434-181f-4daa-8c91-a1ef4c0d5e9e",
-        "solder_mask_bridge|170304800|75586390|c6b80d5f-4642-4f6d-b8d8-4bab85b91457|5ee9a2c2-c182-4273-93e6-540d557c1281",
-        "solder_mask_bridge|171154800|75586390|bbdf6b05-126d-4cb8-8855-2352afbc0849|0ab85445-fc45-4b57-9f85-d630e0f00214",
-        "solder_mask_bridge|199208590|74608800|00cbc9d7-0456-4c9a-842f-1521a28737bc|24831cab-e183-4d53-8b64-77eecf052d77",
-        "solder_mask_bridge|201998150|74218800|8afe3797-8b05-4c02-9efc-5404f266b160|4f078aaa-e470-4dc1-88ff-a3dc2c76f059"
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
