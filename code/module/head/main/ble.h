@@ -5,6 +5,6 @@
 #ifndef BLE_H
 #define BLE_H
 
-void start_ble_server();
+void init_ble();
 
 #endif //BLE_H
