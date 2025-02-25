@@ -129,9 +129,7 @@ static esp_ble_adv_params_t adv_params = {
     .adv_filter_policy = ADV_FILTER_ALLOW_SCAN_ANY_CON_ANY,
 };
 
-#define PROFILE_NUM 2
-#define PROFILE_A_APP_ID 0
-#define PROFILE_B_APP_ID 1
+#define PROFILE_APP_ID 0
 
 struct gatts_profile_inst {
     esp_gatts_cb_t gatts_cb;
@@ -512,8 +510,7 @@ void init_ble()
     esp_bluedroid_enable();
     esp_ble_gatts_register_callback(gatts_event_handler);
     esp_ble_gap_register_callback(gap_event_handler);
-    esp_ble_gatts_app_register(PROFILE_A_APP_ID);
-    esp_ble_gatts_app_register(PROFILE_B_APP_ID);
+    esp_ble_gatts_app_register(PROFILE_APP_ID);
 
     esp_ble_gatt_set_local_mtu(500);
 }
