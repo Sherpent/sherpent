@@ -8031,7 +8031,7 @@
 	)
 	(polyline
 		(pts
-			(xy 74.93 360.68) (xy 80.01 353.06)
+			(xy 74.93 360.68) (xy 80.436 351.1541)
 		)
 		(stroke
 			(width 0)
@@ -8469,6 +8469,17 @@
 		)
 		(uuid "3db4749f-bcf4-4e05-9546-d137ef3d4611")
 	)
+	(polyline
+		(pts
+			(xy 49.53 323.85) (xy 55.88 340.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+			(color 0 161 142 1)
+		)
+		(uuid "3de4e5dd-4fd6-4918-af43-6585b624db83")
+	)
 	(wire
 		(pts
 			(xy 422.91 267.97) (xy 425.45 267.97)
@@ -8718,6 +8729,16 @@
 			(type default)
 		)
 		(uuid "55047bf9-67b0-438b-ad18-895b8b1e683b")
+	)
+	(polyline
+		(pts
+			(xy 59.69 336.55) (xy 92.71 339.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "56e5ceea-7901-412b-b3b3-b9689e8b12f7")
 	)
 	(wire
 		(pts
@@ -9218,6 +9239,16 @@
 			(type default)
 		)
 		(uuid "80ec541d-75d3-47d7-8c81-6211b6b9819e")
+	)
+	(polyline
+		(pts
+			(xy 92.71 339.09) (xy 95.25 344.17)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8122b89f-e3cd-4e16-b6a7-63a6dcf68f40")
 	)
 	(wire
 		(pts
@@ -9899,6 +9930,16 @@
 		)
 		(uuid "c51cb544-0cdb-4356-9cc4-532ba7e93bae")
 	)
+	(polyline
+		(pts
+			(xy 74.93 331.47) (xy 77.47 328.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c53cfac9-7730-4303-80d1-b9e29de4efe4")
+	)
 	(wire
 		(pts
 			(xy 227.33 267.97) (xy 241.3 267.97)
@@ -10029,6 +10070,16 @@
 		)
 		(uuid "cf5aecba-0587-41d9-9f76-c3396754a5b7")
 	)
+	(polyline
+		(pts
+			(xy 54.61 323.85) (xy 54.61 328.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf73eb36-60d2-4b9a-9a10-0915c707e0ce")
+	)
 	(wire
 		(pts
 			(xy 525.78 316.23) (xy 529.59 316.23)
@@ -10058,6 +10109,16 @@
 			(type default)
 		)
 		(uuid "d211dc14-d58a-47b3-babf-b4b3b5b30b00")
+	)
+	(polyline
+		(pts
+			(xy 74.93 330.2) (xy 77.47 327.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d2487265-7fce-4a89-b64b-51b5adf873e1")
 	)
 	(wire
 		(pts
@@ -10109,6 +10170,16 @@
 		)
 		(uuid "d56cf68b-abd0-4964-aad0-bc3b65655133")
 	)
+	(polyline
+		(pts
+			(xy 64.77 323.85) (xy 64.77 328.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d58753e8-3e67-4f38-a26b-7eb8d537490d")
+	)
 	(wire
 		(pts
 			(xy 60.96 356.87) (xy 60.96 359.41)
@@ -10128,6 +10199,17 @@
 			(type default)
 		)
 		(uuid "d63d08ee-25bd-4784-b74d-02cb3555a19a")
+	)
+	(polyline
+		(pts
+			(xy 76.2 336.55) (xy 55.88 340.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+			(color 0 161 142 1)
+		)
+		(uuid "d77eb121-1d66-471e-889f-1eb7b9fb2abb")
 	)
 	(wire
 		(pts
@@ -10569,7 +10651,7 @@
 		)
 		(uuid "fea40ffd-e16d-4e5b-8713-2a4437620ad5")
 	)
-	(text_box "Patches à faire:\n- Mettre une 0 ohm sur R26\n- Enlever Q4\n- mettre un mosfet P sur D29\n	- Connecter sa gate sur le pad de Q4\n- Connecter Le v+ de R6 et R3 avant le mosfet sur D29"
+	(text_box "Patches à faire:\n- Mettre une 0 ohm sur R26\n- Enlever Q4\n- mettre un mosfet P sur D29\n	- Connecter sa gate sur le pad de Q4\n- Connecter Le v+ de R6 et R3 avant le mosfet sur D29\n\nExplication des patches:\nLe DCDC ne désactive pas sa sortie quand son enable est \"false\". Il désactive seulement le switching. La tension à sa sortie est celle a son entrée avec une drop de tension equivalente a une diode interne.\nLe mosfet Q4 qui switchait EN est donc relocalisé sur la footprint de D29 afin de switcher l'alimentation du DCDC. Cela implique qu'il faut un mosfet capable de supporter toute la puissance du board"
 		(exclude_from_sim no)
 		(at 124.46 359.41 0)
 		(size 54.61 41.91)
@@ -10587,6 +10669,25 @@
 			(justify left top)
 		)
 		(uuid "8011b731-5086-495f-9233-f00d69113fa7")
+	)
+	(text_box "Remplacé par LED pour drop de 2v car le board bleu sort une petite tension sur vUSB"
+		(exclude_from_sim no)
+		(at 68.58 360.68 0)
+		(size 13.97 8.89)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 0.889 0.889)
+			)
+			(justify left top)
+		)
+		(uuid "8ccc9954-08ff-465d-870c-2cb18d81e332")
 	)
 	(text "LEDs"
 		(exclude_from_sim no)
@@ -10698,17 +10799,6 @@
 			)
 		)
 		(uuid "59ccfa76-1b20-4481-9b3c-b89be049dd8c")
-	)
-	(text "Changements:\n\n- Stayon fonctionner\n- Le stayon defeat le purpose de la diode idéale\n- Ajouté des condensateurs pour filtrer les spikes et drops des servo\n- LDO pour leds\n- Les neopixels c pas I2C c'est un affaire qui existe juste pour ça. \n  C'est un peu l'equivalent de juste TX mais pas exactement. \n  J'ai enlevé le connecteur I2C et j'ai utilisé la pin de plus pour le bouton\n\n\n\nQuestions:\n\n- V USB sur le stayon c'est good?\n- On met tu le board de charge pour sauver 80 cents, moins de \n  risque que ça marche pas et l'approbation de Tessier?\n- On met tu le boost converter à 5v pour sauver un LDO pour \n  les leds et anyway la datasheet dit que 6v et 4v c un torque semblable\n- R25 WTF\n\nTodo:\n\n- Choisir et placer un bouton\n- Placer et router les leds\n- Choisir les condo de filtrage des steppers et les placer (footprints manquantes)\n- finir de router près du connecteur. En prendre un surface mount serait plus facile "
-		(exclude_from_sim no)
-		(at 648.97 2.54 0)
-		(effects
-			(font
-				(size 10.16 10.16)
-			)
-			(justify left top)
-		)
-		(uuid "6021d670-95e1-45eb-877a-6a6f69dd5583")
 	)
 	(text "Boost converter"
 		(exclude_from_sim no)
@@ -10824,15 +10914,15 @@
 		)
 		(uuid "c31f64ee-16be-486d-a51f-ad4c7f25b606")
 	)
-	(text "À vérifier"
+	(text "Coupé"
 		(exclude_from_sim no)
-		(at 74.93 361.95 0)
+		(at 80.772 328.676 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 		)
-		(uuid "e38535cf-1fda-41b5-b3fb-d948414e9621")
+		(uuid "cb10df32-d470-41ee-9d7a-21ce1b40a19d")
 	)
 	(text "USB"
 		(exclude_from_sim no)
@@ -13677,7 +13767,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "22ebb387-1429-422f-bd57-cf789c11700b")
 		(property "Reference" "D29"
@@ -26366,7 +26456,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "d6bcffbe-05cd-4911-9b3a-d4830827d9ec")
 		(property "Reference" "R26"
 			(at 93.726 326.898 90)
@@ -27153,6 +27243,104 @@
 			(project "SHERPENT20250113"
 				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
 					(reference "C17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Simulation_SPICE:PMOS")
+		(at 59.69 331.47 270)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board no)
+		(dnp no)
+		(uuid "e3eb22ae-9273-4e52-8073-42bf5ba29f8a")
+		(property "Reference" "Q_Patch"
+			(at 64.516 331.724 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "PMOS"
+			(at 64.516 334.264 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 62.23 326.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://ngspice.sourceforge.io/docs/ngspice-html-manual/manual.xhtml#cha_MOSFETs"
+			(at 46.99 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "P-MOSFET transistor, drain/source/gate"
+			(at 59.69 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Device" "PMOS"
+			(at 42.545 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Type" "VDMOS"
+			(at 40.64 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Sim.Pins" "1=D 2=G 3=S"
+			(at 44.45 331.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ab122db1-33cc-4d64-91c5-1eca5d801bdc")
+		)
+		(pin "2"
+			(uuid "872793c9-90c6-4c64-8053-5b6778976c90")
+		)
+		(pin "3"
+			(uuid "189a57c7-9de5-410e-80df-e6e223fc3ff2")
+		)
+		(instances
+			(project "SHERPENT20250113"
+				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
+					(reference "Q_Patch")
 					(unit 1)
 				)
 			)
@@ -29185,7 +29373,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "fbfe9cb8-6fcc-4df8-bce3-844d51218ca6")
 		(property "Reference" "Q4"
 			(at 100.076 339.344 90)
