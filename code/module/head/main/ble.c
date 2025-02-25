@@ -413,7 +413,6 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         conn_params.timeout = 400;    // timeout = 400*10ms = 4000ms
         ESP_LOGI(GATTS_TAG, "Connected, conn_id %u, remote "ESP_BD_ADDR_STR"",
                  param->connect.conn_id, ESP_BD_ADDR_HEX(param->connect.remote_bda));
-        profile.conn_id = param->connect.conn_id;
         //start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
 
