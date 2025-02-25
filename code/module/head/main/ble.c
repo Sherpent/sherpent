@@ -169,6 +169,7 @@ static conn_callback_t conn_callback_table[] = {
 };
 
 static message_callback_t message_callback = NULL;
+static event_callback_t setup_complete_callback = NULL;
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
@@ -177,13 +178,11 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
     case ESP_GAP_BLE_ADV_DATA_SET_COMPLETE_EVT:
         adv_config_done &= (~adv_config_flag);
         if (adv_config_done == 0){
-            esp_ble_gap_start_advertising(&adv_params);
         }
         break;
     case ESP_GAP_BLE_SCAN_RSP_DATA_SET_COMPLETE_EVT:
         adv_config_done &= (~scan_rsp_config_flag);
         if (adv_config_done == 0){
-            esp_ble_gap_start_advertising(&adv_params);
         }
         break;
 
@@ -400,6 +399,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     case ESP_GATTS_START_EVT:
         ESP_LOGI(GATTS_TAG, "Service start, status %d, service_handle %d",
                  param->start.status, param->start.service_handle);
+        if (setup_complete_callback != NULL) setup_complete_callback();
         break;
     case ESP_GATTS_STOP_EVT:
         break;
@@ -423,7 +423,6 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     case ESP_GATTS_DISCONNECT_EVT:
         ESP_LOGI(GATTS_TAG, "Disconnected, remote "ESP_BD_ADDR_STR", reason 0x%02x",
                  ESP_BD_ADDR_HEX(param->disconnect.remote_bda), param->disconnect.reason);
-        esp_ble_gap_start_advertising(&adv_params);
 
         if (conn_callback_table[DISCONNECTION] != NULL) conn_callback_table[DISCONNECTION](param->disconnect.conn_id);
         break;
@@ -502,6 +501,14 @@ bool send_message(uint16_t conn_id, struct Message message) {
     return esp_ble_gatts_send_indicate(profile.gatts_if, conn_id, profile.char_handle, sizeof(notify_data), notify_data, false) == ESP_OK;
 }
 
+bool set_advertising(bool is_advertising) {
+    if (is_advertising) {
+        return esp_ble_gap_start_advertising(&adv_params) == ESP_GATT_OK;
+    } else {
+        return esp_ble_gap_stop_advertising() == ESP_GATT_OK;
+    }
+}
+
 void register_conn_callback(enum conn_callback_type type, conn_callback_t callback) { conn_callback_table[type] = callback; }
 void register_msg_callback(message_callback_t callback) { message_callback = callback; }
-
+void register_setup_complete_callback(event_callback_t callback) { setup_complete_callback = callback; }
