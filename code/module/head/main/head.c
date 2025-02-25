@@ -4,6 +4,5 @@
 
 void app_main(void)
 {
-    start_ble_server();
-
+    init_ble();
 }
