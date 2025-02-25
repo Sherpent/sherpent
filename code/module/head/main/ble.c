@@ -162,6 +162,14 @@ static prepare_type_env_t a_prepare_write_env;
 void example_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 void example_exec_write_event_env(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 
+// ================================ CALLBACKS ================================
+static conn_callback_t conn_callback_table[] = {
+        [CONNECTION] = NULL,
+        [DISCONNECTION] = NULL,
+};
+
+static message_callback_t message_callback = NULL;
+
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
     switch (event) {
@@ -316,48 +324,18 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         break;
     }
     case ESP_GATTS_WRITE_EVT: {
-        ESP_LOGI(GATTS_TAG, "Characteristic write, conn_id %d, trans_id %" PRIu32 ", handle %d", param->write.conn_id, param->write.trans_id, param->write.handle);
-        if (!param->write.is_prep){
-            ESP_LOGI(GATTS_TAG, "value len %d, value ", param->write.len);
-            ESP_LOG_BUFFER_HEX(GATTS_TAG, param->write.value, param->write.len);
-            if (profile.descr_handle == param->write.handle && param->write.len == 2){
-                uint16_t descr_value = param->write.value[1]<<8 | param->write.value[0];
-                if (descr_value == 0x0001){
-                    if (a_property & ESP_GATT_CHAR_PROP_BIT_NOTIFY){
-                        ESP_LOGI(GATTS_TAG, "Notification enable");
-                        uint8_t notify_data[15];
-                        for (int i = 0; i < sizeof(notify_data); ++i)
-                        {
-                            notify_data[i] = i%0xff;
-                        }
-                        //the size of notify_data[] need less than MTU size
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, profile.char_handle,
-                                                sizeof(notify_data), notify_data, false);
-                    }
-                }else if (descr_value == 0x0002){
-                    if (a_property & ESP_GATT_CHAR_PROP_BIT_INDICATE){
-                        ESP_LOGI(GATTS_TAG, "Indication enable");
-                        uint8_t indicate_data[15];
-                        for (int i = 0; i < sizeof(indicate_data); ++i)
-                        {
-                            indicate_data[i] = i%0xff;
-                        }
-                        //the size of indicate_data[] need less than MTU size
-                        esp_ble_gatts_send_indicate(gatts_if, param->write.conn_id, profile.char_handle,
-                                                sizeof(indicate_data), indicate_data, true);
-                    }
-                }
-                else if (descr_value == 0x0000){
-                    ESP_LOGI(GATTS_TAG, "Notification/Indication disable");
-                }else{
-                    ESP_LOGE(GATTS_TAG, "Unknown descriptor value");
-                    ESP_LOG_BUFFER_HEX(GATTS_TAG, param->write.value, param->write.len);
-                }
+        ESP_LOGI(GATTS_TAG, "Characteristic write, conn_id %d, trans_id %" PRIu32 ", handle %d",
+                 param->write.conn_id, param->write.trans_id, param->write.handle);
 
-            }
-        }
-        example_write_event_env(gatts_if, &a_prepare_write_env, param);
+        ESP_LOGI(GATTS_TAG, "value len %d, value ", param->write.len);
+        ESP_LOG_BUFFER_HEX(GATTS_TAG, param->write.value, param->write.len);
+
+        struct Message *message = (struct Message*) malloc(param->write.value[0]);
+        memcpy(message, param->write.value, param->write.value[0]);
+
+        if (message_callback != NULL) { message_callback(param->write.conn_id, message); }
         break;
+
     }
     case ESP_GATTS_EXEC_WRITE_EVT:
         ESP_LOGI(GATTS_TAG,"Execute write");
@@ -439,13 +417,15 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         //start sent the update connection parameters to the peer device.
         esp_ble_gap_update_conn_params(&conn_params);
 
-
+        if (conn_callback_table[CONNECTION] != NULL) conn_callback_table[CONNECTION](param->connect.conn_id);
         break;
     }
     case ESP_GATTS_DISCONNECT_EVT:
         ESP_LOGI(GATTS_TAG, "Disconnected, remote "ESP_BD_ADDR_STR", reason 0x%02x",
                  ESP_BD_ADDR_HEX(param->disconnect.remote_bda), param->disconnect.reason);
         esp_ble_gap_start_advertising(&adv_params);
+
+        if (conn_callback_table[DISCONNECTION] != NULL) conn_callback_table[DISCONNECTION](param->disconnect.conn_id);
         break;
     case ESP_GATTS_CONF_EVT:
         ESP_LOGI(GATTS_TAG, "Confirm receive, status %d, attr_handle %d", param->conf.status, param->conf.handle);
@@ -515,6 +495,13 @@ void init_ble()
     esp_ble_gatt_set_local_mtu(500);
 }
 
+bool send_message(uint16_t conn_id, struct Message message) {
+    uint8_t notify_data[message.msg_size];
+    memcpy(&notify_data, &message, message.msg_size);
 
+    return esp_ble_gatts_send_indicate(profile.gatts_if, conn_id, profile.char_handle, sizeof(notify_data), notify_data, false) == ESP_OK;
+}
 
+void register_conn_callback(enum conn_callback_type type, conn_callback_t callback) { conn_callback_table[type] = callback; }
+void register_msg_callback(message_callback_t callback) { message_callback = callback; }
 
