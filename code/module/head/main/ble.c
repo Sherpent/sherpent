@@ -515,7 +515,7 @@ void init_ble()
     esp_ble_gatts_app_register(PROFILE_A_APP_ID);
     esp_ble_gatts_app_register(PROFILE_B_APP_ID);
 
-    esp_err_t local_mtu_ret = esp_ble_gatt_set_local_mtu(500);
+    esp_ble_gatt_set_local_mtu(500);
 }
 
 
