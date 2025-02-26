@@ -3,6 +3,7 @@
 #include <head.h>
 #include <esp_log.h>
 #include <led.h>
+#include <servo.h>
 #include <power.h>
 #include <string.h>
 
@@ -49,6 +50,7 @@ void app_main(void)
     register_setup_complete_callback(ble_main);
 
     led_init();
+    servo_init();
     init_ble();
 
     button_setup();
@@ -151,11 +153,60 @@ void send_message_to_module(uint8_t segment_id, struct Message *message) {
         ESP_LOGW("MODULE_MANAGER", "Attempted to send a message to a non registered module #%d", segment_id);
     }
 
-    send_message(get_conn_id(segment_id), message);
+    if (segment_id != 0) {
+        send_message(get_conn_id(segment_id), message);
+    } else {
+        message_callback(segment_id, message);
+    }
 }
 
 void message_callback(uint8_t segment_id, struct Message *message) {
-    burst(255, 140, 0, 500);
-    struct SetLight sent_message = {5, 9, 0, 255, 0};
-    send_message_to_module(1, (struct Message*) &sent_message);
+    //burst(255, 140, 0, 500);
+
+    switch (message->msg_id) {
+        case LOG: {
+            struct Log *log = (struct Log *) message;
+            switch (log->log_level) {
+                case DEBUG:
+                    ESP_LOGD("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    break;
+                case INFO:
+                    ESP_LOGI("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    break;
+                case WARNING:
+                    ESP_LOGW("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    break;
+                case ERROR:
+                    ESP_LOGE("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    break;
+            }
+            break;
+        }
+        case INFO_BATTERY: {
+            struct InfoBattery *info_battery = (struct InfoBattery *) message;
+            ESP_LOGI("LOG", "Module #%d [Battery level] - %.2f%%", (float) info_battery->level * (100.0f / 255.0f));
+            break;
+        }
+        case SET_YAW: {
+            struct SetYaw *set_yaw = (struct SetYaw *) message;
+            set_servo_angle(YAW, (float) set_yaw->angle_degrees);
+            break;
+        }
+        case SET_PITCH: {
+            struct SetPitch *set_pitch = (struct SetPitch *) message;
+            set_servo_angle(PITCH, (float) set_pitch->angle_degrees);
+            break;
+        }
+        case SET_LIGHT: {
+            struct SetLight *set_light = (struct SetLight *) message;
+            for (int i = 0; i < PIXEL_COUNT; i++) {
+                set_pixel_rgb(i, set_light->red, set_light->green, set_light->blue);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    //struct SetLight sent_message = {5, 9, 0, 255, 0};
+    //send_message_to_module(1, (struct Message*) &sent_message);
 }

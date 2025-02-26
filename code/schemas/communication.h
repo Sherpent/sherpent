@@ -8,12 +8,9 @@
 // Message ID Enum
 enum MessageID: uint8_t {
     LOG,
-    INFO_YAW,
-    INFO_PITCH,
-    INFO_COUNT,
+    REGISTER,
     INFO_BATTERY,
 
-    SET_ID,
     SET_YAW,
     SET_PITCH,
     SET_LIGHT,
@@ -34,61 +31,41 @@ enum LogLevel: uint8_t {
     ERROR,
 };
 
-// Forward Message Structures
 struct Log {
     uint8_t msg_size;
     enum MessageID msg_id;
-    uint8_t segment_id;
     enum LogLevel log_level;
     char message[];
 };
 
-struct InfoYaw {
+struct Register {
     uint8_t msg_size;
     enum MessageID msg_id;
     uint8_t segment_id;
-    int8_t angle_degrees;
 };
 
-struct InfoPitch {
-    uint8_t msg_size;
-    enum MessageID msg_id;
-    uint8_t segment_id;
-    int8_t angle_degrees;
-};
 
 struct InfoBattery {
     uint8_t msg_size;
     enum MessageID msg_id;
-    uint8_t segment_id;
     uint8_t level;
-};
-
-// Backward Message Structures
-struct SetID {
-    uint8_t msg_size;
-    enum MessageID msg_id;
-    uint64_t id;
-};
-
-struct SetYaw {
-    uint8_t msg_size;
-    enum MessageID msg_id;
-    uint8_t segment_id;
-    int8_t angle_degrees;
 };
 
 struct SetPitch {
     uint8_t msg_size;
     enum MessageID msg_id;
-    uint8_t segment_id;
+    int8_t angle_degrees;
+};
+
+struct SetYaw {
+    uint8_t msg_size;
+    enum MessageID msg_id;
     int8_t angle_degrees;
 };
 
 struct SetLight {
     uint8_t msg_size;
     enum MessageID msg_id;
-    uint8_t segment_id;
     uint8_t red;
     uint8_t green;
     uint8_t blue;
