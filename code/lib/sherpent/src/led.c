@@ -89,11 +89,6 @@ void task_led(void *parameters) {
     }
 }
 
-
-/**
- * Flash for a set period of time with a set color
- * @param parameters (red: uint8_t, green: uint8_t, blue: uint8_t, period: uint16_t, duty: float)
- */
 void task_flash(void *parameters) {
     struct FlashParams *params = (struct FlashParams *) parameters;
 
@@ -127,10 +122,28 @@ void task_flash(void *parameters) {
     }
 }
 
-/**
- * Flash for a set period of time with a set color once
- * @param parameters (red: uint8_t, green: uint8_t, blue: uint8_t, duration: uint16_t)
- */
+void flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty) {
+    // Dynamically allocate memory for the parameters
+    struct FlashParams *params = pvPortMalloc(sizeof(struct FlashParams));
+    if (params == NULL) {
+        // Handle memory allocation failure (e.g., log it, return, etc.)
+        return;
+    }
+
+    params->red = red;
+    params->green = green;
+    params->blue = blue;
+    params->period = period;
+    params->duty = duty;
+
+    // Create the task and check if it's created successfully
+    BaseType_t result = xTaskCreate(task_flash, "TaskFlash", 2048, (void*) params, 1, NULL);
+    if (result != pdPASS) {
+        // Handle task creation failure (e.g., log it, free memory, etc.)
+        vPortFree(params);
+    }
+}
+
 void task_burst(void *parameters) {
     struct BurstParams *params = (struct BurstParams *) parameters;
 
@@ -157,28 +170,6 @@ void task_burst(void *parameters) {
     }
 
     vTaskDelete(NULL);
-}
-
-void flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty) {
-    // Dynamically allocate memory for the parameters
-    struct FlashParams *params = pvPortMalloc(sizeof(struct FlashParams));
-    if (params == NULL) {
-        // Handle memory allocation failure (e.g., log it, return, etc.)
-        return;
-    }
-
-    params->red = red;
-    params->green = green;
-    params->blue = blue;
-    params->period = period;
-    params->duty = duty;
-
-    // Create the task and check if it's created successfully
-    BaseType_t result = xTaskCreate(task_flash, "TaskFlash", 2048, (void*) params, 1, NULL);
-    if (result != pdPASS) {
-        // Handle task creation failure (e.g., log it, free memory, etc.)
-        vPortFree(params);
-    }
 }
 
 void burst(uint8_t red, uint8_t green, uint8_t blue, uint16_t duration) {

@@ -25,6 +25,8 @@ void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue)
 void set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue);
 void set_pixel_effect_release(uint32_t pixel_num);
 
+void task_led(void *parameters);
+
 struct FlashParams {
     uint8_t red;
     uint8_t green;
@@ -32,6 +34,12 @@ struct FlashParams {
     uint16_t period;
     float duty;
 };
+/**
+ * Flash for a set period of time with a set color
+ * @param parameters (red: uint8_t, green: uint8_t, blue: uint8_t, period: uint16_t, duty: float)
+ */
+void task_flash(void *parameters);
+void flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty);
 
 struct BurstParams {
     uint8_t red;
@@ -39,22 +47,11 @@ struct BurstParams {
     uint8_t blue;
     uint16_t duration;
 };
-
-void task_led(void *parameters);
-
-/**
- * Flash for a set period of time with a set color
- * @param parameters (red: uint8_t, green: uint8_t, blue: uint8_t, period: uint16_t, duty: float)
- */
-void task_flash(void *parameters);
-
 /**
  * Flash for a set period of time with a set color once
  * @param parameters (red: uint8_t, green: uint8_t, blue: uint8_t, duration: uint16_t)
  */
 void task_burst(void *parameters);
-
-void flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty);
 void burst(uint8_t red, uint8_t green, uint8_t blue, uint16_t duration);
 
 #endif // LED_H
