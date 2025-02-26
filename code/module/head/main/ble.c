@@ -26,9 +26,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
+#include <freertos/queue.h>
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_bt.h"
@@ -169,7 +167,12 @@ static conn_callback_t conn_callback_table[] = {
 };
 
 static message_callback_t message_callback = NULL;
+
 static event_callback_t setup_complete_callback = NULL;
+
+// ================================== QUEUE ==================================
+// Queue to hold incoming messages
+QueueHandle_t message_queue;
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param)
 {
@@ -323,18 +326,39 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         break;
     }
     case ESP_GATTS_WRITE_EVT: {
-        ESP_LOGI(GATTS_TAG, "Characteristic write, conn_id %d, trans_id %" PRIu32 ", handle %d",
+        ESP_LOGI(GATTS_TAG, "GATT_WRITE_EVT, conn_id %d, trans_id %d, handle %d",
                  param->write.conn_id, param->write.trans_id, param->write.handle);
 
-        ESP_LOGI(GATTS_TAG, "value len %d, value ", param->write.len);
-        ESP_LOG_BUFFER_HEX(GATTS_TAG, param->write.value, param->write.len);
+        if (!param->write.is_prep) {
+            ESP_LOGI(GATTS_TAG, "GATT_WRITE_EVT, value len %d, value:", param->write.len);
+            ESP_LOG_BUFFER_HEX(GATTS_TAG, param->write.value, param->write.len);
 
-        struct Message *message = (struct Message*) malloc(param->write.value[0]);
-        memcpy(message, param->write.value, param->write.value[0]);
+            // Allocate memory for message
+            struct Message *message = (struct Message *) malloc(param->write.value[0]);
+            if (message == NULL) {
+                ESP_LOGE(GATTS_TAG, "Failed to allocate memory for message");
+                return;
+            }
+            memcpy(message, param->write.value, param->write.value[0]);
 
-        if (message_callback != NULL) { message_callback(param->write.conn_id, message); }
+            // Prepare queue item
+            message_queue_item_t queue_item = {
+                    .conn_id = param->write.conn_id,
+                    .message = message
+            };
+
+            // Try to send the message to the queue
+            if (message_queue != NULL) {
+                if (xQueueSendToBack(message_queue, ( void * ) &queue_item, 0) != pdPASS) {
+                    ESP_LOGE(GATTS_TAG, "Message queue full, dropping message");
+                    free(message);  // Free memory if queue is full
+                }
+            }
+        }
+
+        example_write_event_env(gatts_if, &a_prepare_write_env, param);
+
         break;
-
     }
     case ESP_GATTS_EXEC_WRITE_EVT:
         ESP_LOGI(GATTS_TAG,"Execute write");
@@ -410,7 +434,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
         conn_params.latency = 0;
         conn_params.max_int = 0x20;    // max_int = 0x20*1.25ms = 40ms
         conn_params.min_int = 0x10;    // min_int = 0x10*1.25ms = 20ms
-        conn_params.timeout = 400;    // timeout = 400*10ms = 4000ms
+        conn_params.timeout = 1400;    // timeout = 400*10ms = 4000ms
         ESP_LOGI(GATTS_TAG, "Connected, conn_id %u, remote "ESP_BD_ADDR_STR"",
                  param->connect.conn_id, ESP_BD_ADDR_HEX(param->connect.remote_bda));
         //start sent the update connection parameters to the peer device.
@@ -463,6 +487,19 @@ static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_
     }
 }
 
+void message_task(void *pvParameters) {
+    message_queue_item_t queueItem;
+
+    for (;;) {
+        if (xQueueReceive(message_queue, &queueItem, 10) == pdPASS) {
+            if (message_callback != NULL) {
+                message_callback(queueItem.conn_id, queueItem.message);
+            }
+            free(queueItem.message);
+        }
+    }
+}
+
 static void init_nvs() {
     esp_err_t ret;
 
@@ -480,6 +517,13 @@ void init_ble()
 {
     init_nvs();
 
+    message_queue = xQueueCreate(50, sizeof(message_queue_item_t));
+    if (message_queue == NULL) {
+        ESP_LOGE(GATTS_TAG, "Failed to create message queue");
+    } else {
+        xTaskCreate(message_task, "MessageTask", 2048, NULL, 1, NULL);
+    }
+
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     esp_bt_controller_init(&bt_cfg);
 
@@ -493,9 +537,9 @@ void init_ble()
     esp_ble_gatt_set_local_mtu(500);
 }
 
-bool send_message(uint16_t conn_id, struct Message message) {
-    uint8_t notify_data[message.msg_size];
-    memcpy(&notify_data, &message, message.msg_size);
+bool send_message(uint16_t conn_id, struct Message *message) {
+    uint8_t notify_data[message->msg_size];
+    memcpy(notify_data, message, message->msg_size);
 
     return esp_ble_gatts_send_indicate(profile.gatts_if, conn_id, profile.char_handle, sizeof(notify_data), notify_data, false) == ESP_OK;
 }

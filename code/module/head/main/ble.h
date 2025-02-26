@@ -8,10 +8,17 @@
 #include <stdint.h>
 #include <communication.h>
 #include <stdbool.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
 
 typedef void (*conn_callback_t)(uint16_t conn_id);
 typedef void (*message_callback_t)(uint16_t sender_conn_id, struct Message *message);
 typedef void (*event_callback_t)();
+
+typedef struct {
+    int conn_id;
+    struct Message *message;
+} message_queue_item_t;
 
 enum conn_callback_type {
     CONNECTION,
@@ -20,7 +27,7 @@ enum conn_callback_type {
 
 void init_ble();
 
-bool send_message(uint16_t conn_id, struct Message message);
+bool send_message(uint16_t conn_id, struct Message *message);
 
 bool set_advertising(bool is_advertising);
 

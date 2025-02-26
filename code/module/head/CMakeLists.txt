@@ -8,4 +8,5 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 add_library(schemas
         ../../schemas/communication.c  # Reference the communication.c file in the schemas directory
         ../../schemas/communication.h)
+
 project(head)
