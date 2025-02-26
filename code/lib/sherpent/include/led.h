@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdint-gcc.h>
 
+#define COLOR_QUEUE_SIZE 5
 #define PIXEL_COUNT 10
 
 #define NEOPIXEL_PIN 21
@@ -19,7 +20,10 @@ void led_init();
 /**
  * Sets the pixel at pixel_num to color.
  */
-bool set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue);
+void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue);
+
+void set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue);
+void set_pixel_effect_release(uint32_t pixel_num);
 
 struct FlashParams {
     uint8_t red;
@@ -35,6 +39,8 @@ struct BurstParams {
     uint8_t blue;
     uint16_t duration;
 };
+
+void task_led(void *parameters);
 
 /**
  * Flash for a set period of time with a set color

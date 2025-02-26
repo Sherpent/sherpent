@@ -5,59 +5,90 @@
 #include <soc/io_mux_reg.h>
 #include <neopixel.h>
 #include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
 #include "led.h"
 #include "esp_log.h"
 
-tNeopixelContext neopixel = NULL;
+static tNeopixelContext neopixel = NULL;
+
+static uint32_t main_color[PIXEL_COUNT] = {0};
+static QueueHandle_t effect_queue[PIXEL_COUNT];
+static TaskHandle_t led_task = NULL;
 
 void led_init() {
-    neopixel = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
-    //PIN_FUNC_SELECT(NEOPIXEL_PIN, PIN_FUNC_GPIO);
-    //gpio_set_direction(NEOPIXEL_PIN, GPIO_MODE_OUTPUT);
-    //gpio_matrix_out(NEOPIXEL_PIN, CPU_GPIO_OUT5_IDX, false, false);
-
+    bool queue_creation_failed = false;
     for (int i = 0; i < PIXEL_COUNT; i++) {
-        set_pixel_rgb(i, 0, 0, 0);
-    }
-}
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-
-// Declare a global mutex (or semaphore) for synchronizing access to neopixel
-static SemaphoreHandle_t neopixel_mutex = NULL;
-
-bool set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
-    // Initialize the mutex if not already initialized
-    if (neopixel_mutex == NULL) {
-        neopixel_mutex = xSemaphoreCreateMutex();
-        if (neopixel_mutex == NULL) {
-            ESP_LOGW("LED", "Failed to create mutex");
-            return false;
+        effect_queue[i] = xQueueCreate(COLOR_QUEUE_SIZE, sizeof(uint32_t));
+        if (effect_queue[i] == NULL) {
+            queue_creation_failed = true;
+            break;
         }
     }
 
-    // Try to take the mutex (blocking if needed)
-    if (xSemaphoreTake(neopixel_mutex, portMAX_DELAY) != pdPASS) {
-        ESP_LOGW("LED", "Failed to acquire mutex");
-        return false;
+    if (queue_creation_failed) {
+        ESP_LOGE("LED", "Failed to create effect queues");
+    } else {
+        xTaskCreate(task_led, "LEDTask", 2048, NULL, 1, &led_task);
     }
 
-    // Critical section: Access shared resource (neopixel)
-    if (neopixel == NULL) {
-        ESP_LOGW("LED", "neopixel == NULL, make sure to call led_init()");
-        xSemaphoreGive(neopixel_mutex); // Release the mutex before returning
-        return false;
-    }
-
-    tNeopixel pixel = { pixel_num, NP_RGB(red, green, blue) };
-    bool result = neopixel_SetPixel(neopixel, &pixel, 1);
-
-    // Release the mutex after operation
-    xSemaphoreGive(neopixel_mutex);
-
-    return result;
+    neopixel = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
+    xTaskNotifyGive(led_task); // Update LEDs
 }
+
+void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
+    if (pixel_num >= PIXEL_COUNT) {
+        ESP_LOGW("LED", "Trying to set color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
+        return;
+    }
+
+    main_color[pixel_num] = NP_RGB(red, green, blue);
+    xTaskNotifyGive(led_task);
+}
+
+void set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
+    if (pixel_num >= PIXEL_COUNT) {
+        ESP_LOGW("LED", "Trying to set effect color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
+        return;
+    }
+
+    uint32_t color = NP_RGB(red, green, blue);
+    if (xQueueSendToFront(effect_queue[pixel_num], (void *) &color, 10) != pdTRUE) {
+        ESP_LOGW("LED", "Failed to push led state for queue #%d", pixel_num);
+    } else {
+        xTaskNotifyGive(led_task);
+    }
+}
+
+void set_pixel_effect_release(uint32_t pixel_num) {
+    if (pixel_num >= PIXEL_COUNT) {
+        ESP_LOGW("LED", "Trying to release effect color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
+        return;
+    }
+
+    uint32_t color;
+    xQueueReceive(effect_queue[pixel_num], &color, 10);
+    xTaskNotifyGive(led_task);
+}
+
+void task_led(void *parameters) {
+    uint32_t color;
+
+    for (;;) {
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ESP_LOGI("LED", "Updating LEDs");
+        for (int i = 0; i < PIXEL_COUNT; i++) {
+            if (uxQueueMessagesWaiting(effect_queue[i]) == 0) {
+                color = main_color[i];
+            } else {
+                xQueuePeek(effect_queue[i], &color, 10);
+            }
+
+            tNeopixel pixel = {i, color};
+            if (!neopixel_SetPixel(neopixel, &pixel, 1)) ESP_LOGE("LED", "Failed to control LEDs");
+        }
+    }
+}
+
 
 /**
  * Flash for a set period of time with a set color
@@ -86,11 +117,11 @@ void task_flash(void *parameters) {
 
     for (;;) {
         for (int i = 0; i < PIXEL_COUNT; i++) {
-            set_pixel_rgb(i, params->red, params->green, params->blue);
+            set_pixel_effect_rgb(i, params->red, params->green, params->blue);
         }
         vTaskDelay(high_period);
         for (int i = 0; i < PIXEL_COUNT; i++) {
-            set_pixel_rgb(i, 0, 0, 0);
+            set_pixel_effect_release(i);
         }
         vTaskDelay(low_period);
     }
@@ -118,11 +149,11 @@ void task_burst(void *parameters) {
     }
 
     for (int i = 0; i < PIXEL_COUNT; i++) {
-        set_pixel_rgb(i, params->red, params->green, params->blue);
+        set_pixel_effect_rgb(i, params->red, params->green, params->blue);
     }
     vTaskDelay(period);
     for (int i = 0; i < PIXEL_COUNT; i++) {
-        set_pixel_rgb(i, 0, 0, 0);
+        set_pixel_effect_release(i);
     }
 
     vTaskDelete(NULL);
