@@ -4,32 +4,22 @@
 
 #include <soc/io_mux_reg.h>
 #include <neopixel.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/queue.h>
+#include <string.h>
+#include <math.h>
 #include "led.h"
 #include "esp_log.h"
 
 static tNeopixelContext neopixel = NULL;
 
 static uint32_t main_color[PIXEL_COUNT] = {0};
-static QueueHandle_t effect_queue[PIXEL_COUNT];
+static struct xLIST effect_queue[PIXEL_COUNT];
 static TaskHandle_t led_task = NULL;
 
 void led_init() {
-    bool queue_creation_failed = false;
     for (int i = 0; i < PIXEL_COUNT; i++) {
-        effect_queue[i] = xQueueCreate(COLOR_QUEUE_SIZE, sizeof(uint32_t));
-        if (effect_queue[i] == NULL) {
-            queue_creation_failed = true;
-            break;
-        }
+        vListInitialise(&effect_queue[i]);
     }
-
-    if (queue_creation_failed) {
-        ESP_LOGE("LED", "Failed to create effect queues");
-    } else {
-        xTaskCreate(task_led, "LEDTask", 2048, NULL, 1, &led_task);
-    }
+    xTaskCreate(task_led, "LEDTask", 2048, NULL, 1, &led_task);
 
     neopixel = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
     xTaskNotifyGive(led_task); // Update LEDs
@@ -45,46 +35,101 @@ void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue)
     xTaskNotifyGive(led_task);
 }
 
-void set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
-    if (pixel_num >= PIXEL_COUNT) {
-        ESP_LOGW("LED", "Trying to set effect color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
-        return;
-    }
-
-    uint32_t color = NP_RGB(red, green, blue);
-    if (xQueueSendToFront(effect_queue[pixel_num], (void *) &color, 10) != pdTRUE) {
-        ESP_LOGW("LED", "Failed to push led state for queue #%d", pixel_num);
-    } else {
-        xTaskNotifyGive(led_task);
-    }
+struct xLIST_ITEM *set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
+    return set_pixel_effect_argb(pixel_num, 255, red, green, blue);
 }
 
-void set_pixel_effect_release(uint32_t pixel_num) {
+struct xLIST_ITEM *set_pixel_effect_argb(uint32_t pixel_num, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue) {
+    if (pixel_num >= PIXEL_COUNT) {
+        ESP_LOGW("LED", "Invalid pixel index: %d (Valid range: 0-%d)", pixel_num, PIXEL_COUNT - 1);
+        return NULL;
+    }
+
+    // Allocate memory for a new effect item
+    effect_item_t *item = pvPortMalloc(sizeof(effect_item_t));
+    if (item == NULL) {
+        ESP_LOGE("LED", "Memory allocation failed for effect item!");
+        return NULL;
+    }
+
+    // Set color value
+    item->color = NP_ARGB(alpha, red, green, blue);
+
+    // Initialize and set list item
+    vListInitialiseItem(&item->listItem);
+    listSET_LIST_ITEM_OWNER(&item->listItem, item);
+
+    // Ensure the queue is initialized before inserting
+    if (listLIST_IS_INITIALISED(&effect_queue[pixel_num])) {
+        vListInsertEnd(&effect_queue[pixel_num], &item->listItem);
+    } else {
+        ESP_LOGE("LED", "Effect queue for pixel %d is not initialized!", pixel_num);
+        vPortFree(item);
+        return NULL;
+    }
+
+    // Notify the LED task if it exists
+    if (led_task != NULL) {
+        xTaskNotifyGive(led_task);
+    } else {
+        ESP_LOGW("LED", "LED task is NULL; notification not sent.");
+    }
+
+    return &item->listItem;
+}
+
+void set_pixel_effect_release(uint32_t pixel_num, struct xLIST_ITEM *handle, bool silently) {
     if (pixel_num >= PIXEL_COUNT) {
         ESP_LOGW("LED", "Trying to release effect color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
         return;
     }
 
-    uint32_t color;
-    xQueueReceive(effect_queue[pixel_num], &color, 10);
-    xTaskNotifyGive(led_task);
+    effect_item_t *effect = (effect_item_t *) listGET_LIST_ITEM_OWNER(handle);
+    uxListRemove(handle);
+    free(effect);
+
+    if (!silently) {
+        xTaskNotifyGive(led_task);
+    }
 }
+
+void stop_effect(TaskHandle_t effect_handle) {
+    xTaskNotifyGive(effect_handle);
+}
+
+static uint32_t blend_colors(uint32_t main_color, uint32_t effect_color) {
+    uint8_t alpha = (effect_color >> 24) & 0xFF;
+    uint8_t inverse_alpha = 255 - alpha;
+
+    uint8_t red   = (((main_color >> 16) & 0xFF) * inverse_alpha + ((effect_color >> 16) & 0xFF) * alpha) >> 8;
+    uint8_t green = (((main_color >> 8) & 0xFF) * inverse_alpha + ((effect_color >> 8) & 0xFF) * alpha) >> 8;
+    uint8_t blue  = ((main_color & 0xFF) * inverse_alpha + (effect_color & 0xFF) * alpha) >> 8;
+
+    return NP_RGB(red, green, blue);
+}
+
 
 void task_led(void *parameters) {
     uint32_t color;
 
     for (;;) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        ESP_LOGI("LED", "Updating LEDs");
+
         for (int i = 0; i < PIXEL_COUNT; i++) {
-            if (uxQueueMessagesWaiting(effect_queue[i]) == 0) {
-                color = main_color[i];
+            if (!listLIST_IS_EMPTY(&effect_queue[i])) {  // Corrected condition
+
+                ListItem_t *item = listGET_HEAD_ENTRY(&effect_queue[i]);
+                effect_item_t *effect = (effect_item_t *) listGET_LIST_ITEM_OWNER(item);
+                color = blend_colors(main_color[i], effect->color);  // Cleaner blending logic
+
             } else {
-                xQueuePeek(effect_queue[i], &color, 10);
+                color = main_color[i];
             }
 
             tNeopixel pixel = {i, color};
-            if (!neopixel_SetPixel(neopixel, &pixel, 1)) ESP_LOGE("LED", "Failed to control LEDs");
+            if (!neopixel_SetPixel(neopixel, &pixel, 1)) {
+                ESP_LOGE("LED", "Failed to control LEDs");
+            }
         }
     }
 }
@@ -110,25 +155,27 @@ void task_flash(void *parameters) {
         low_period = pdMS_TO_TICKS(10);
     }
 
+    ListItem_t *handles[PIXEL_COUNT];
+
     for (;;) {
+        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(0)) > 0) break;
         for (int i = 0; i < PIXEL_COUNT; i++) {
-            set_pixel_effect_rgb(i, params->red, params->green, params->blue);
+            handles[i] = set_pixel_effect_rgb(i, params->red, params->green, params->blue);
         }
         vTaskDelay(high_period);
         for (int i = 0; i < PIXEL_COUNT; i++) {
-            set_pixel_effect_release(i);
+            set_pixel_effect_release(i, handles[i], false);
         }
+        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(0)) > 0) break;
         vTaskDelay(low_period);
     }
+
+    vTaskDelete(NULL);
 }
 
-void flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty) {
+TaskHandle_t flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty) {
     // Dynamically allocate memory for the parameters
     struct FlashParams *params = pvPortMalloc(sizeof(struct FlashParams));
-    if (params == NULL) {
-        // Handle memory allocation failure (e.g., log it, return, etc.)
-        return;
-    }
 
     params->red = red;
     params->green = green;
@@ -137,11 +184,13 @@ void flash(uint8_t red, uint8_t green, uint8_t blue, uint16_t period, float duty
     params->duty = duty;
 
     // Create the task and check if it's created successfully
-    BaseType_t result = xTaskCreate(task_flash, "TaskFlash", 2048, (void*) params, 1, NULL);
+    TaskHandle_t handle = NULL;
+    BaseType_t result = xTaskCreate(task_flash, "TaskFlash", 2048, (void*) params, 1, &handle);
     if (result != pdPASS) {
         // Handle task creation failure (e.g., log it, free memory, etc.)
         vPortFree(params);
     }
+    return handle;
 }
 
 void task_burst(void *parameters) {
@@ -161,24 +210,21 @@ void task_burst(void *parameters) {
         period = pdMS_TO_TICKS(10); // default to 10 ms
     }
 
+    ListItem_t *handles[PIXEL_COUNT];
     for (int i = 0; i < PIXEL_COUNT; i++) {
-        set_pixel_effect_rgb(i, params->red, params->green, params->blue);
+        handles[i] = set_pixel_effect_rgb(i, params->red, params->green, params->blue);
     }
     vTaskDelay(period);
     for (int i = 0; i < PIXEL_COUNT; i++) {
-        set_pixel_effect_release(i);
+        set_pixel_effect_release(i, handles[i], false);
     }
 
     vTaskDelete(NULL);
 }
 
-void burst(uint8_t red, uint8_t green, uint8_t blue, uint16_t duration) {
+TaskHandle_t burst(uint8_t red, uint8_t green, uint8_t blue, uint16_t duration) {
     // Dynamically allocate memory for the parameters
     struct BurstParams *params = pvPortMalloc(sizeof(struct BurstParams));
-    if (params == NULL) {
-        // Handle memory allocation failure (e.g., log it, return, etc.)
-        return;
-    }
 
     params->red = red;
     params->green = green;
@@ -186,9 +232,66 @@ void burst(uint8_t red, uint8_t green, uint8_t blue, uint16_t duration) {
     params->duration = duration;
 
     // Create the task and check if it's created successfully
-    BaseType_t result = xTaskCreate(task_burst, "TaskBurst", 2048, (void*) params, 1, NULL);
+    TaskHandle_t handle = NULL;
+    BaseType_t result = xTaskCreate(task_burst, "TaskBurst", 2048, (void*) params, 1, &handle);
     if (result != pdPASS) {
         // Handle task creation failure (e.g., log it, free memory, etc.)
         vPortFree(params);
     }
+    return handle;
+}
+
+void task_breath(void *parameters) {
+    struct BreathParams *params = (struct BreathParams *) parameters;
+    ListItem_t *handles[PIXEL_COUNT];
+
+    TickType_t lastWakeTime = xTaskGetTickCount();
+    const TickType_t delay = pdMS_TO_TICKS(10);
+
+    for (;;) {
+        memset(handles, 0, sizeof(handles));  // Clear handles array
+
+        uint64_t time = pdTICKS_TO_MS(xTaskGetTickCount());
+        double phase = (double) time / (double) params->period;  // Correct phase calculation
+        uint8_t alpha = (uint8_t)((sin(M_TWOPI * phase) * 0.5 + 0.5) * (params->alpha_high - params->alpha_low) + params->alpha_low);
+
+        // Apply effect
+        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(0)) > 0) break;
+        for (int i = 0; i < PIXEL_COUNT; i++) {
+            handles[i] = set_pixel_effect_argb(i, alpha, params->red, params->green, params->blue);
+        }
+
+        vTaskDelayUntil(&lastWakeTime, delay);  // Maintain precise timing
+
+        // Release effect
+        for (int i = 0; i < PIXEL_COUNT; i++) {
+            if (handles[i] != NULL) {  // Ensure we only release valid handles
+                set_pixel_effect_release(i, handles[i], true);
+            }
+        }
+        if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(0)) > 0) break;
+    }
+
+    vTaskDelete(NULL);
+}
+
+TaskHandle_t breath(uint8_t red, uint8_t green, uint8_t blue,  uint8_t alpha_low, uint8_t alpha_high, uint16_t period) {
+    // Dynamically allocate memory for the parameters
+    struct BreathParams *params = pvPortMalloc(sizeof(struct BreathParams));
+
+    params->red = red;
+    params->green = green;
+    params->blue = blue;
+    params->alpha_low = alpha_low;
+    params->alpha_high = alpha_high;
+    params->period = period;
+
+    // Create the task and check if it's created successfully
+    TaskHandle_t handle = NULL;
+    BaseType_t result = xTaskCreate(task_breath, "TaskBreath", 2048, (void*) params, 1, &handle);
+    if (result != pdPASS) {
+        // Handle task creation failure (e.g., log it, free memory, etc.)
+        vPortFree(params);
+    }
+    return handle;
 }
