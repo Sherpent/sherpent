@@ -6,7 +6,7 @@ idf_component_register(
         "src/sherpent.c"
         "neopixel/neopixel.c"
         INCLUDE_DIRS "include" "neopixel"
-        REQUIRES driver
+        REQUIRES driver esp_adc
 )
 
 target_include_directories(${COMPONENT_LIB} PUBLIC

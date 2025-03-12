@@ -3,6 +3,7 @@
 #include <head.h>
 #include <esp_log.h>
 #include <led.h>
+#include <safety.h>
 #include <servo.h>
 #include <power.h>
 #include <string.h>
@@ -43,6 +44,8 @@ void monitor_battery_task(void *parameters) {
     TaskHandle_t flash_handle = NULL;
 
     for (;;) {
+        ESP_LOGI("BATTERY VOLTAGE", "%.2lf V", get_battery_voltage());
+        /*
         if (is_battery_charging()) {
             if (breath_handle == NULL) {
                 breath_handle = breath(255, 0, 0, 0, 10, 5000);
@@ -53,9 +56,10 @@ void monitor_battery_task(void *parameters) {
                 breath_handle = NULL;
             }
         }
-        if (get_battery_percentage() < 0.01) { // Under 10%
+        */
+        if (get_battery_percentage() < 0.1) { // Under 10%
             if (flash_handle == NULL) {
-                flash_handle = flash(255, 0, 0, 0, 100);
+                flash_handle = flash(255, 0, 0, 1000, 0.1);
             }
         } else {
             if (flash_handle != NULL) {
@@ -71,6 +75,7 @@ void monitor_battery_task(void *parameters) {
 
 void app_main(void)
 {
+    safety_init();
     power_init();
     set_powered(true);
 
@@ -85,6 +90,8 @@ void app_main(void)
 
     button_setup();
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
+
+    set_pixel_rgb(0, 0, 50, 0);
 }
 
 void ble_main(void) {

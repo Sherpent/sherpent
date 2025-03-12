@@ -3,9 +3,11 @@
 //
 
 #include <soc/io_mux_reg.h>
+#include <driver/gpio.h>
 #include <neopixel.h>
 #include <string.h>
 #include <math.h>
+#include <driver/uart.h>
 #include "led.h"
 #include "esp_log.h"
 
@@ -25,6 +27,8 @@ void led_init() {
     }
     xTaskCreate(task_led, "LEDTask", 2048, NULL, 1, &led_task);
 
+    uart_driver_delete(UART_NUM_0);
+    gpio_set_direction(NEOPIXEL_PIN, GPIO_MODE_INPUT_OUTPUT); // Make sure it's set as GPIO and not as UART
     neopixel = neopixel_Init(PIXEL_COUNT, NEOPIXEL_PIN);
     xTaskNotifyGive(led_task); // Update LEDs
 }
