@@ -5,9 +5,6 @@
 #include <driver/adc.h>
 #include "power.h"
 
-#define ADC_TO_VOLTAGE ((3.3f / 4095.0f) * (3.0f / 2.0f) * 1.05f)
-#define ADC_TO_PERCENTAGE ((1.0f / 4095.0f) * (3.0f / 2.0f) * 1.05f)
-
 static bool _powered = false;
 
 void power_init() {
