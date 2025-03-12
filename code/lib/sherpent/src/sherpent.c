@@ -4,5 +4,6 @@
 
 #include "sherpent.h"
 #include "led.h"
+#include "safety.h"
 #include "servo.h"
 #include "power.h"

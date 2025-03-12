@@ -30,12 +30,26 @@ void power_init() {
 float get_battery_voltage() {
     return (float) adc1_get_raw(ADC_PIN) * ADC_TO_VOLTAGE;
 }
+bool is_below_min_voltage(float voltage) {
+    return voltage < BATTERY_VOLTAGE_MIN;
+}
+bool is_above_max_voltage(float voltage) {
+    return voltage > BATTERY_VOLTAGE_MAX;
+}
+bool is_below_max_critical_voltage(float voltage) {
+    return voltage > BATTERY_VOLTAGE_MAX_CRITICAL;
+}
+
+bool is_battery_voltage_safe(float voltage) {
+    return !is_below_min_voltage(voltage) && !is_above_max_voltage(voltage);
+}
+
 float get_battery_percentage() {
     return (float) adc1_get_raw(ADC_PIN) * ADC_TO_PERCENTAGE;
 }
 
 bool is_battery_charging() {
-    return false;
+    return get_battery_voltage() > 4.2f;
 }
 
 void set_powered(bool powered) {

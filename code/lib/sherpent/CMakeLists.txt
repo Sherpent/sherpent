@@ -1,6 +1,7 @@
 idf_component_register(
         SRCS "src/led.c"
         "src/power.c"
+        "src/safety.c"
         "src/servo.c"
         "src/sherpent.c"
         "neopixel/neopixel.c"
