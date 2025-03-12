@@ -39,6 +39,10 @@ static ledc_channel_config_t ledc_channel[] = {
 };
 
 void servo_init() {
+    static bool initialized = false;
+    if (initialized) return;
+    initialized = true;
+
     gpio_reset_pin(SERVO_PITCH_PIN);
     gpio_reset_pin(SERVO_YAW_PIN);
     gpio_set_direction(SERVO_PITCH_PIN, GPIO_MODE_OUTPUT);

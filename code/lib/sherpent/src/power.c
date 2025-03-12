@@ -12,11 +12,14 @@
 #define ADC_PIN ADC1_CHANNEL_4     // Example: ADC1 Channel 4 corresponds to GPIO20 (check your ESP32 variant)
 
 #define ADC_TO_VOLTAGE ((3.3f / 4095.0f) * (3.0f / 2.0f))
-#define ADC_TO_PERCENTAGE ((1.0f / 4095.0f) * (3.0f / 2.0f))
 
 static bool _powered = false;
 
 void power_init() {
+    static bool initialized = false;
+    if (initialized) return;
+    initialized = true;
+
     // ADC width (12-bit resolution is used here)
     adc1_config_width(ADC_WIDTH);
 
@@ -45,7 +48,7 @@ bool is_battery_voltage_safe(float voltage) {
 }
 
 float get_battery_percentage() {
-    return (float) adc1_get_raw(ADC_PIN) * ADC_TO_PERCENTAGE;
+    return (get_battery_voltage() - BATTERY_VOLTAGE_MIN) / (BATTERY_VOLTAGE_MAX - BATTERY_VOLTAGE_MIN);
 }
 
 bool is_battery_charging() {

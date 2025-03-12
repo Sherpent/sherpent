@@ -38,6 +38,36 @@ void button_setup() {
     gpio_isr_handler_add(BUTTON_PIN, button_isr_handler, NULL);
 }
 
+void monitor_battery_task(void *parameters) {
+    TaskHandle_t breath_handle = NULL;
+    TaskHandle_t flash_handle = NULL;
+
+    for (;;) {
+        if (is_battery_charging()) {
+            if (breath_handle == NULL) {
+                breath_handle = breath(255, 0, 0, 0, 10, 5000);
+            }
+        } else {
+            if (breath_handle != NULL) {
+                stop_effect(breath_handle);
+                breath_handle = NULL;
+            }
+        }
+        if (get_battery_percentage() < 0.01) { // Under 10%
+            if (flash_handle == NULL) {
+                flash_handle = flash(255, 0, 0, 0, 100);
+            }
+        } else {
+            if (flash_handle != NULL) {
+                stop_effect(flash_handle);
+                flash_handle = NULL;
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
+
 
 void app_main(void)
 {
@@ -54,6 +84,7 @@ void app_main(void)
     init_ble();
 
     button_setup();
+    xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
 }
 
 void ble_main(void) {
@@ -161,7 +192,7 @@ void send_message_to_module(uint8_t segment_id, struct Message *message) {
 }
 
 void message_callback(uint8_t segment_id, struct Message *message) {
-    //burst(255, 140, 0, 500);
+    burst(255, 140, 0, 500);
 
     switch (message->msg_id) {
         case LOG: {

@@ -16,6 +16,10 @@ static struct xLIST effect_queue[PIXEL_COUNT];
 static TaskHandle_t led_task = NULL;
 
 void led_init() {
+    static bool initialized = false;
+    if (initialized) return;
+    initialized = true;
+
     for (int i = 0; i < PIXEL_COUNT; i++) {
         vListInitialise(&effect_queue[i]);
     }

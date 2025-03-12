@@ -3,6 +3,10 @@
 #include "freertos/FreeRTOS.h"
 
 void safety_init() {
+    static bool initialized = false;
+    if (initialized) return;
+    initialized = true;
+
     power_init();
     vSafetyCheckerTask(); // Calling immediately for safety
     xTaskCreate(vSafetyCheckerTask, "Safety Checker", 4096, NULL, 1, NULL);
