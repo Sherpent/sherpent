@@ -10651,10 +10651,10 @@
 		)
 		(uuid "fea40ffd-e16d-4e5b-8713-2a4437620ad5")
 	)
-	(text_box "Patches à faire:\n- Mettre une 0 ohm sur R26\n- Enlever Q4\n- mettre un mosfet P sur D29\n	- Connecter sa gate sur le pad de Q4\n- Connecter Le v+ de R6 et R3 avant le mosfet sur D29\n\nExplication des patches:\nLe DCDC ne désactive pas sa sortie quand son enable est \"false\". Il désactive seulement le switching. La tension à sa sortie est celle a son entrée avec une drop de tension equivalente a une diode interne.\nLe mosfet Q4 qui switchait EN est donc relocalisé sur la footprint de D29 afin de switcher l'alimentation du DCDC. Cela implique qu'il faut un mosfet capable de supporter toute la puissance du board"
+	(text_box "Patches à faire:\n- Mettre une 0 ohm sur R26\n- Enlever Q4\n- mettre un mosfet P sur D29\n	- Connecter sa gate sur le pad de Q4\n- Connecter Le v+ de R6 et R3 avant le mosfet sur D29\n\nExplication des patches:\nLe DCDC ne désactive pas sa sortie quand son enable est \"false\". Il désactive seulement le switching. La tension à sa sortie est celle a son entrée avec une drop de tension equivalente a une diode interne.\nLe mosfet Q4 qui switchait EN est donc relocalisé sur la footprint de D29 afin de switcher l'alimentation du DCDC. Cela implique qu'il faut un mosfet capable de supporter toute la puissance du board\n\n19 mars: Le mosfet de la patch crée une drop de tension trop importante qui cause un brown out et les servo vont full lentement\n	Quand on short le mosfet tout marche bien.\n	ToDo: - Trouver Un mosfet qui marche pcq sinon si le board bleu detecte une load quand la batterie est pluggée il trig des safety"
 		(exclude_from_sim no)
 		(at 124.46 359.41 0)
-		(size 54.61 41.91)
+		(size 54.61 58.42)
 		(stroke
 			(width 0)
 			(type default)
@@ -10956,7 +10956,6 @@
 	)
 	(label "VUSB"
 		(at 157.48 262.89 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -10967,7 +10966,6 @@
 	)
 	(label "VBATT"
 		(at 166.37 73.66 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -10978,7 +10976,6 @@
 	)
 	(label "neo_end"
 		(at 440.69 284.48 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -10989,7 +10986,6 @@
 	)
 	(label "StayOn"
 		(at 71.12 354.33 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11000,7 +10996,6 @@
 	)
 	(label "NEO_Row2"
 		(at 361.95 298.45 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11011,7 +11006,6 @@
 	)
 	(label "neo_end"
 		(at 431.8 337.82 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11022,7 +11016,6 @@
 	)
 	(label "Moteur1_PWM"
 		(at 330.2 113.03 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11033,7 +11026,6 @@
 	)
 	(label "CHARGE"
 		(at 121.92 243.84 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11044,7 +11036,6 @@
 	)
 	(label "DIODE_STATE"
 		(at 295.91 267.97 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11055,7 +11046,6 @@
 	)
 	(label "VUSB"
 		(at 71.12 350.52 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11066,7 +11056,6 @@
 	)
 	(label "VBATT"
 		(at 187.96 262.89 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11077,7 +11066,6 @@
 	)
 	(label "VDIODE"
 		(at 295.91 270.51 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11088,7 +11076,6 @@
 	)
 	(label "NEO_Row2"
 		(at 487.68 267.97 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11099,7 +11086,6 @@
 	)
 	(label "VBATT"
 		(at 41.91 323.85 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11110,7 +11096,6 @@
 	)
 	(label "B-"
 		(at 22.86 281.94 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11121,7 +11106,6 @@
 	)
 	(label "VUSB"
 		(at 62.23 293.37 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11132,7 +11116,6 @@
 	)
 	(label "VUSB"
 		(at 231.14 273.05 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11143,7 +11126,6 @@
 	)
 	(label "USB_ESP32N"
 		(at 492.76 105.41 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11154,7 +11136,6 @@
 	)
 	(label "Moteur2_PWM"
 		(at 330.2 115.57 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11165,7 +11146,6 @@
 	)
 	(label "VDIODE"
 		(at 231.14 270.51 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11176,7 +11156,6 @@
 	)
 	(label "USB_ESP32N"
 		(at 48.26 100.33 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11187,7 +11166,6 @@
 	)
 	(label "NEOPX"
 		(at 434.34 97.79 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11198,7 +11176,6 @@
 	)
 	(label "VUSB"
 		(at 48.26 105.41 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11209,7 +11186,6 @@
 	)
 	(label "Moteur2_PWM"
 		(at 187.96 140.97 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11220,7 +11196,6 @@
 	)
 	(label "VUSB"
 		(at 71.12 139.7 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11231,7 +11206,6 @@
 	)
 	(label "VBATT"
 		(at 100.33 298.45 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11242,7 +11216,6 @@
 	)
 	(label "Moteur1_PWM"
 		(at 187.96 119.38 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11253,7 +11226,6 @@
 	)
 	(label "USB_ESP32N"
 		(at 128.27 149.86 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11264,7 +11236,6 @@
 	)
 	(label "Button"
 		(at 35.56 341.63 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11275,7 +11246,6 @@
 	)
 	(label "USB_ESP32P"
 		(at 95.25 149.86 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11286,7 +11256,6 @@
 	)
 	(label "VUSB"
 		(at 21.59 254 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11297,7 +11266,6 @@
 	)
 	(label "B-"
 		(at 166.37 97.79 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11308,7 +11276,6 @@
 	)
 	(label "NEOPX"
 		(at 361.95 267.97 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11319,7 +11286,6 @@
 	)
 	(label "VUSB"
 		(at 104.14 139.7 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11330,7 +11296,6 @@
 	)
 	(label "VBATT"
 		(at 114.3 259.08 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11341,7 +11306,6 @@
 	)
 	(label "VBATT"
 		(at 100.33 293.37 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11352,7 +11316,6 @@
 	)
 	(label "USB_ESP32P"
 		(at 48.26 97.79 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11363,7 +11326,6 @@
 	)
 	(label "USB_ESP32P"
 		(at 492.76 102.87 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11374,7 +11336,6 @@
 	)
 	(label "CHARGE"
 		(at 330.2 105.41 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11385,7 +11346,6 @@
 	)
 	(label "StayOn"
 		(at 330.2 107.95 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11396,7 +11356,6 @@
 	)
 	(label "Button"
 		(at 330.2 102.87 0)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11407,7 +11366,6 @@
 	)
 	(label "B-"
 		(at 100.33 295.91 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -11418,7 +11376,6 @@
 	)
 	(label "VBATT"
 		(at 454.66 100.33 180)
-		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
