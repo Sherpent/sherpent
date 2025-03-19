@@ -33,11 +33,19 @@ void register_module(uint16_t conn_id, uint8_t segment_id);
 void unregister_module(uint8_t segment_id);
 void _message_callback(uint16_t sender_conn_id, struct Message *message);
 
+bool is_master_conn_id(uint16_t conn_id);
+bool is_master_connected();
+void register_master(uint16_t conn_id);
+void unregister_master();
+
 void ble_main(void);
 void on_connect(uint16_t conn_id);
 void on_disconnect(uint16_t conn_id);
 
 void send_message_to_module(uint8_t segment_id, struct Message *message);
 void message_callback(uint8_t segment_id, struct Message *message);
+
+void send_message_to_master(struct Message *message);
+void master_message_callback(struct Message *message);
 
 #endif // HEAD_H

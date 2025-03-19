@@ -35,7 +35,7 @@ void led_init() {
 
 void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
     if (pixel_num >= PIXEL_COUNT) {
-        ESP_LOGW("LED", "Trying to set color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
+        ESP_LOGW("LED", "Trying to set color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", (int) pixel_num, PIXEL_COUNT - 1);
         return;
     }
 
@@ -49,7 +49,7 @@ struct xLIST_ITEM *set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t
 
 struct xLIST_ITEM *set_pixel_effect_argb(uint32_t pixel_num, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue) {
     if (pixel_num >= PIXEL_COUNT) {
-        ESP_LOGW("LED", "Invalid pixel index: %d (Valid range: 0-%d)", pixel_num, PIXEL_COUNT - 1);
+        ESP_LOGW("LED", "Invalid pixel index: %d (Valid range: 0-%d)", (int) pixel_num, PIXEL_COUNT - 1);
         return NULL;
     }
 
@@ -71,7 +71,7 @@ struct xLIST_ITEM *set_pixel_effect_argb(uint32_t pixel_num, uint8_t alpha, uint
     if (listLIST_IS_INITIALISED(&effect_queue[pixel_num])) {
         vListInsertEnd(&effect_queue[pixel_num], &item->listItem);
     } else {
-        ESP_LOGE("LED", "Effect queue for pixel %d is not initialized!", pixel_num);
+        ESP_LOGE("LED", "Effect queue for pixel %d is not initialized!", (int) pixel_num);
         vPortFree(item);
         return NULL;
     }
@@ -88,7 +88,7 @@ struct xLIST_ITEM *set_pixel_effect_argb(uint32_t pixel_num, uint8_t alpha, uint
 
 void set_pixel_effect_release(uint32_t pixel_num, struct xLIST_ITEM *handle, bool silently) {
     if (pixel_num >= PIXEL_COUNT) {
-        ESP_LOGW("LED", "Trying to release effect color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", pixel_num, PIXEL_COUNT - 1);
+        ESP_LOGW("LED", "Trying to release effect color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", (int) pixel_num, PIXEL_COUNT - 1);
         return;
     }
 

@@ -9,6 +9,7 @@
 enum MessageID: uint8_t {
     LOG,
     REGISTER,
+    REGISTER_MASTER,
     INFO_BATTERY,
 
     SET_YAW,
@@ -42,6 +43,11 @@ struct Register {
     uint8_t msg_size;
     enum MessageID msg_id;
     uint8_t segment_id;
+};
+
+struct RegisterMaster {
+    uint8_t msg_size;
+    enum MessageID msg_id;
 };
 
 

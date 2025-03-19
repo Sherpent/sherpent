@@ -15,6 +15,9 @@
 static bool modules_registered[MAX_MODULE_NUM] = {false};
 static uint16_t modules_conn_id[MAX_MODULE_NUM] = {0};
 
+static bool master_connected = false;
+static uint16_t master_conn_id = 0;
+
 void rgb_task(void *pvParameters);
 
 // Interrupt handler
@@ -104,6 +107,8 @@ void on_connect(uint16_t conn_id) {
 }
 
 void on_disconnect(uint16_t conn_id) {
+    if (is_master_conn_id(conn_id)) unregister_master();
+
     uint8_t segment_id = get_segment_id(conn_id);
     if (segment_id != 0) unregister_module(get_segment_id(conn_id));
 
@@ -129,7 +134,7 @@ uint8_t get_segment_id(uint16_t conn_id) {
 
 uint16_t get_conn_id(uint8_t segment_id) {
     if (!is_segment_id_registered(segment_id)) {
-        ESP_LOGW("MODULE_MANAGER", "module #%d is not registered, but trying to find it's connection id was attempted");
+        ESP_LOGW("MODULE_MANAGER", "module #%d is not registered, but trying to find it's connection id was attempted", segment_id);
         return 0;
     }
 
@@ -149,6 +154,17 @@ void _message_callback(uint16_t sender_conn_id, struct Message *message) {
         return;
     }
 
+    if (message->msg_id == REGISTER_MASTER) {
+        struct Register *register_message = (struct Register*) message;
+        register_module(sender_conn_id, register_message->segment_id);
+        burst(0, 140, 255, 500);
+        return;
+    }
+
+    if (is_master_conn_id(sender_conn_id)) {
+        master_message_callback(message);
+        return;
+    }
 
     uint8_t segment_id = get_segment_id(sender_conn_id);
     if (segment_id == 0) {
@@ -156,8 +172,32 @@ void _message_callback(uint16_t sender_conn_id, struct Message *message) {
     } else message_callback(get_segment_id(sender_conn_id), message);
 }
 
+bool is_master_conn_id(uint16_t conn_id) {
+    return is_master_connected() && master_conn_id == conn_id;
+}
+
+bool is_master_connected() {
+    return master_connected;
+}
+
+void register_master(uint16_t conn_id) {
+    if (!is_master_connected()) {
+        ESP_LOGW("MASTER_MANAGER", "Overriding conn_id of master (Master was already registered), %d -> %d", master_conn_id, conn_id);
+    }
+    master_conn_id = conn_id;
+    master_connected = true;
+}
+
+void unregister_master() {
+    if (!is_master_connected()) {
+        ESP_LOGW("MASTER_MANAGER", "Attempted to unregister master while no master is registered, aborting");
+        master_conn_id = 0;
+        master_connected = false;
+    }
+}
+
 void register_module(uint16_t conn_id, uint8_t segment_id) {
-    if (segment_id == 0) ESP_LOGW("MODULE_MANAGER", "Attempted to register module #0 which can't have a connection id as it represents itself", segment_id, get_conn_id(segment_id), conn_id);
+    if (segment_id == 0) ESP_LOGW("MODULE_MANAGER", "Attempted to register module #0 which can't have a connection id as it represents itself");
     else {
         if (is_segment_id_registered(segment_id))
             ESP_LOGW("MODULE_MANAGER", "Overriding conn_id of module #%d (Module was already registered), %d -> %d",
@@ -173,8 +213,7 @@ void register_module(uint16_t conn_id, uint8_t segment_id) {
 void unregister_module(uint8_t segment_id) {
     if (segment_id == 0) {
         ESP_LOGW("MODULE_MANAGER",
-                 "Attempted to unregister module #0 which doesn't have a connection id as it represents itself",
-                 segment_id);
+                 "Attempted to unregister module #0 which doesn't have a connection id as it represents itself");
     } else {
         if (!is_segment_id_registered(segment_id))
             ESP_LOGW("MODULE_MANAGER", "Attempted to unregister non registered module #%d",  segment_id);
@@ -206,23 +245,23 @@ void message_callback(uint8_t segment_id, struct Message *message) {
             struct Log *log = (struct Log *) message;
             switch (log->log_level) {
                 case DEBUG:
-                    ESP_LOGD("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    ESP_LOGD("LOG", "Module #%d - %.*s", segment_id, getMessageLength(log), log->message);
                     break;
                 case INFO:
-                    ESP_LOGI("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    ESP_LOGI("LOG", "Module #%d - %.*s", segment_id, (int) getMessageLength(log), log->message);
                     break;
                 case WARNING:
-                    ESP_LOGW("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    ESP_LOGW("LOG", "Module #%d - %.*s", segment_id, (int) getMessageLength(log), log->message);
                     break;
                 case ERROR:
-                    ESP_LOGE("LOG", "Module #%d - %.*s", log->message, getMessageLength(log));
+                    ESP_LOGE("LOG", "Module #%d - %.*s", segment_id, (int) getMessageLength(log), log->message);
                     break;
             }
             break;
         }
         case INFO_BATTERY: {
             struct InfoBattery *info_battery = (struct InfoBattery *) message;
-            ESP_LOGI("LOG", "Module #%d [Battery level] - %.2f%%", (float) info_battery->level * (100.0f / 255.0f));
+            ESP_LOGI("LOG", "Module #%d [Battery level] - %.2f %%", segment_id, (float) info_battery->level * (100.0f / 255.0f));
             break;
         }
         case SET_YAW: {
@@ -247,4 +286,17 @@ void message_callback(uint8_t segment_id, struct Message *message) {
     }
     //struct SetLight sent_message = {5, 9, 0, 255, 0};
     //send_message_to_module(1, (struct Message*) &sent_message);
+}
+
+void send_message_to_master(struct Message *message) {
+    if (is_master_connected()) {
+        ESP_LOGW("MODULE_MANAGER", "Attempted to send a message to a non master");
+    }
+
+    send_message(get_conn_id(master_conn_id), message);
+    burst(140, 0, 255, 500);
+}
+
+void master_message_callback(struct Message *message) {
+    burst(140, 0, 255, 500);
 }
