@@ -107,6 +107,7 @@ void on_connect(uint16_t conn_id) {
 }
 
 void on_disconnect(uint16_t conn_id) {
+    set_advertising(true);
     if (is_master_conn_id(conn_id)) unregister_master();
 
     uint8_t segment_id = get_segment_id(conn_id);

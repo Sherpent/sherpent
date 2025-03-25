@@ -4,11 +4,43 @@
 
 #ifndef BLE_H
 #define BLE_H
-#include "esp_gap_ble_api.h"
+#include <stdint.h>
+#include <communication.h>
+#include <stdbool.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
+#include <esp_gap_ble_api.h>
+
+typedef void (*scan_callback_t)();
+typedef void (*conn_callback_t)(uint16_t conn_id);
+typedef void (*message_callback_t)(uint16_t sender_conn_id, struct Message *message);
+typedef void (*event_callback_t)();
+
+typedef struct {
+    int conn_id;
+    struct Message *message;
+} message_queue_item_t;
+
+enum conn_callback_type {
+    CONNECTION,
+    DISCONNECTION,
+};
+
+enum scan_callback_type {
+    START,
+    STOP,
+};
 
 void init_ble();
 
-static void scan_init();
-static void scan_result_cb(esp_ble_gap_cb_param_t *scan_result);
+bool send_message(struct Message *message);
+bool start_scan(uint32_t duration);
+
+bool is_connected();
+
+void register_conn_callback(enum conn_callback_type type, conn_callback_t callback);
+void register_scan_callback(enum scan_callback_type type, scan_callback_t callback);
+void register_msg_callback(message_callback_t callback);
+void register_setup_complete_callback(event_callback_t callback);
 
 #endif //BLE_H

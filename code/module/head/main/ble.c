@@ -27,6 +27,7 @@
 #include <inttypes.h>
 #include "freertos/FreeRTOS.h"
 #include <freertos/queue.h>
+#include "esp_system.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_bt.h"
@@ -157,6 +158,105 @@ typedef struct {
 
 static prepare_type_env_t a_prepare_write_env;
 
+static char *esp_key_type_to_str(esp_ble_key_type_t key_type)
+{
+    char *key_str = NULL;
+    switch(key_type) {
+        case ESP_LE_KEY_NONE:
+            key_str = "ESP_LE_KEY_NONE";
+            break;
+        case ESP_LE_KEY_PENC:
+            key_str = "ESP_LE_KEY_PENC";
+            break;
+        case ESP_LE_KEY_PID:
+            key_str = "ESP_LE_KEY_PID";
+            break;
+        case ESP_LE_KEY_PCSRK:
+            key_str = "ESP_LE_KEY_PCSRK";
+            break;
+        case ESP_LE_KEY_PLK:
+            key_str = "ESP_LE_KEY_PLK";
+            break;
+        case ESP_LE_KEY_LLK:
+            key_str = "ESP_LE_KEY_LLK";
+            break;
+        case ESP_LE_KEY_LENC:
+            key_str = "ESP_LE_KEY_LENC";
+            break;
+        case ESP_LE_KEY_LID:
+            key_str = "ESP_LE_KEY_LID";
+            break;
+        case ESP_LE_KEY_LCSRK:
+            key_str = "ESP_LE_KEY_LCSRK";
+            break;
+        default:
+            key_str = "INVALID BLE KEY TYPE";
+            break;
+
+    }
+
+    return key_str;
+}
+
+static char *esp_auth_req_to_str(esp_ble_auth_req_t auth_req)
+{
+    char *auth_str = NULL;
+    switch(auth_req) {
+        case ESP_LE_AUTH_NO_BOND:
+            auth_str = "ESP_LE_AUTH_NO_BOND";
+            break;
+        case ESP_LE_AUTH_BOND:
+            auth_str = "ESP_LE_AUTH_BOND";
+            break;
+        case ESP_LE_AUTH_REQ_MITM:
+            auth_str = "ESP_LE_AUTH_REQ_MITM";
+            break;
+        case ESP_LE_AUTH_REQ_BOND_MITM:
+            auth_str = "ESP_LE_AUTH_REQ_BOND_MITM";
+            break;
+        case ESP_LE_AUTH_REQ_SC_ONLY:
+            auth_str = "ESP_LE_AUTH_REQ_SC_ONLY";
+            break;
+        case ESP_LE_AUTH_REQ_SC_BOND:
+            auth_str = "ESP_LE_AUTH_REQ_SC_BOND";
+            break;
+        case ESP_LE_AUTH_REQ_SC_MITM:
+            auth_str = "ESP_LE_AUTH_REQ_SC_MITM";
+            break;
+        case ESP_LE_AUTH_REQ_SC_MITM_BOND:
+            auth_str = "ESP_LE_AUTH_REQ_SC_MITM_BOND";
+            break;
+        default:
+            auth_str = "INVALID BLE AUTH REQ";
+            break;
+    }
+
+    return auth_str;
+}
+
+static void show_bonded_devices(void)
+{
+    int dev_num = esp_ble_get_bond_device_num();
+    if (dev_num == 0) {
+        ESP_LOGI(GATTS_TAG, "Bonded devices number zero\n");
+        return;
+    }
+
+    esp_ble_bond_dev_t *dev_list = (esp_ble_bond_dev_t *)malloc(sizeof(esp_ble_bond_dev_t) * dev_num);
+    if (!dev_list) {
+        ESP_LOGI(GATTS_TAG, "malloc failed, return\n");
+        return;
+    }
+    esp_ble_get_bond_device_list(&dev_num, dev_list);
+    ESP_LOGI(GATTS_TAG, "Bonded devices number %d", dev_num);
+    for (int i = 0; i < dev_num; i++) {
+        ESP_LOGI(GATTS_TAG, "[%u] addr_type %u, addr "ESP_BD_ADDR_STR"",
+                 i, dev_list[i].bd_addr_type, ESP_BD_ADDR_HEX(dev_list[i].bd_addr));
+    }
+
+    free(dev_list);
+}
+
 void example_write_event_env(esp_gatt_if_t gatts_if, prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 void example_exec_write_event_env(prepare_type_env_t *prepare_write_env, esp_ble_gatts_cb_param_t *param);
 
@@ -216,6 +316,67 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
                   param->pkt_data_length_cmpl.status,
                   param->pkt_data_length_cmpl.params.rx_len,
                   param->pkt_data_length_cmpl.params.tx_len);
+        break;
+    case ESP_GAP_BLE_PASSKEY_REQ_EVT:                           /* passkey request event */
+        ESP_LOGI(GATTS_TAG, "Passkey request");
+        /* Call the following function to input the passkey which is displayed on the remote device */
+        //esp_ble_passkey_reply(heart_rate_profile_tab[HEART_PROFILE_APP_IDX].remote_bda, true, 0x00);
+        break;
+    case ESP_GAP_BLE_OOB_REQ_EVT: {
+        ESP_LOGI(GATTS_TAG, "OOB request");
+        uint8_t tk[16] = {1}; //If you paired with OOB, both devices need to use the same tk
+        esp_ble_oob_req_reply(param->ble_security.ble_req.bd_addr, tk, sizeof(tk));
+        break;
+    }
+    case ESP_GAP_BLE_LOCAL_IR_EVT:                               /* BLE local IR event */
+        ESP_LOGI(GATTS_TAG, "Local identity root");
+        break;
+    case ESP_GAP_BLE_LOCAL_ER_EVT:                               /* BLE local ER event */
+        ESP_LOGI(GATTS_TAG, "Local encryption root");
+        break;
+    case ESP_GAP_BLE_NC_REQ_EVT:
+        /* The app will receive this evt when the IO has DisplayYesNO capability and the peer device IO also has DisplayYesNo capability.
+        show the passkey number to the user to confirm it with the number displayed by peer device. */
+        esp_ble_confirm_reply(param->ble_security.ble_req.bd_addr, true);
+        ESP_LOGI(GATTS_TAG, "Numeric Comparison request, passkey %" PRIu32, param->ble_security.key_notif.passkey);
+        break;
+    case ESP_GAP_BLE_SEC_REQ_EVT:
+        /* send the positive(true) security response to the peer device to accept the security request.
+        If not accept the security request, should send the security response with negative(false) accept value*/
+        esp_ble_gap_security_rsp(param->ble_security.ble_req.bd_addr, true);
+        break;
+    case ESP_GAP_BLE_PASSKEY_NOTIF_EVT:  ///the app will receive this evt when the IO  has Output capability and the peer device IO has Input capability.
+        ///show the passkey number to the user to input it in the peer device.
+        ESP_LOGI(GATTS_TAG, "Passkey notify, passkey %06" PRIu32, param->ble_security.key_notif.passkey);
+        break;
+    case ESP_GAP_BLE_KEY_EVT:
+        //shows the ble key info share with peer device to the user.
+        ESP_LOGI(GATTS_TAG, "Key exchanged, key_type %s", esp_key_type_to_str(param->ble_security.ble_key.key_type));
+        break;
+    case ESP_GAP_BLE_AUTH_CMPL_EVT: {
+        esp_bd_addr_t bd_addr;
+        memcpy(bd_addr, param->ble_security.auth_cmpl.bd_addr, sizeof(esp_bd_addr_t));
+        ESP_LOGI(GATTS_TAG, "Authentication complete, addr_type %u, addr "ESP_BD_ADDR_STR"",
+                 param->ble_security.auth_cmpl.addr_type, ESP_BD_ADDR_HEX(bd_addr));
+        if(!param->ble_security.auth_cmpl.success) {
+            ESP_LOGI(GATTS_TAG, "Pairing failed, reason 0x%x",param->ble_security.auth_cmpl.fail_reason);
+        } else {
+            ESP_LOGI(GATTS_TAG, "Pairing successfully, auth_mode %s",esp_auth_req_to_str(param->ble_security.auth_cmpl.auth_mode));
+        }
+        show_bonded_devices();
+        break;
+    }
+    case ESP_GAP_BLE_REMOVE_BOND_DEV_COMPLETE_EVT: {
+        ESP_LOGD(GATTS_TAG, "Bond device remove, status %d, device "ESP_BD_ADDR_STR"",
+                 param->remove_bond_dev_cmpl.status, ESP_BD_ADDR_HEX(param->remove_bond_dev_cmpl.bd_addr));
+        break;
+    }
+    case ESP_GAP_BLE_SET_LOCAL_PRIVACY_COMPLETE_EVT:
+        if (param->local_privacy_cmpl.status != ESP_BT_STATUS_SUCCESS){
+            ESP_LOGE(GATTS_TAG, "Local privacy config failed, status %x", param->local_privacy_cmpl.status);
+            break;
+        }
+        ESP_LOGI(GATTS_TAG, "Local privacy config successfully");
         break;
     default:
         break;
@@ -428,18 +589,7 @@ static void gatts_profile_a_event_handler(esp_gatts_cb_event_t event, esp_gatt_i
     case ESP_GATTS_STOP_EVT:
         break;
     case ESP_GATTS_CONNECT_EVT: {
-        esp_ble_conn_update_params_t conn_params = {0};
-        memcpy(conn_params.bda, param->connect.remote_bda, sizeof(esp_bd_addr_t));
-        /* For the IOS system, please reference the apple official documents about the ble connection parameters restrictions. */
-        conn_params.latency = 0;
-        conn_params.max_int = 0x20;    // max_int = 0x20*1.25ms = 40ms
-        conn_params.min_int = 0x10;    // min_int = 0x10*1.25ms = 20ms
-        conn_params.timeout = 1400;    // timeout = 400*10ms = 4000ms
-        ESP_LOGI(GATTS_TAG, "Connected, conn_id %u, remote "ESP_BD_ADDR_STR"",
-                 param->connect.conn_id, ESP_BD_ADDR_HEX(param->connect.remote_bda));
-        //start sent the update connection parameters to the peer device.
-        esp_ble_gap_update_conn_params(&conn_params);
-
+        esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM);
         if (conn_callback_table[CONNECTION] != NULL) conn_callback_table[CONNECTION](param->connect.conn_id);
         break;
     }
@@ -535,6 +685,29 @@ void init_ble()
     esp_ble_gatts_app_register(PROFILE_APP_ID);
 
     esp_ble_gatt_set_local_mtu(500);
+
+    /* set the security iocap & auth_req & key size & init key response key parameters to the stack*/
+    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;     //bonding with peer device after authentication
+    esp_ble_io_cap_t iocap = ESP_IO_CAP_NONE;           //set the IO capability to No output No input
+    uint8_t key_size = 16;      //the key size should be 7~16 bytes
+    uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+    uint8_t rsp_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+    //set static passkey
+    uint32_t passkey = 123456;
+    uint8_t auth_option = ESP_BLE_ONLY_ACCEPT_SPECIFIED_AUTH_DISABLE;
+    uint8_t oob_support = ESP_BLE_OOB_DISABLE;
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_STATIC_PASSKEY, &passkey, sizeof(uint32_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t));
+    /* If your BLE device acts as a Slave, the init_key means you hope which types of key of the master should distribute to you,
+    and the response key means which key you can distribute to the master;
+    If your BLE device acts as a master, the response key means you hope which types of key of the slave should distribute to you,
+    and the init key means which key you can distribute to the slave. */
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t));
+    esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t));
 }
 
 bool send_message(uint16_t conn_id, struct Message *message) {
