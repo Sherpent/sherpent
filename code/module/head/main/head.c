@@ -100,11 +100,11 @@ void app_main(void)
     {
         set_servo_angle(YAW, (float) 0);
         set_servo_angle(PITCH, (float) 0);
-        vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+        vTaskDelay(pdMS_TO_TICKS(300)); // Sleep for 1000 ms
         set_servo_angle(YAW, (float) 100);
-        vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+        //vTaskDelay(pdMS_TO_TICKS(500)); // Sleep for 1000 ms
         set_servo_angle(PITCH, (float) 100);
-        vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+        vTaskDelay(pdMS_TO_TICKS(300)); // Sleep for 1000 ms
     }
 }
 

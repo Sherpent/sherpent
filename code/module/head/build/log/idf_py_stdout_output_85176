@@ -1,0 +1,67 @@
+Command: ninja flash
+[1/5] cd /home/user/repos/sherpent/code/module/head/build/esp-idf/esptool_py && /home/user/.espressif/python_env/idf5.5_py3.10_env/bin/python /home/user/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/user/repos/sherpent/code/module/head/build/partition_table/partition-table.bin /home/user/repos/sherpent/code/module/head/build/head.bin
+head.bin binary size 0xcf540 bytes. Smallest app partition is 0x100000 bytes. 0x30ac0 bytes (19%) free.
+[2/5] Performing build step for 'bootloader'
+[1/1] cd /home/user/repos/sherpent/code/module/head/build/bootloader/esp-idf/esptool_py && /home/user/.espressif/python_env/idf5.5_py3.10_env/bin/python /home/user/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /home/user/repos/sherpent/code/module/head/build/bootloader/bootloader.bin
+Bootloader binary size 0x5230 bytes. 0x2dd0 bytes (36%) free.
+[3/5] No install step for 'bootloader'
+[4/5] Completed 'bootloader'
+[4/5] cd /home/user/esp/esp-idf/components/esptool_py && /usr/bin/cmake -D IDF_PATH=/home/user/esp/esp-idf -D "SERIAL_TOOL=/home/user/.espressif/python_env/idf5.5_py3.10_env/bin/python;;/home/user/esp/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32c3" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/home/user/repos/sherpent/code/module/head/build -P /home/user/esp/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32c3 -p /dev/ttyACM0 -b 115200 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 2MB 0x0 bootloader/bootloader.bin 0x10000 head.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.9.dev6
+Serial port /dev/ttyACM0
+Connecting....
+Chip is ESP32-C3 (QFN32) (revision v0.4)
+Features: WiFi, BLE, Embedded Flash 4MB (XMC)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: 9c:9e:6e:8d:f8:04
+Uploading stub...
+Running stub...
+Stub running...
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00005fff...
+Flash will be erased from 0x00010000 to 0x000dffff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+SHA digest in image updated
+Compressed 21040 bytes to 13223...
+Writing at 0x00000000... (100 %)
+Wrote 21040 bytes (13223 compressed) at 0x00000000 in 0.3 seconds (effective 501.2 kbit/s)...
+Hash of data verified.
+Compressed 849216 bytes to 438212...
+Writing at 0x00010000... (3 %)
+Writing at 0x0001d750... (7 %)
+Writing at 0x00029f90... (11 %)
+Writing at 0x00033d52... (14 %)
+Writing at 0x00039fdf... (18 %)
+Writing at 0x00040552... (22 %)
+Writing at 0x00047091... (25 %)
+Writing at 0x0004edb6... (29 %)
+Writing at 0x00056b7a... (33 %)
+Writing at 0x0005e2d2... (37 %)
+Writing at 0x0006545b... (40 %)
+Writing at 0x0006c7dd... (44 %)
+Writing at 0x000744a0... (48 %)
+Writing at 0x0007ba54... (51 %)
+Writing at 0x00083fbd... (55 %)
+Writing at 0x0008bfec... (59 %)
+Writing at 0x00092e16... (62 %)
+Writing at 0x0009a1dd... (66 %)
+Writing at 0x000a1216... (70 %)
+Writing at 0x000a890c... (74 %)
+Writing at 0x000affe0... (77 %)
+Writing at 0x000b765d... (81 %)
+Writing at 0x000be146... (85 %)
+Writing at 0x000c3e58... (88 %)
+Writing at 0x000cc485... (92 %)
+Writing at 0x000d2fe1... (96 %)
+Writing at 0x000d9b0a... (100 %)
+Wrote 849216 bytes (438212 compressed) at 0x00010000 in 6.2 seconds (effective 1097.1 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 103...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (effective 559.2 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...

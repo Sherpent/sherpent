@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "head",
-    "project_version":    "v1.0.0-11-g5bcbfb2-dirty",
+    "project_version":    "v1.0.0-12-gdb9927a-dirty",
     "project_path":       "/home/user/repos/sherpent/code/module/head",
     "idf_path":           "/home/user/esp/esp-idf",
     "build_dir":          "/home/user/repos/sherpent/code/module/head/build",
