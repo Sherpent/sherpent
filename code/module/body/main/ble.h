@@ -13,6 +13,7 @@
 
 typedef void (*scan_callback_t)();
 typedef void (*conn_callback_t)(uint16_t conn_id);
+typedef void (*conn_ready_callback_t)();
 typedef void (*message_callback_t)(uint16_t sender_conn_id, struct Message *message);
 typedef void (*event_callback_t)();
 
@@ -40,6 +41,7 @@ bool is_connected();
 
 void register_conn_callback(enum conn_callback_type type, conn_callback_t callback);
 void register_scan_callback(enum scan_callback_type type, scan_callback_t callback);
+void register_conn_ready_callback(conn_ready_callback_t callback);
 void register_msg_callback(message_callback_t callback);
 void register_setup_complete_callback(event_callback_t callback);
 

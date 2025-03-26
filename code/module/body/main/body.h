@@ -5,4 +5,7 @@
 #ifndef BODY_H
 #define BODY_H
 
+void setup();
+void connected();
+
 #endif // BODY_H

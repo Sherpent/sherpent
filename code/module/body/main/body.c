@@ -1,4 +1,5 @@
 #include <ble.h>
+#include "body.h"
 
 #include <led.h>
 #include <power.h>
@@ -34,7 +35,9 @@ void button_setup() {
 
 void app_main(void) {
     set_powered(true);
-    //init_ble();
+    register_setup_complete_callback(setup);
+    register_conn_ready_callback(connected);
+    init_ble();
 
     power_init();
     led_init();
@@ -43,6 +46,20 @@ void app_main(void) {
     button_setup();
 
     xTaskCreate(rgb_task, "RGB Task", 2048, NULL, 1, NULL);
+    start_scan(60);
+}
+
+void setup() {
+    start_scan(60);
+}
+
+void connected() {
+    struct Register *message = malloc(sizeof(struct Register));
+    message->msg_size = (uint8_t) sizeof(struct Register);
+    message->msg_id = REGISTER;
+    message->segment_id = (uint8_t) 1;
+    send_message((struct Message *) message);
+    ESP_LOGD("DEBUG", "Sending message");
 }
 
 void rgb_task(void *pvParameters) {
@@ -75,12 +92,6 @@ void rgb_task(void *pvParameters) {
 
             set_pixel_rgb(i, r, g, b);
         }
-
-
-
-        float angle = (float) (abs(180 - hue) - 90);
-        set_servo_angle(YAW, angle);
-        set_servo_angle(PITCH,  angle);
 
         hue = (hue + 5) % 360; // Increment hue for smooth transition
         vTaskDelay(pdMS_TO_TICKS(20)); // Delay for animation speed

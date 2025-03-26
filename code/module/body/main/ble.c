@@ -29,7 +29,7 @@
 #define APP_ID 0
 #define INVALID_HANDLE   0
 
-static char remote_device_name[ESP_BLE_ADV_NAME_LEN_MAX] = "ESP_GATTS_DEMO";
+static char remote_device_name[ESP_BLE_ADV_NAME_LEN_MAX] = "SHERPENT";
 static bool connect    = false;
 static bool get_service = false;
 static esp_gattc_char_elem_t *char_elem_result   = NULL;
@@ -53,6 +53,7 @@ static scan_callback_t scan_callback_table[] = {
         [STOP] = NULL,
 };
 
+static conn_ready_callback_t conn_ready_callback = NULL;
 static message_callback_t message_callback = NULL;
 
 static event_callback_t setup_complete_callback = NULL;
@@ -272,7 +273,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                                 if (char_elem_result[i].uuid.len == ESP_UUID_LEN_16 && char_elem_result[i].uuid.uuid.uuid16 == REMOTE_NOTIFY_UUID && (char_elem_result[i].properties & ESP_GATT_CHAR_PROP_BIT_NOTIFY))
                                 {
                                     profile.notify_char_handle = char_elem_result[i].char_handle;
-                                    esp_ble_gattc_register_for_notify (gattc_if,
+                                    esp_ble_gattc_register_for_notify(gattc_if,
                                                                        profile.remote_bda,
                                                                        char_elem_result[i].char_handle);
                                     break;
@@ -292,6 +293,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                 break;
             } else {
                 ESP_LOGI(GATTC_TAG, "Notification register successfully");
+                if (conn_ready_callback != NULL) conn_ready_callback();
             }
             break;
         }
@@ -611,6 +613,7 @@ bool start_scan(uint32_t duration) {
 
 void register_conn_callback(enum conn_callback_type type, conn_callback_t callback) { conn_callback_table[type] = callback; }
 void register_scan_callback(enum scan_callback_type type, scan_callback_t callback) { scan_callback_table[type] = callback; }
+void register_conn_ready_callback(conn_ready_callback_t callback) { conn_ready_callback = callback; }
 void register_msg_callback(message_callback_t callback) { message_callback = callback; }
 void register_setup_complete_callback(event_callback_t callback) { setup_complete_callback = callback; }
 
