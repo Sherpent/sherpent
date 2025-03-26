@@ -311,7 +311,6 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
 
             // Prepare queue item
             message_queue_item_t queue_item = {
-                    .conn_id = param->write.conn_id,
                     .message = message
             };
 
@@ -348,7 +347,7 @@ static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_
                      ESP_BD_ADDR_HEX(p_data->disconnect.remote_bda), p_data->disconnect.reason);
             connect = false;
             get_service = false;
-            if (conn_callback_table[DISCONNECTION] != NULL) conn_callback_table[DISCONNECTION](p_data->disconnect.conn_id);
+            if (conn_callback_table[DISCONNECTION] != NULL) conn_callback_table[DISCONNECTION]();
             break;
         default:
             break;
@@ -552,7 +551,7 @@ void message_task(void *pvParameters) {
     for (;;) {
         if (xQueueReceive(message_queue, &queueItem, 10) == pdPASS) {
             if (message_callback != NULL) {
-                message_callback(queueItem.conn_id, queueItem.message);
+                message_callback(queueItem.message);
             }
             free(queueItem.message);
         }

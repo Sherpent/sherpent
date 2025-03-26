@@ -12,13 +12,12 @@
 #include <esp_gap_ble_api.h>
 
 typedef void (*scan_callback_t)();
-typedef void (*conn_callback_t)(uint16_t conn_id);
+typedef void (*conn_callback_t)();
 typedef void (*conn_ready_callback_t)();
-typedef void (*message_callback_t)(uint16_t sender_conn_id, struct Message *message);
+typedef void (*message_callback_t)(struct Message *message);
 typedef void (*event_callback_t)();
 
 typedef struct {
-    int conn_id;
     struct Message *message;
 } message_queue_item_t;
 

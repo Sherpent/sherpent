@@ -4,6 +4,7 @@
 #include <led.h>
 #include <power.h>
 #include <servo.h>
+#include <storage.h>
 #include "esp_log.h"
 #include "esp_intr_alloc.h"
 #include "driver/gpio.h"
@@ -35,8 +36,11 @@ void button_setup() {
 
 void app_main(void) {
     set_powered(true);
-    register_setup_complete_callback(setup);
-    register_conn_ready_callback(connected);
+    register_setup_complete_callback(ble_main);
+    register_scan_callback(STOP, on_scan_stopped);
+    register_conn_ready_callback(on_connected);
+    register_conn_callback(DISCONNECTION, on_disconnected);
+    register_msg_callback(message_callback);
     init_ble();
 
     power_init();
@@ -44,56 +48,85 @@ void app_main(void) {
     servo_init();
 
     button_setup();
+    set_pixel_rgb(0, 0, 50, 0);
 
-    xTaskCreate(rgb_task, "RGB Task", 2048, NULL, 1, NULL);
+    uint8_t segment_id;
+    if (get_segment_id(&segment_id) == ESP_OK) {
+        ESP_LOGI("MODULE INFO", "Current segment_id: %d", segment_id);
+    }
+
     start_scan(60);
 }
 
-void setup() {
-    start_scan(60);
+void ble_main() {
+    //start_scan(60);
 }
 
-void connected() {
+void on_connected() {
     struct Register *message = malloc(sizeof(struct Register));
     message->msg_size = (uint8_t) sizeof(struct Register);
     message->msg_id = REGISTER;
-    message->segment_id = (uint8_t) 1;
+    get_segment_id(&(message->segment_id));
     send_message((struct Message *) message);
-    ESP_LOGD("DEBUG", "Sending message");
 }
 
-void rgb_task(void *pvParameters) {
-    int hue = 0;
+void on_disconnected() {
+    start_scan(5);
+}
 
-    while (1) {
-        ESP_LOGI("BATTERY", "%f V", get_battery_voltage());
-
-
-        for (int i = 0; i < PIXEL_COUNT; i++) {
-            int shifted_hue = (hue + (0 * 25)) % 360; // Shift hue for a rainbow effect
-            int r, g, b;
-
-            // Simple HSV to RGB conversion
-            if (shifted_hue < 120) {
-                r = (120 - shifted_hue) * 255 / 120;
-                g = shifted_hue * 255 / 120;
-                b = 0;
-            } else if (shifted_hue < 240) {
-                shifted_hue -= 120;
-                r = 0;
-                g = (120 - shifted_hue) * 255 / 120;
-                b = shifted_hue * 255 / 120;
-            } else {
-                shifted_hue -= 240;
-                r = shifted_hue * 255 / 120;
-                g = 0;
-                b = (120 - shifted_hue) * 255 / 120;
-            }
-
-            set_pixel_rgb(i, r, g, b);
-        }
-
-        hue = (hue + 5) % 360; // Increment hue for smooth transition
-        vTaskDelay(pdMS_TO_TICKS(20)); // Delay for animation speed
+void on_scan_stopped() {
+    if (!is_connected()) {
+        start_scan(true);
     }
+}
+
+void message_callback(struct Message *message) {
+    burst(255, 140, 0, 500);
+
+    switch (message->msg_id) {
+        case LOG: {
+            struct Log *log = (struct Log *) message;
+            switch (log->log_level) {
+                case DEBUG:
+                    ESP_LOGD("LOG", "%.*s", getMessageLength(log), log->message);
+                    break;
+                case INFO:
+                    ESP_LOGI("LOG", "%.*s", (int) getMessageLength(log), log->message);
+                    break;
+                case WARNING:
+                    ESP_LOGW("LOG", "%.*s", (int) getMessageLength(log), log->message);
+                    break;
+                case ERROR:
+                    ESP_LOGE("LOG", "%.*s", (int) getMessageLength(log), log->message);
+                    break;
+            }
+            break;
+        }
+        case INFO_BATTERY: {
+            struct InfoBattery *info_battery = (struct InfoBattery *) message;
+            ESP_LOGI("LOG", "[Battery level] - %.2f %%", (float) info_battery->level * (100.0f / 255.0f));
+            break;
+        }
+        case SET_YAW: {
+            struct SetYaw *set_yaw = (struct SetYaw *) message;
+            set_servo_angle(YAW, (float) set_yaw->angle_degrees);
+            break;
+        }
+        case SET_PITCH: {
+            struct SetPitch *set_pitch = (struct SetPitch *) message;
+            set_servo_angle(PITCH, (float) set_pitch->angle_degrees);
+            break;
+        }
+        case SET_LIGHT: {
+            struct SetLight *set_light = (struct SetLight *) message;
+            for (int i = 0; i < PIXEL_COUNT; i++) {
+                set_pixel_rgb(i, set_light->red, set_light->green, set_light->blue);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    //struct SetLight sent_message = {5, 9, 0, 255, 0};
+    //send_message_to_module(1, (struct Message*) &sent_message);
 }
