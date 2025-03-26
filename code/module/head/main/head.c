@@ -7,6 +7,7 @@
 #include <servo.h>
 #include <power.h>
 #include <string.h>
+#include <math.h>
 
 #include "esp_intr_alloc.h"
 #include "driver/gpio.h"
@@ -19,6 +20,7 @@ static bool master_connected = false;
 static uint16_t master_conn_id = 0;
 
 void rgb_task(void *pvParameters);
+void test();
 
 // Interrupt handler
 static void IRAM_ATTR button_isr_handler(void* arg) {
@@ -91,10 +93,52 @@ void app_main(void)
     servo_init();
     init_ble();
 
+    set_servo_angle(YAW, 0);
+    set_servo_angle(PITCH, 0);
+
     button_setup();
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
+    xTaskCreate(test, "Slither", 4096, NULL, 2, NULL);
 
     set_pixel_rgb(0, 0, 50, 0);
+}
+
+void test() {
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency = pdMS_TO_TICKS(100);
+    for (;;) {
+        static float slither_offset = 0.0f;
+        float slither_frequency = 0.5f;
+        float curve_angle = 8.0f;
+        //float angles[link_count];
+        //find_angles(angles, link_count, 12.4, slither, 1000, 1e-2);
+
+        //Serial.println(angles[1]);
+        int link_count = 4;
+        float turning = 0;
+        slither_offset += 0.1f * 2.0f * 3.14f * slither_frequency;
+        for (int i = 0; i < 4; i++) {
+            float angle = (float) sin((double) slither_offset + 2.0f * 3.14f * (float) i * 1.0f / (float) link_count) *
+                          45.0f + turning * 90.0f / (float) link_count;
+
+            struct SetYaw *message = malloc(sizeof(struct SetYaw));
+            message->msg_size = (uint8_t) sizeof(struct SetYaw);
+            message->msg_id = SET_YAW;
+            message->angle_degrees = (int8_t) angle;
+            send_message_to_module(i, ((struct Message *) message));
+
+            struct SetPitch *message_pitch = malloc(sizeof(struct SetPitch));
+            message_pitch->msg_size = (uint8_t) sizeof(struct SetPitch);
+            message_pitch->msg_id = SET_PITCH;
+            message_pitch->angle_degrees = (int8_t) (curve_angle / (float) link_count);
+            send_message_to_module(i, ((struct Message *) message_pitch));
+            //float blue = ((angle + 90.0f) * 255.0f / 180.0f);
+            //for (int j = 0; j < PIXEL_COUNT; j++) {
+                //set_pixel_rgb(j, 0, 0, blue);
+            //}
+        }
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
+    }
 }
 
 void ble_main(void) {
@@ -229,6 +273,7 @@ void unregister_module(uint8_t segment_id) {
 void send_message_to_module(uint8_t segment_id, struct Message *message) {
     if (!is_segment_id_registered(segment_id)) {
         ESP_LOGW("MODULE_MANAGER", "Attempted to send a message to a non registered module #%d", segment_id);
+        return;
     }
 
     if (segment_id != 0) {
@@ -239,7 +284,7 @@ void send_message_to_module(uint8_t segment_id, struct Message *message) {
 }
 
 void message_callback(uint8_t segment_id, struct Message *message) {
-    burst(255, 140, 0, 500);
+    //burst(255, 140, 0, 500);
 
     switch (message->msg_id) {
         case LOG: {
@@ -295,7 +340,7 @@ void send_message_to_master(struct Message *message) {
     }
 
     send_message(get_conn_id(master_conn_id), message);
-    burst(140, 0, 255, 500);
+    //burst(140, 0, 255, 500);
 }
 
 void master_message_callback(struct Message *message) {
