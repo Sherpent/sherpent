@@ -95,17 +95,22 @@ void app_main(void)
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
 
     set_pixel_rgb(0, 0, 50, 0);
-
-    while(true) //Added RG
-    {
-        set_servo_angle(YAW, (float) 0);
-        set_servo_angle(PITCH, (float) 0);
-        vTaskDelay(pdMS_TO_TICKS(300)); // Sleep for 1000 ms
-        set_servo_angle(YAW, (float) 100);
-        //vTaskDelay(pdMS_TO_TICKS(500)); // Sleep for 1000 ms
-        set_servo_angle(PITCH, (float) 100);
-        vTaskDelay(pdMS_TO_TICKS(300)); // Sleep for 1000 ms
-    }
+    set_servo_angle(YAW, (float) 0);
+    set_servo_angle(PITCH, (float) 0);
+while(true) //Added RG
+{
+   set_servo_angle(YAW, (float) 0);
+   set_servo_angle(PITCH, (float) 0);
+   vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+   set_servo_angle(YAW, (float) 90);
+   vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+   set_servo_angle(PITCH, (float) 90);
+   vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+   set_servo_angle(YAW, (float) -90);
+   vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+   set_servo_angle(PITCH, (float) -90);
+   vTaskDelay(pdMS_TO_TICKS(2000)); // Sleep for 1000 ms
+}
 }
 
 void ble_main(void) {

@@ -1,0 +1,83 @@
+Command: ninja flash
+[1/10] Performing build step for 'bootloader'
+[1/1] cd /home/user/repos/sherpent/code/module/head/build/bootloader/esp-idf/esptool_py && /home/user/.espressif/python_env/idf5.5_py3.10_env/bin/python /home/user/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /home/user/repos/sherpent/code/module/head/build/bootloader/bootloader.bin
+Bootloader binary size 0x5230 bytes. 0x2dd0 bytes (36%) free.
+[2/10] No install step for 'bootloader'
+[3/10] Completed 'bootloader'
+[4/10] Building C object esp-idf/main/CMakeFiles/__idf_main.dir/head.c.obj
+/home/user/repos/sherpent/code/module/head/main/head.c: In function 'monitor_battery_task':
+/home/user/repos/sherpent/code/module/head/main/head.c:46:18: warning: unused variable 'breath_handle' [-Wunused-variable]
+   46 |     TaskHandle_t breath_handle = NULL;
+      |                  ^~~~~~~~~~~~~
+[5/10] Linking C static library esp-idf/main/libmain.a
+[6/10] Generating ld/sections.ld
+[7/10] Linking CXX executable head.elf
+[8/10] Generating binary image from built executable
+esptool.py v4.9.dev6
+Creating esp32c3 image...
+Merged 1 ELF section
+Successfully created esp32c3 image.
+Generated /home/user/repos/sherpent/code/module/head/build/head.bin
+[9/10] cd /home/user/repos/sherpent/code/module/head/build/esp-idf/esptool_py && /home/user/.espressif/python_env/idf5.5_py3.10_env/bin/python /home/user/esp/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /home/user/repos/sherpent/code/module/head/build/partition_table/partition-table.bin /home/user/repos/sherpent/code/module/head/build/head.bin
+head.bin binary size 0xcf510 bytes. Smallest app partition is 0x100000 bytes. 0x30af0 bytes (19%) free.
+[9/10] cd /home/user/esp/esp-idf/components/esptool_py && /usr/bin/cmake -D IDF_PATH=/home/user/esp/esp-idf -D "SERIAL_TOOL=/home/user/.espressif/python_env/idf5.5_py3.10_env/bin/python;;/home/user/esp/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32c3" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/home/user/repos/sherpent/code/module/head/build -P /home/user/esp/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32c3 -p /dev/ttyACM0 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 2MB 0x0 bootloader/bootloader.bin 0x10000 head.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.9.dev6
+Serial port /dev/ttyACM0
+Connecting...
+Chip is ESP32-C3 (QFN32) (revision v0.4)
+Features: WiFi, BLE, Embedded Flash 4MB (XMC)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: 9c:9e:6e:8d:f8:10
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00005fff...
+Flash will be erased from 0x00010000 to 0x000dffff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+SHA digest in image updated
+Compressed 21040 bytes to 13225...
+Writing at 0x00000000... (100 %)
+Wrote 21040 bytes (13225 compressed) at 0x00000000 in 0.3 seconds (effective 553.1 kbit/s)...
+Hash of data verified.
+Compressed 849168 bytes to 438190...
+Writing at 0x00010000... (3 %)
+Writing at 0x0001d761... (7 %)
+Writing at 0x00029f9a... (11 %)
+Writing at 0x00033de0... (14 %)
+Writing at 0x0003a00e... (18 %)
+Writing at 0x00040567... (22 %)
+Writing at 0x000470a3... (25 %)
+Writing at 0x0004ee2e... (29 %)
+Writing at 0x00056b88... (33 %)
+Writing at 0x0005e2fc... (37 %)
+Writing at 0x0006546b... (40 %)
+Writing at 0x0006c7dc... (44 %)
+Writing at 0x000744ca... (48 %)
+Writing at 0x0007ba4b... (51 %)
+Writing at 0x00083fc8... (55 %)
+Writing at 0x0008bfe2... (59 %)
+Writing at 0x00092e37... (62 %)
+Writing at 0x0009a1d6... (66 %)
+Writing at 0x000a1217... (70 %)
+Writing at 0x000a8910... (74 %)
+Writing at 0x000affe2... (77 %)
+Writing at 0x000b7679... (81 %)
+Writing at 0x000be141... (85 %)
+Writing at 0x000c3e58... (88 %)
+Writing at 0x000cc48c... (92 %)
+Writing at 0x000d301b... (96 %)
+Writing at 0x000d9afc... (100 %)
+Wrote 849168 bytes (438190 compressed) at 0x00010000 in 6.0 seconds (effective 1131.3 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 103...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (103 compressed) at 0x00008000 in 0.0 seconds (effective 648.1 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
