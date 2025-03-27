@@ -641,7 +641,9 @@ void message_task(void *pvParameters) {
     message_queue_item_t queueItem;
 
     for (;;) {
-        if (xQueueReceive(message_queue, &queueItem, 10) == pdPASS) {
+        if (message_queue == NULL) {
+            ESP_LOGW(GATTS_TAG, "Message queue not initialized");
+        } else if (xQueueReceive(message_queue, &queueItem, 10) == pdPASS) {
             if (message_callback != NULL) {
                 message_callback(queueItem.conn_id, queueItem.message);
             }
