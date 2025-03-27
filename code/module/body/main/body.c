@@ -40,8 +40,8 @@ void app_main(void) {
     register_scan_callback(STOP, on_scan_stopped);
     register_conn_ready_callback(on_connected);
     register_conn_callback(DISCONNECTION, on_disconnected);
-    register_msg_callback(message_callback);
     init_ble();
+    register_msg_callback(message_callback);
 
     power_init();
     led_init();
@@ -68,10 +68,12 @@ void on_connected() {
     message->msg_id = REGISTER;
     get_segment_id(&(message->segment_id));
     send_message((struct Message *) message);
+    burst(0, 255, 0, 500);
 }
 
 void on_disconnected() {
     start_scan(5);
+    burst(255, 0, 0, 500);
 }
 
 void on_scan_stopped() {
@@ -81,7 +83,7 @@ void on_scan_stopped() {
 }
 
 void message_callback(struct Message *message) {
-    burst(255, 140, 0, 500);
+    //burst(255, 140, 0, 500);
 
     switch (message->msg_id) {
         case LOG: {

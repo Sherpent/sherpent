@@ -12,6 +12,7 @@
 #include "esp_intr_alloc.h"
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
+#include <movement.h>
 
 static bool modules_registered[MAX_MODULE_NUM] = {false};
 static uint16_t modules_conn_id[MAX_MODULE_NUM] = {0};
@@ -82,63 +83,28 @@ void app_main(void)
 {
     safety_init();
     power_init();
-    set_powered(true);
+    //set_powered(true);
 
     register_conn_callback(CONNECTION, on_connect);
     register_conn_callback(DISCONNECTION, on_disconnect);
-    register_msg_callback(_message_callback);
     register_setup_complete_callback(ble_main);
+    init_ble();
+    register_msg_callback(_message_callback);
 
     led_init();
     servo_init();
-    init_ble();
-
-    set_servo_angle(YAW, 0);
-    set_servo_angle(PITCH, 0);
 
     button_setup();
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
-    xTaskCreate(test, "Slither", 4096, NULL, 2, NULL);
+    init_slither_task();
+
+    //init_uart();
 
     set_pixel_rgb(0, 0, 50, 0);
-}
 
-void test() {
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency = pdMS_TO_TICKS(100);
-    for (;;) {
-        static float slither_offset = 0.0f;
-        float slither_frequency = 0.5f;
-        float curve_angle = 8.0f;
-        //float angles[link_count];
-        //find_angles(angles, link_count, 12.4, slither, 1000, 1e-2);
-
-        //Serial.println(angles[1]);
-        int link_count = 4;
-        float turning = 0;
-        slither_offset += 0.1f * 2.0f * 3.14f * slither_frequency;
-        for (int i = 0; i < 4; i++) {
-            float angle = (float) sin((double) slither_offset + 2.0f * 3.14f * (float) i * 1.0f / (float) link_count) *
-                          45.0f + turning * 90.0f / (float) link_count;
-
-            struct SetYaw *message = malloc(sizeof(struct SetYaw));
-            message->msg_size = (uint8_t) sizeof(struct SetYaw);
-            message->msg_id = SET_YAW;
-            message->angle_degrees = (int8_t) angle;
-            send_message_to_module(i, ((struct Message *) message));
-
-            struct SetPitch *message_pitch = malloc(sizeof(struct SetPitch));
-            message_pitch->msg_size = (uint8_t) sizeof(struct SetPitch);
-            message_pitch->msg_id = SET_PITCH;
-            message_pitch->angle_degrees = (int8_t) (curve_angle / (float) link_count);
-            send_message_to_module(i, ((struct Message *) message_pitch));
-            //float blue = ((angle + 90.0f) * 255.0f / 180.0f);
-            //for (int j = 0; j < PIXEL_COUNT; j++) {
-                //set_pixel_rgb(j, 0, 0, blue);
-            //}
-        }
-        vTaskDelayUntil(&xLastWakeTime, xFrequency);
-    }
+    set_slither_frequency(-0.5f);
+    set_turn_angle(0.0f);
+    set_raise_angle(-45.0f);
 }
 
 void ble_main(void) {
@@ -345,4 +311,16 @@ void send_message_to_master(struct Message *message) {
 
 void master_message_callback(struct Message *message) {
     burst(140, 0, 255, 500);
+
+    switch (message->msg_id) {
+        case CONTROL: {
+            struct Control *control = (struct Control *) message;
+            set_turn_angle(control->x * 90.0f);
+            set_slither_frequency(control->y * 0.75f);
+            set_raise_angle(10.0f);
+            break;
+        }
+        default:
+            break;
+    }
 }
