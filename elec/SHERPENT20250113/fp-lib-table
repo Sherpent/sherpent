@@ -14,4 +14,5 @@
   (lib (name "CS1213AGF160")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ul_CS1213AGF160/KiCADv6/footprints.pretty")(options "")(descr ""))
   (lib (name "Library")(type "KiCad")(uri "${KIPRJMOD}/Librairie/WS2812B4020/Library.pretty")(options "")(descr ""))
   (lib (name "TP4056")(type "KiCad")(uri "${KIPRJMOD}/Librairie/TP4056/TP4056-18650-master")(options "")(descr ""))
+  (lib (name "CMLE105T-2R2MS")(type "KiCad")(uri "${KIPRJMOD}/Librairie/ul_CMLE105T-2R2MS/KiCADv6/footprints.pretty")(options "")(descr ""))
 )
