@@ -43,14 +43,23 @@ void servo_init() {
     if (initialized) return;
     initialized = true;
 
-    gpio_reset_pin(SERVO_PITCH_PIN);
-    gpio_reset_pin(SERVO_YAW_PIN);
-    gpio_set_direction(SERVO_PITCH_PIN, GPIO_MODE_OUTPUT);
-    gpio_set_direction(SERVO_YAW_PIN, GPIO_MODE_OUTPUT);
+    // Reset and configure GPIOs after LEDC is set up
+    //gpio_reset_pin(SERVO_PITCH_PIN);
+    //gpio_reset_pin(SERVO_YAW_PIN);
+    //gpio_set_direction(SERVO_PITCH_PIN, GPIO_MODE_OUTPUT);
 
-    ledc_timer_config(&ledc_timer);
-    ledc_channel_config(&ledc_channel[PITCH]);
-    ledc_channel_config(&ledc_channel[YAW]);
+    // Ensure GPIO starts low before LEDC takes control
+    //gpio_set_level(SERVO_PITCH_PIN, 0);
+    // gpio_set_level(SERVO_YAW_PIN, 0);
+
+    // Configure LEDC first to avoid unintended GPIO states
+    ESP_ERROR_CHECK(ledc_timer_config(&ledc_timer));
+    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[PITCH]));
+    ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[YAW]));
+
+    // Explicitly set LEDC duty cycle to 0 to prevent spikes
+    set_servo_angle(YAW, 0);
+    set_servo_angle(PITCH, 0);
 }
 
 void set_servo_angle(enum servo_type_t servo_type, float angle) {
