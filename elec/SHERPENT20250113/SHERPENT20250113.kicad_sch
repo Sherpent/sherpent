@@ -16357,7 +16357,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-223"
 			(at 82.55 180.34 0)
 			(effects
 				(font
@@ -16784,7 +16784,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-223"
 			(at 215.9 149.86 0)
 			(effects
 				(font
