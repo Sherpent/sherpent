@@ -15,6 +15,8 @@ enum MessageID: uint8_t {
     SET_YAW,
     SET_PITCH,
     SET_LIGHT,
+
+    CONTROL,
 };
 
 // General Message Structure
@@ -75,6 +77,15 @@ struct SetLight {
     uint8_t red;
     uint8_t green;
     uint8_t blue;
+};
+
+// MASTER ONLY
+struct Control {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    float x;
+    float y;
+    float z;
 };
 
 // Function Declarations
