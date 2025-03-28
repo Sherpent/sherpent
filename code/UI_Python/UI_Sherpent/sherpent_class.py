@@ -5,6 +5,10 @@ class Sherpent:
     def __init__(self):
         self.modules_list = []
         self.nbr_modules = 0
+        self.simulation_activated = False
+        self.demarrage = False
+        self.vecteur_x = 0
+        self.vecteur_y = 0
 
     def add_module(self):
         """Add module to the list"""
@@ -13,6 +17,7 @@ class Sherpent:
         if isinstance(module, Modules):
             self.modules_list.append(module)
             self.nbr_modules = len(self.modules_list)
+            return module
         else:
             print("--> Erreur Sherpent: L'objet ajouté n'est pas un module valide.")
 

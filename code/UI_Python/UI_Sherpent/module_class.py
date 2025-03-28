@@ -13,9 +13,12 @@ class Modules:
         self.module_width = 20
         self.module_length = 80
 
+        self.charge = 100.0
+
         self.module_color = 0
-        self.label = QLabel("")
-        self.slider = QSlider()
+        self.label_servo1 = QLabel("")
+        self.label_servo2 = QLabel("")
+        self.label_charge = QLabel("")
 
         self.module_name = ""
 
@@ -56,4 +59,10 @@ class Modules:
 
     def get_name(self):
         return self.module_name
+
+    def set_charge(self, charge):
+        self.charge = charge
+
+    def get_charge(self):
+        return self.charge
 

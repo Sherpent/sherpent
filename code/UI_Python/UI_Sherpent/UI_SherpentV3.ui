@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1174</width>
+    <height>868</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="mainTitle">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Rubik</family>
+        <pointsize>50</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Sherpent</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QWidget" name="widgetAffichageSherpent" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>600</width>
+             <height>600</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(85, 255, 255);</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_2" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>400</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>400</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="startBtn">
+                <property name="font">
+                 <font>
+                  <family>Rubik</family>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Start</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="stopBtn">
+                <property name="font">
+                 <font>
+                  <family>Rubik</family>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Stop</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="simBtn">
+                <property name="font">
+                 <font>
+                  <family>Rubik</family>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Sim</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QWidget" name="commandWidget" native="true">
+              <layout class="QVBoxLayout" name="commandWidgetVerticalLayout">
+               <item>
+                <widget class="QWidget" name="module0_widget" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <item>
+                   <widget class="QLabel" name="titre_module0_label">
+                    <property name="font">
+                     <font>
+                      <family>Rubik</family>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Module 0</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_module0">
+                    <item>
+                     <widget class="QWidget" name="servo1_0_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_4">
+                       <item>
+                        <widget class="QLabel" name="titre_servo1_0_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 1</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo1_0_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="servo2_0_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_5">
+                       <item>
+                        <widget class="QLabel" name="titre_servo2_0_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 2</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo2_0_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="charge0_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_6">
+                       <item>
+                        <widget class="QLabel" name="titre_charge0_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Charge</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_charge0_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>100 %</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="module1_widget" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_14">
+                  <item>
+                   <widget class="QLabel" name="titre_module1_label">
+                    <property name="font">
+                     <font>
+                      <family>Rubik</family>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Module 1</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_module1">
+                    <item>
+                     <widget class="QWidget" name="servo1_1_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_11">
+                       <item>
+                        <widget class="QLabel" name="titre_servo1_1_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 1</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo1_1_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="servo2_1_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_12">
+                       <item>
+                        <widget class="QLabel" name="titre_servo2_1_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 2</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo2_1_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="charge1_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_13">
+                       <item>
+                        <widget class="QLabel" name="titre_charge1_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Charge</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_charge1_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>100 %</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="module2_widget" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_21">
+                  <item>
+                   <widget class="QLabel" name="titre_module2_label">
+                    <property name="font">
+                     <font>
+                      <family>Rubik</family>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Module 2</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_module2">
+                    <item>
+                     <widget class="QWidget" name="servo1_2_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_18">
+                       <item>
+                        <widget class="QLabel" name="titre_servo1_2_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 1</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo1_2_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="servo2_2_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_19">
+                       <item>
+                        <widget class="QLabel" name="titre_servo2_2_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 2</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo2_2_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="charge2_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_20">
+                       <item>
+                        <widget class="QLabel" name="titre_charge2_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Charge</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_charge2_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>100 %</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="module3_widget" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_25">
+                  <item>
+                   <widget class="QLabel" name="titre_module3_label">
+                    <property name="font">
+                     <font>
+                      <family>Rubik</family>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Module 3</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_module3">
+                    <item>
+                     <widget class="QWidget" name="servo1_3_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_22">
+                       <item>
+                        <widget class="QLabel" name="titre_servo1_3_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 1</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo1_3_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="servo2_3_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_23">
+                       <item>
+                        <widget class="QLabel" name="titre_servo2_3_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 2</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo2_3_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="charge3_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_24">
+                       <item>
+                        <widget class="QLabel" name="titre_charge3_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Charge</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_charge3_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>100 %</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="module4_widget" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_29">
+                  <item>
+                   <widget class="QLabel" name="titre_module4_label">
+                    <property name="font">
+                     <font>
+                      <family>Rubik</family>
+                      <pointsize>12</pointsize>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Module 4</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_module4">
+                    <item>
+                     <widget class="QWidget" name="servo1_4_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_26">
+                       <item>
+                        <widget class="QLabel" name="titre_servo1_4_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 1</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo1_4_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="servo2_4_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_27">
+                       <item>
+                        <widget class="QLabel" name="titre_servo2_4_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Servo 2</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_servo2_4_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>000.0 °</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QWidget" name="charge4_widget" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_28">
+                       <item>
+                        <widget class="QLabel" name="titre_charge4_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Charge</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="valeur_charge4_label">
+                         <property name="font">
+                          <font>
+                           <family>Rubik</family>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>100 %</string>
+                         </property>
+                         <property name="alignment">
+                          <set>Qt::AlignCenter</set>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1174</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
