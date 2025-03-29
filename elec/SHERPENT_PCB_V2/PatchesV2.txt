@@ -1,0 +1,8 @@
+- Enable Buck boost
+	État: Résolu
+	Il faut gérer nous-même la déconnexion de l'alim. Patch temporaire: Toujours allumé
+	Patch permanente: NTF6P02T3G
+- Buck boost qui brule
+
+
+
