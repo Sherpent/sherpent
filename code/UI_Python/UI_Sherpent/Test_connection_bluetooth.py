@@ -1,27 +1,35 @@
-import serial
-import time
+from bleak import BleakClient
+import struct
 
-# Remplace 'COM5' par le port attribué à ton ESP32 (Windows)
-# Sur Linux, utilise '/dev/rfcomm0' ou un autre port détecté
-PORT_BT = "COM5"
-BAUDRATE = 115200  # Doit correspondre à la vitesse de l'ESP32
+MAC_ADDRESS = "9C:9E:6E:8D:F7:EA"
+UUID_WRITE_CHARACTERISTIC = "0000ff01-0000-1000-8000-00805f9b34fb"
 
-try:
-    # Ouvrir la connexion série Bluetooth
-    ser = serial.Serial(PORT_BT, BAUDRATE, timeout=1)
-    time.sleep(2)  # Laisser le temps à la connexion de s'établir
+async def master_connect():
+    async with BleakClient(MAC_ADDRESS) as client:
+        data = bytearray([0x02,0x02])
+        await client.write_gatt_char(UUID_WRITE_CHARACTERISTIC, data, response = False)
 
-    # Envoyer un message
-    message = "Hello ESP32!\n"
-    ser.write(message.encode())  # Convertir en bytes avant d'envoyer
-    print(f"Envoyé : {message}")
+async def send_ble():
+   async with BleakClient(MAC_ADDRESS) as client:
+       data = struct.pack("BBff",12,7, 0, 0)
+       await client.write_gatt_char(UUID_WRITE_CHARACTERISTIC, data, response = False)
+#"""
 
-    # Lire une réponse (si l'ESP32 envoie quelque chose)
-    response = ser.readline().decode().strip()
-    if response:
-        print(f"Réponse de l'ESP32 : {response}")
+def notification_handler(sender, data):
+    value = float.fromhex(data.hex())  # Conversion en float
+    print(f"Notification reçue : {value}")
 
-    ser.close()  # Fermer la connexion
+async def listen_notifications():
+    async with BleakClient(MAC_ADDRESS) as client:
+        await client.start_notify(UUID_WRITE_CHARACTERISTIC, notification_handler)
+        await asyncio.sleep(60)  # Écouter 60 sec
+        await client.stop_notify(UUID_WRITE_CHARACTERISTIC)
 
-except Exception as e:
-    print(f"Erreur : {e}")
+
+#"""
+
+import asyncio
+asyncio.run(master_connect())
+asyncio.run(send_ble())
+asyncio.run(listen_notifications())
+
