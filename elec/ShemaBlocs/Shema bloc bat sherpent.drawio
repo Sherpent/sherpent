@@ -1,0 +1,63 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" version="26.0.16">
+  <diagram name="Page-1" id="rMlebAaXrlebgaBH_DkB">
+    <mxGraphModel dx="699" dy="394" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#FF0000;endArrow=none;startFill=0;" edge="1" parent="1" source="lSff1AIIwq2ItTI8pMkJ-2" target="lSff1AIIwq2ItTI8pMkJ-4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="275" y="170" />
+              <mxPoint x="275" y="195" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#000000;endArrow=none;startFill=0;" edge="1" parent="1" source="lSff1AIIwq2ItTI8pMkJ-2" target="lSff1AIIwq2ItTI8pMkJ-4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="275" y="250" />
+              <mxPoint x="275" y="225" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-2" value="Batterie" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="190" y="170" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-3" value="PCB" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="135" width="220" height="255" as="geometry" />
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-4" value="Header" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="180" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-5" value="Fuse 10A" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="190" width="46" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;strokeColor=#FF0000;endArrow=none;startFill=0;" edge="1" parent="1" source="lSff1AIIwq2ItTI8pMkJ-11" target="lSff1AIIwq2ItTI8pMkJ-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="275" y="280" />
+              <mxPoint x="275" y="305" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#000000;endArrow=none;startFill=0;" edge="1" parent="1" source="lSff1AIIwq2ItTI8pMkJ-11" target="lSff1AIIwq2ItTI8pMkJ-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="275" y="360" />
+              <mxPoint x="275" y="335" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-11" value="Batterie" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="190" y="280" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-12" value="Header" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="290" width="80" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="lSff1AIIwq2ItTI8pMkJ-13" value="Fuse 10A" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="380" y="300" width="46" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
