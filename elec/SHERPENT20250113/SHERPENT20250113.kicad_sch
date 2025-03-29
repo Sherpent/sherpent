@@ -6376,12 +6376,6 @@
 		(uuid "416c6817-312b-4ba3-a7fd-18b0eed034cd")
 	)
 	(junction
-		(at 187.96 135.89)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "4470fa87-baee-4ff2-bb7a-5df6bed00d75")
-	)
-	(junction
 		(at 60.96 198.12)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6668,12 +6662,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "fcb74b46-118f-4f2c-ad20-8658014c1746")
-	)
-	(junction
-		(at 201.93 135.89)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "fcef918e-9d15-48ec-bb76-bbcd5a0fc018")
 	)
 	(no_connect
 		(at 92.71 90.17)
@@ -7098,16 +7086,6 @@
 			(type default)
 		)
 		(uuid "20107b81-bc75-421a-809e-b4c3ad207aca")
-	)
-	(wire
-		(pts
-			(xy 199.39 135.89) (xy 201.93 135.89)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "21b68432-7b78-40f1-ae92-8b7fb42925e3")
 	)
 	(wire
 		(pts
@@ -8628,16 +8606,6 @@
 			(type default)
 		)
 		(uuid "ce1fa8e3-6ffc-4f25-a43a-94c6a6f910e7")
-	)
-	(wire
-		(pts
-			(xy 187.96 135.89) (xy 191.77 135.89)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ceaf0b7c-ce70-4f2f-a755-ed339686e808")
 	)
 	(wire
 		(pts
@@ -10607,74 +10575,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R_US")
-		(at 195.58 135.89 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp yes)
-		(uuid "16d83d25-0b00-43bc-b66b-4eaec36d8d6c")
-		(property "Reference" "R7"
-			(at 194.818 133.35 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "0"
-			(at 198.628 133.35 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_1206_3216Metric"
-			(at 195.834 130.81 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 195.58 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor, US symbol"
-			(at 195.58 135.89 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "5101c9a9-fb0f-4605-8953-aaee2249f618")
-		)
-		(pin "1"
-			(uuid "f9ead243-b435-48cf-84ed-44aca638b769")
-		)
-		(instances
-			(project "SHERPENT20250113"
-				(path "/b9eec091-4b52-44a1-b170-afda02802a46"
-					(reference "R7")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 326.39 68.58 0)
 		(unit 1)
@@ -10878,7 +10778,7 @@
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
-		(on_board no)
+		(on_board yes)
 		(dnp no)
 		(uuid "1b7adc2c-9324-499f-88ea-b2c6fdf7a34a")
 		(property "Reference" "TP10"
@@ -22741,7 +22641,7 @@
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
-		(on_board no)
+		(on_board yes)
 		(dnp no)
 		(uuid "ee60d2e4-7ecc-408b-a8f4-95b2f2e1d35b")
 		(property "Reference" "TP11"
