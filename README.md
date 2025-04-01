@@ -96,9 +96,3 @@ Le projet sera développé en utilisant la méthodologie Agile, avec des livrabl
    - **Issues :** Pour suivre les problèmes et défis.
    - **Projets :** Pour gérer les tâches et la planification Agile.
    - **Pull Requests :** Pour réviser et intégrer les changements.
-
----
-
-## 🔖 Liens Utiles
-- [Dépôt GitHub](#) (*ajoutez ici l'URL du dépôt*)
-- [Documentation du Projet](#) (*ajoutez un lien vers la documentation partagée si applicable*)
