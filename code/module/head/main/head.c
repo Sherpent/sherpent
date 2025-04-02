@@ -46,23 +46,10 @@ void button_setup() {
 }
 
 void monitor_battery_task(void *parameters) {
-    TaskHandle_t breath_handle = NULL;
     TaskHandle_t flash_handle = NULL;
 
     for (;;) {
         ESP_LOGI("BATTERY VOLTAGE", "%.2lf V", get_battery_voltage());
-        /*
-        if (is_battery_charging()) {
-            if (breath_handle == NULL) {
-                breath_handle = breath(255, 0, 0, 0, 10, 5000);
-            }
-        } else {
-            if (breath_handle != NULL) {
-                stop_effect(breath_handle);
-                breath_handle = NULL;
-            }
-        }
-        */
         if (get_battery_percentage() < 0.1) { // Under 10%
             if (flash_handle == NULL) {
                 flash_handle = flash(255, 0, 0, 1000, 0.1);
@@ -96,15 +83,20 @@ void app_main(void)
 
     button_setup();
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
-    init_slither_task();
 
     //init_uart();
 
     set_pixel_rgb(0, 0, 50, 0);
 
-    set_slither_frequency(-0.5f);
-    set_turn_angle(0.0f);
-    set_raise_angle(-45.0f);
+    //set_slither_frequency(0.5f);
+    //set_sidewinding(1.0f);
+    //set_turn_angle(0.0f);
+    //set_raise_angle(-45.0f);
+
+    //set_slither_frequency(0.0f);
+    //set_sidewinding(0.0f);
+    //set_turn_angle(0.0f);
+    //set_raise_angle(-45.0f);
 }
 
 void ble_main(void) {
@@ -167,7 +159,7 @@ void _message_callback(uint16_t sender_conn_id, struct Message *message) {
 
     if (message->msg_id == REGISTER_MASTER) {
         struct Register *register_message = (struct Register*) message;
-        register_module(sender_conn_id, register_message->segment_id);
+        register_master(sender_conn_id);
         burst(0, 140, 255, 500);
         return;
     }
@@ -218,6 +210,9 @@ void register_module(uint16_t conn_id, uint8_t segment_id) {
         modules_conn_id[segment_id - 1] = conn_id;
         ESP_LOG_BUFFER_HEX("MODULE_MANAGER", modules_registered, sizeof(modules_registered));
         ESP_LOG_BUFFER_HEX("MODULE_MANAGER", modules_conn_id, sizeof(modules_conn_id));
+
+        set_axis(YAW, segment_id, get_angle(YAW, segment_id));
+        set_axis(PITCH, segment_id, get_angle(PITCH, segment_id));
     }
 }
 
@@ -250,6 +245,9 @@ void send_message_to_module(uint8_t segment_id, struct Message *message) {
 }
 
 void message_callback(uint8_t segment_id, struct Message *message) {
+    static struct InfoBatteryMaster battery_info_master_message;   // Allocate once
+    battery_info_master_message.msg_size = sizeof(struct InfoBatteryMaster);
+    battery_info_master_message.msg_id = INFO_BATTERY_MASTER;
     //burst(255, 140, 0, 500);
 
     switch (message->msg_id) {
@@ -274,6 +272,11 @@ void message_callback(uint8_t segment_id, struct Message *message) {
         case INFO_BATTERY: {
             struct InfoBattery *info_battery = (struct InfoBattery *) message;
             ESP_LOGI("LOG", "Module #%d [Battery level] - %.2f %%", segment_id, (float) info_battery->level * (100.0f / 255.0f));
+
+            battery_info_master_message.segment_id = segment_id;
+            battery_info_master_message.level = info_battery->level;
+            send_message_to_master((struct Message *) &battery_info_master_message);
+
             break;
         }
         case SET_YAW: {
@@ -301,11 +304,12 @@ void message_callback(uint8_t segment_id, struct Message *message) {
 }
 
 void send_message_to_master(struct Message *message) {
-    if (is_master_connected()) {
+    if (!is_master_connected()) {
         ESP_LOGW("MODULE_MANAGER", "Attempted to send a message to a non master");
+        return;
     }
 
-    send_message(get_conn_id(master_conn_id), message);
+    send_message(master_conn_id, message);
     //burst(140, 0, 255, 500);
 }
 
@@ -315,9 +319,10 @@ void master_message_callback(struct Message *message) {
     switch (message->msg_id) {
         case CONTROL: {
             struct Control *control = (struct Control *) message;
-            set_turn_angle(control->x * 90.0f);
-            set_slither_frequency(control->y * 0.75f);
-            set_raise_angle(10.0f);
+            set_slither_frequency(0.5f * control->y);
+            set_sidewinding(control->x);
+            //set_turn_angle(0.0f);
+            //set_raise_angle(-45.0f);
             break;
         }
         default:

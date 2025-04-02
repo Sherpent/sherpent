@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <driver/gpio.h>
+#include <math.h>
 #include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
@@ -131,7 +132,7 @@ bool is_battery_voltage_safe(float voltage) {
 }
 
 float get_battery_percentage() {
-    return (get_battery_voltage() - BATTERY_VOLTAGE_MIN) / (BATTERY_VOLTAGE_MAX - BATTERY_VOLTAGE_MIN);
+    return fminf(fmaxf((get_battery_voltage() - BATTERY_VOLTAGE_MIN) / (BATTERY_VOLTAGE_MAX - BATTERY_VOLTAGE_MIN), 0.0f), 1.0f);
 }
 
 bool is_battery_charging() {

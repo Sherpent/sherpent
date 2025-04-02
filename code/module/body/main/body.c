@@ -2,6 +2,7 @@
 #include "body.h"
 
 #include <led.h>
+#include <safety.h>
 #include <power.h>
 #include <servo.h>
 #include <storage.h>
@@ -34,8 +35,40 @@ void button_setup() {
     gpio_isr_handler_add(BUTTON_PIN, button_isr_handler, NULL);
 }
 
+void monitor_battery_task(void *parameters) {
+    TaskHandle_t flash_handle = NULL;
+
+    struct InfoBattery battery_info; // Allocate once
+    battery_info.msg_size = sizeof(struct InfoBattery);
+    battery_info.msg_id = INFO_BATTERY;
+
+    for (;;) {
+        ESP_LOGI("BATTERY VOLTAGE", "%.2lf V", get_battery_voltage());
+        float battery_percentage = get_battery_percentage();
+        if (battery_percentage < 0.1) { // Under 10%
+            if (flash_handle == NULL) {
+                flash_handle = flash(255, 0, 0, 1000, 0.1);
+            }
+        } else {
+            if (flash_handle != NULL) {
+                stop_effect(flash_handle);
+                flash_handle = NULL;
+            }
+        }
+
+        battery_info.level = battery_percentage * 255;
+        send_message((struct Message *) &battery_info);
+
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
+
+
 void app_main(void) {
-    set_powered(true);
+    safety_init();
+    power_init();
+    //set_powered(true);
+
     register_setup_complete_callback(ble_main);
     register_scan_callback(STOP, on_scan_stopped);
     register_conn_ready_callback(on_connected);
@@ -43,11 +76,11 @@ void app_main(void) {
     init_ble();
     register_msg_callback(message_callback);
 
-    power_init();
     led_init();
     servo_init();
 
     button_setup();
+    xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
     set_pixel_rgb(0, 0, 50, 0);
 
     uint8_t segment_id;

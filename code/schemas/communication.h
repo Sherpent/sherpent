@@ -17,6 +17,9 @@ enum MessageID: uint8_t {
     SET_LIGHT,
 
     CONTROL,
+    INFO_YAW,
+    INFO_PITCH,
+    INFO_BATTERY_MASTER,
 };
 
 // General Message Structure
@@ -59,6 +62,13 @@ struct InfoBattery {
     uint8_t level;
 };
 
+struct InfoBatteryMaster {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    uint8_t segment_id;
+    uint8_t level;
+};
+
 struct SetPitch {
     uint8_t msg_size;
     enum MessageID msg_id;
@@ -85,8 +95,22 @@ struct Control {
     enum MessageID msg_id;
     float x;
     float y;
-    float z;
 };
+
+struct InfoYaw {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    uint8_t segment_id;
+    int8_t angle_degrees;
+};
+
+struct InfoPitch {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    uint8_t segment_id;
+    int8_t angle_degrees;
+};
+
 
 // Function Declarations
 //struct Message* packageMessage(enum MessageID message_id, void* data, size_t data_size);
