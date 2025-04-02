@@ -87,6 +87,7 @@ void app_main(void)
     //init_uart();
 
     set_pixel_rgb(0, 0, 50, 0);
+    roll(360.0f, 0.75f);
 
     //set_slither_frequency(0.5f);
     //set_sidewinding(1.0f);
