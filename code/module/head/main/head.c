@@ -45,11 +45,11 @@ void button_setup() {
     gpio_isr_handler_add(BUTTON_PIN, button_isr_handler, NULL);
 }
 
+
 void monitor_battery_task(void *parameters) {
     TaskHandle_t flash_handle = NULL;
 
     for (;;) {
-        ESP_LOGI("BATTERY VOLTAGE", "%.2lf V", get_battery_voltage());
         if (get_battery_percentage() < 0.1) { // Under 10%
             if (flash_handle == NULL) {
                 flash_handle = flash(255, 0, 0, 1000, 0.1);
@@ -70,7 +70,7 @@ void app_main(void)
 {
     safety_init();
     power_init();
-    //set_powered(true);
+    set_powered(true);
 
     register_conn_callback(CONNECTION, on_connect);
     register_conn_callback(DISCONNECTION, on_disconnect);
@@ -80,6 +80,7 @@ void app_main(void)
 
     led_init();
     servo_init();
+    init_movement();
 
     button_setup();
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
@@ -87,10 +88,11 @@ void app_main(void)
     //init_uart();
 
     set_pixel_rgb(0, 0, 50, 0);
-    roll(360.0f, 0.75f);
+    roll(360.0f, 0.95f);
+    //look_up(90.0f, 0.0f);
 
-    //set_slither_frequency(0.5f);
-    //set_sidewinding(1.0f);
+    set_slither_frequency(-0.5f);
+    set_sidewinding(0.0f);
     //set_turn_angle(0.0f);
     //set_raise_angle(-45.0f);
 
@@ -212,8 +214,8 @@ void register_module(uint16_t conn_id, uint8_t segment_id) {
         ESP_LOG_BUFFER_HEX("MODULE_MANAGER", modules_registered, sizeof(modules_registered));
         ESP_LOG_BUFFER_HEX("MODULE_MANAGER", modules_conn_id, sizeof(modules_conn_id));
 
-        set_axis(YAW, segment_id, get_angle(YAW, segment_id));
-        set_axis(PITCH, segment_id, get_angle(PITCH, segment_id));
+        //set_axis(YAW, segment_id, get_angle(YAW, segment_id));
+        //set_axis(PITCH, segment_id, get_angle(PITCH, segment_id));
     }
 }
 

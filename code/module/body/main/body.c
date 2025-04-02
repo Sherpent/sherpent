@@ -67,7 +67,7 @@ void monitor_battery_task(void *parameters) {
 void app_main(void) {
     safety_init();
     power_init();
-    //set_powered(true);
+    set_powered(true);
 
     register_setup_complete_callback(ble_main);
     register_scan_callback(STOP, on_scan_stopped);

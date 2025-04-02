@@ -11,6 +11,10 @@
 #define PI 3.141592653589793f
 #define TWO_PI (2.0f * PI)
 
+typedef struct {
+    int8_t angle;
+} angle_queue_item_t;
+
 int8_t get_angle(enum servo_type_t axis, uint8_t segment_id);
 
 void set_axis(enum servo_type_t axis, uint8_t segment_id, int8_t angle);
@@ -20,8 +24,11 @@ void set_raise_angle(float angle);
 void set_slither_frequency(float frequency);
 void set_sidewinding(float sidewinding_);
 
+void look_up(float look_pitch, float look_yaw);
+
 void roll(float roll_angle, float tightness);
 
+void init_movement();
 void init_slither_task();
 
 #endif //HEAD_MOVEMENT_H
