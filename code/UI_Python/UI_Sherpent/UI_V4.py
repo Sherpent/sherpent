@@ -2,6 +2,7 @@ import sys
 import math
 import time
 from PyQt5 import QtCore
+import asyncio
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QSlider, QLabel, QButtonGroup
 from PyQt5.QtCore import Qt
@@ -93,8 +94,12 @@ class SherpentControl(QMainWindow):
 
         self.controller.start()
 
-        self.bluetooth = BluetoothManager(self.sherpent)
-        self.bluetooth.start()
+        #self.bluetooth = BluetoothManager(self.sherpent)
+        #self.bluetooth.start()
+
+        self.address = "9C:9E:6E:8D:F7:EA"  # Adresse du périphérique Bluetooth
+        self.characteristic_uuid = "0000ff01-0000-1000-8000-00805f9b34fb"  # UUID de la caractéristique
+        self.bt_manager = BluetoothManager(self.sherpent, self.address)
 
 
         self.update_nbr_modules(5)
@@ -196,13 +201,21 @@ class SherpentControl(QMainWindow):
 
     def closeEvent(self, event):
         self.controller.stop()
-        self.bluetooth.stop()
+        #self.bluetooth.stop()
         self.controller.wait()
-        self.bluetooth.wait()
+        #self.bluetooth.wait()
         event.accept()
+
+    async def run(self):
+        """Gère la connexion Bluetooth et les interactions."""
+        if await self.bt_manager.connect():
+            await self.bt_manager.read_data(self.characteristic_uuid)
+            #await self.bt_manager.write_data(self.characteristic_uuid, b'\x01')
+            #await self.bt_manager.disconnect()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = SherpentControl()
     window.show()
+    asyncio.run(window.run())
     sys.exit(app.exec_())

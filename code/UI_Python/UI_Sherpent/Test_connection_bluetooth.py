@@ -22,6 +22,9 @@ def notification_handler(sender, data):
     if msg_ID == 10:
         valeur = struct.unpack("B", data[3:4])[0]
         print(f"Valeur : {valeur}")
+    elif msg_ID == 9:
+        valeur = struct.unpack("b", data[3:4])[0]
+        print(f"Angle #{segment_ID} : {valeur}")
     elif msg_ID == 8:
         valeur = struct.unpack("b", data[3:4])[0]
         print(f"Angle #{segment_ID} : {valeur}")

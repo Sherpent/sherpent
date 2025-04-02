@@ -1,50 +1,60 @@
 from PyQt5 import QtCore
 import time
 import random
+from bleak import BleakClient
+import struct
+import asyncio
+
+from bleak.exc import BleakDeviceNotFoundError
+
 
 class BluetoothManager(QtCore.QThread):
     """Gestion du bluetooth en arrière-plan"""
 
 
-    def __init__(self, sherpent, parent=None):
+    def __init__(self, sherpent, address, parent=None):
         super().__init__(parent)
+        """Initialise le client Bluetooth avec l'adresse du périphérique."""
+        self.address = address
+        self.client = BleakClient(address)
 
         self.sherpent = sherpent
-        self.running = True
 
+    async def connect(self):
+        """Établit la connexion avec le périphérique Bluetooth."""
+        try:
+            await self.client.connect()
+            if self.client.is_connected:
+                print(f"Connecté à {self.address}")
+            return self.client.is_connected
+        except Exception as e:
+            print(f"Erreur de connexion : {e}")
+            return False
 
-    def run(self):
-        while self.running:
-            if self.sherpent.demarrage:
+    async def disconnect(self):
+        """Ferme la connexion Bluetooth."""
+        if self.client.is_connected:
+            await self.client.disconnect()
+            print("Déconnecté.")
 
-                if not self.sherpent.simulation_activated:
-                    # Sherpent envoie des données
-                    self.send_vector()
-                    self.receive_data()
+    async def read_data(self, characteristic_uuid):
+        """Lit une valeur depuis une caractéristique donnée."""
+        if self.client.is_connected:
+            try:
+                data = await self.client.read_gatt_char(characteristic_uuid)
+                print(f"Données reçues : {data}")
+                return data
+            except Exception as e:
+                print(f"Erreur de lecture : {e}")
+        else:
+            print("Non connecté.")
+        return None
 
-            time.sleep(1)
-
-    def stop(self):
-        """Arrête la boucle."""
-        self.running = False
-
-    def send_vector(self):
-        #print("Send vector")
-        vector_x = self.sherpent.vecteur_x
-        vector_y = self.sherpent.vecteur_y*-1
-        print(f"Vecteur : x={vector_x} y={vector_y}")
-
-    def receive_data(self):
-
-        list_module = self.sherpent.get_modules()
-
-
-
-        for i in range(len(list_module)):
-            valeurs_servo1 = random.randint(0, 180)
-            valeurs_servo2 = random.randint(0, 180)
-
-            list_module[i].set_angle(1,valeurs_servo1)
-            list_module[i].set_angle(2, valeurs_servo2)
-
-        #print("received")
+    async def write_data(self, characteristic_uuid, data):
+        """Écrit des données dans une caractéristique donnée."""
+        if self.client.is_connected:
+            try:
+                await self.client.write_gatt_char(characteristic_uuid, data)
+                print(f"Données envoyées : {data}")
+            except Exception as e:
+                print(f"Erreur d'écriture : {e}")
