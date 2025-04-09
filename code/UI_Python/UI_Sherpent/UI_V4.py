@@ -79,11 +79,6 @@ class SherpentControl(QMainWindow):
 
         self.module_widget = ModulesSherpentWidget(self.ui.widgetAffichageSherpent, self.sherpent)
 
-        """
-        self.module_widget = ModulesSherpentWidget(self.ui.widgetAffichageSherpent, self.sherpent)
-        self.module_widget.setGeometry(0, 0, self.ui.widgetAffichageSherpent.width(),
-                                         self.ui.widgetAffichageSherpent.height())
-        """
         self.button_group = QButtonGroup()
         self.init_ui()
 
@@ -123,8 +118,6 @@ class SherpentControl(QMainWindow):
         self.button_group.addButton(self.ui.startBtn)
         self.button_group.addButton(self.ui.stopBtn)
         self.button_group.buttonClicked.connect(self.start_stop_btn_toggled)
-
-
 
     def btnSim_toggled(self, etat):
         if etat:
