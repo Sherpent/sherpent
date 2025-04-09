@@ -1,0 +1,33 @@
+Patch notes
+
+Pcb #1 État: Testé bat + moteurs
+	Problème:
+	Rien ne se passe quand no appuie sur le bouton.
+	Avec USB: S'allume quand on pese sur le bouton (D25 manquante)
+		Apres avoir été pluggé, le bouton fais allumer meme sur betterie mais stayon marche pas
+	Avec safety bypass: Ya juste le stayon qui marche pas
+	Mesures:
+	Pin stayon tjrs à 0v
+	
+	Solution: 
+		Changer le code
+		Patch temporaire: Brancher usb pour sortir de over current protection
+		Patch long terme: Betteries plus chargées? Bypasser le board bleu?
+	C'est réglé.
+	Problème: Board bleu laisse pas poweron après avoir branché la batterie. Il faut plugger usb ou short b-
+
+PCB#2 État: Testé bat+moteurs
+
+PCB#3 État: Testé bat + moteurs
+	Problème: ne s'allume pas
+	Mesures: 
+		- Sortie du boost quand on pese sur le bouton: 2.8v
+		- EN du boost tjrs a 0v
+	Solution short en a 1 sur footprint de Q4
+	Résultat: Fonctionne bien. À tester avec moteurs
+
+PCB#4 État: Testé bat + moteurs
+	Problème: Gate du power mosfet est tjrs triggered par tension sur vusb causée par le board bleu car il a une diode ordinaire et non une led
+	Solution: Mettre une led sur D25 pour drop de tension plus haute (les autres pcbs l'ont deja)
+
+PCB#5 État: En cours de soudure
