@@ -1,6 +1,6 @@
 Patch notes
 
-Pcb #1 État: Tester bat + moteurs
+Pcb #1 État: Testé bat + moteurs
 	Problème:
 	Rien ne se passe quand no appuie sur le bouton.
 	Avec USB: S'allume quand on pese sur le bouton (D25 manquante)
