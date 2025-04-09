@@ -1,13 +1,15 @@
 import sys
 import math
+import struct
 import time
 from PyQt5 import QtCore
 import asyncio
+from qasync import QEventLoop, asyncSlot, asyncClose
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QSlider, QLabel, QButtonGroup
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from UI_SherpentV4 import Ui_MainWindow  # Import de l'interface générée par Qt Designer
-from PyQt5.QtGui import QPainter, QPen, QBrush, QPolygonF
+from PyQt5.QtGui import QPainter, QPen, QBrush, QPolygonF, QColor
 from PyQt5.QtCore import QPointF
 from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtWidgets
@@ -28,19 +30,35 @@ class ModulesSherpentWidget(QWidget):
         qp = QPainter(self)
         qp.setRenderHint(QPainter.Antialiasing)
         qp.setPen(QPen(Qt.black, 2))
-        qp.setBrush(QBrush(Qt.gray))
+        #qp.setBrush(QBrush(Qt.gray))
         angle_acc = 0
+
+        #self.update_color_module(qp)
 
         list_modules = self.sherpent.get_modules()
         nbr_modules = self.sherpent.get_nbr_modules()
         for i in range(0, nbr_modules):
             module = list_modules[i]
 
+            charge = module.get_charge()
+
+            # Choix de la couleur en fonction de la charge
+            if charge >= 75.0:
+                qp.setBrush(QBrush(Qt.green))
+            elif charge >= 50.0:
+                qp.setBrush(QBrush(QColor("yellow")))
+            elif charge >= 25.0:
+                qp.setBrush(QBrush(QColor("orange")))
+            else:
+                qp.setBrush(QBrush(Qt.red))
+
             x, y = module.get_front_position()
             width = module.module_width
             length = module.module_length
 
             angle_acc += module.get_angle(1) # Angle en degré
+            if i==0:
+                angle_acc += 90
             angle_rad = math.radians(angle_acc)
 
             x_new = x - length * math.cos(angle_rad)
@@ -64,13 +82,28 @@ class ModulesSherpentWidget(QWidget):
     def update_modules(self):
         self.update()
 
+    def update_color_module(self, qp):
+        for module in self.sherpent.get_modules():
+            charge = module.get_charge()
+            if charge >= 75.0:
+                qp.setBrush(QBrush(Qt.green))
+
+            elif charge < 75.0 and charge >= 50.0:
+                qp.setBrush(QBrush(QColor("yellow")))
+
+            elif charge < 50.0 and charge >= 25.0:
+                qp.setBrush(QBrush(QColor("orange")))
+
+            elif charge < 25.0:
+                qp.setBrush(QBrush(Qt.red))
+
+
 class SherpentControl(QMainWindow):
     """ Interface principale utilisant l'UI de Qt Designer """
     def __init__(self):
         super().__init__()
 
         self.controller_is_connected = False
-
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -85,28 +118,32 @@ class SherpentControl(QMainWindow):
         # Lancement du thread du controller
         self.controller = ControllerManager(self.sherpent)
         self.controller.controller_connected.connect(self.update_controller_status)
-        QtCore.QTimer.singleShot(100, self.controller.check_controller_status)
+        QTimer.singleShot(100, self.controller.check_controller_status)
 
         self.controller.start()
 
-        #self.bluetooth = BluetoothManager(self.sherpent)
-        #self.bluetooth.start()
-
-        self.address = "9C:9E:6E:8D:F7:EA"  # Adresse du périphérique Bluetooth
+        self.address = "9C:9E:6E:8D:F8:12"  # Adresse du périphérique Bluetooth
         self.characteristic_uuid = "0000ff01-0000-1000-8000-00805f9b34fb"  # UUID de la caractéristique
         self.bt_manager = BluetoothManager(self.sherpent, self.address)
-
 
         self.update_nbr_modules(5)
         self.show()
 
         # Timer pour update l'affichage du sherpent
-        self.update_timer = QtCore.QTimer(self)
+        self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self.update_value_module)
-        self.update_timer.start(100)
+        self.update_timer.start(200)
+
+        # Lancer la connexion au démarrage
+        QTimer.singleShot(0, self.defer_start_bluetooth)
+        self.joystick_timer = QTimer(self)
+        self.joystick_timer.timeout.connect(self.send_joystick_to_ble)
+        #self.joystick_timer.start(200)
 
     def init_ui(self):
         """ Connection entre les boutons du UI et leurs actions """
+        #self.resize(400,400)
+
         # Ajout d'un layout pour mettre le widget du sherpent
         layout = QtWidgets.QVBoxLayout(self.ui.widgetAffichageSherpent)
         layout.addWidget(self.module_widget)
@@ -192,23 +229,60 @@ class SherpentControl(QMainWindow):
             print("---> Signal recu : Manette pas connecté")
             self.controller_is_connected = False
 
-    def closeEvent(self, event):
-        self.controller.stop()
-        #self.bluetooth.stop()
-        self.controller.wait()
-        #self.bluetooth.wait()
-        event.accept()
+    def handle_notification(self, sender, data):
+        #print(f"Notif : {data}")
+        msg_size, msg_ID, segment_ID = struct.unpack("BBB", data[:3])
 
-    async def run(self):
-        """Gère la connexion Bluetooth et les interactions."""
-        if await self.bt_manager.connect():
-            await self.bt_manager.read_data(self.characteristic_uuid)
-            #await self.bt_manager.write_data(self.characteristic_uuid, b'\x01')
-            #await self.bt_manager.disconnect()
+        if msg_ID == 10:
+            valeur = round(struct.unpack("B", data[3:4])[0] / 255*100, 1)
+            self.sherpent.get_modules()[segment_ID].set_charge(valeur)
+            #print(f"Segment ID : {segment_ID} Valeur : {valeur}")
+
+        elif msg_ID == 9:
+            valeur = struct.unpack("b", data[3:4])[0]
+            self.sherpent.get_modules()[segment_ID].set_angle(2, valeur)
+            #print(f"Angle #{segment_ID} : {valeur}")
+        elif msg_ID == 8:
+            valeur = struct.unpack("b", data[3:4])[0]
+            self.sherpent.get_modules()[segment_ID].set_angle(1, valeur)
+            #print(f"Angle #{segment_ID} : {valeur}")
+
+
+    def defer_start_bluetooth(self):
+        asyncio.create_task(self.start_bluetooth())
+
+    async def start_bluetooth(self):
+        if await self.bt_manager.connect(self.characteristic_uuid):
+            await self.bt_manager.start_notifications(
+                self.characteristic_uuid,
+                self.handle_notification
+            )
+            # Start le timer
+            self.joystick_timer.start(1000)
+
+    def send_joystick_to_ble(self):
+        asyncio.create_task(self.bt_manager.send_joystick_vectors(self.characteristic_uuid))
+
+    @asyncClose
+    async def closeEvent(self, event):
+        print("🔚 Fermeture de la fenêtre, déconnexion Bluetooth...")
+        self.update_timer.stop()
+        self.joystick_timer.stop()
+        await self.bt_manager.stop_notifications(self.characteristic_uuid)
+        await self.bt_manager.disconnect()
+        event.accept()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    # Intégration asyncio <-> Qt grâce à qasync
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
+
     window = SherpentControl()
     window.show()
-    asyncio.run(window.run())
-    sys.exit(app.exec_())
+    #asyncio.run(window.run())
+    #sys.exit(app.exec_())
+
+    with loop:
+        loop.run_forever()

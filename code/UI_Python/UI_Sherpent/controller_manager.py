@@ -35,12 +35,16 @@ class ControllerManager(QtCore.QThread):
                 pygame.event.pump()  # Met à jour les événements pygame
                 if self.joystick:
                     x_axis = self.joystick.get_axis(0)  # Axe X (gauche-droite)
-                    y_axis = self.joystick.get_axis(1)  # Axe Y (haut-bas)
+                    y_axis = self.joystick.get_axis(1)*-1  # Axe Y (haut-bas)
                     r2_trigger = self.joystick.get_axis(5)  # Gâchette droite R2
                     l2_trigger = self.joystick.get_axis(4)  # Gâchette gauche L2
                     r1_trigger = self.joystick.get_button(10)  # Gâchette droite R2
                     l1_trigger = self.joystick.get_button(9)  # Gâchette gauche L2
 
+                    if x_axis < 0.15 and x_axis > -0.15:
+                        x_axis = 0
+                    if y_axis < 0.15 and y_axis > -0.15:
+                        y_axis = 0
 
                     if self.sherpent.simulation_activated:
                         nbr_modules = self.sherpent.get_nbr_modules()
@@ -73,11 +77,12 @@ class ControllerManager(QtCore.QThread):
                             angle = module_x.get_angle(1) + (r2_trigger - l2_trigger) * 5
                             module_x.set_angle(1, round(angle,1))
 
-                            #print(f"Position: ({new_x}, {new_y}), Angle: {angle}")
-
                     else:
+
                         self.sherpent.vecteur_x = round(x_axis,1)
                         self.sherpent.vecteur_y = round(y_axis,1)
+
+                        self.sherpent.side_winding = round( ((l2_trigger*-1)+r2_trigger) ,1)
 
                 pygame.time.wait(100)  # Évite d'utiliser 100% du CPU
 

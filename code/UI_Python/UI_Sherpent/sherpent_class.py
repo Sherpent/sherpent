@@ -9,6 +9,7 @@ class Sherpent:
         self.demarrage = False
         self.vecteur_x = 0
         self.vecteur_y = 0
+        self.side_winding = 0.0
 
     def add_module(self):
         """Add module to the list"""
