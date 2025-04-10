@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <servo.h>
+#include <stdbool.h>
 
 #ifndef HEAD_MOVEMENT_H
 #define HEAD_MOVEMENT_H
@@ -18,12 +19,15 @@
 
 typedef struct {
     uint8_t segment_id;
-    enum servo_type_t axis;
-    int8_t angle;
+    bool pitch;
+    bool yaw;
+    int8_t pitch_angle;
+    int8_t yaw_angle;
 } angle_queue_item_t;
 
 int8_t get_angle(enum servo_type_t axis, uint8_t segment_id);
 
+void set_both_axis(uint8_t segment_id, int8_t pitch_angle, int8_t yaw_angle);
 void set_axis(enum servo_type_t axis, uint8_t segment_id, int8_t angle);
 
 void control_raw(float x1_, float y, float x2_);

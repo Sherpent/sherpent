@@ -76,14 +76,50 @@ void set_sidewinding(float sidewinding_) {
     }
 }
 
+void set_both_axis(uint8_t segment_id, int8_t pitch_angle, int8_t yaw_angle) {
+    if (!is_segment_id_registered(segment_id)) return;
+
+    angle_queue_item_t queue_item = {
+            .segment_id = segment_id,
+            .pitch = true,
+            .yaw = true,
+            .pitch_angle = pitch_angle,
+            .yaw_angle = yaw_angle,
+    };
+
+    QueueHandle_t queue = angle_queue;
+
+    if (queue == NULL) {
+        ESP_LOGW("MOVEMENT", "Angle queue not initialized for segment %u", segment_id);
+        return;
+    }
+
+    // Attempt to queue angle
+    if (xQueueSendToBack(queue, &queue_item, 0) != pdPASS) {
+        ESP_LOGW("MOVEMENT", "Angle queue full for segment %u. Overriding oldest value.", segment_id);
+        // Drop the oldest entry
+        angle_queue_item_t dummy;
+        if (xQueueReceive(queue, &dummy, 0) != pdPASS) {
+            ESP_LOGE("MOVEMENT", "Failed to dequeue from full queue (segment %u)", segment_id);
+            return;
+        }
+
+        // Try sending again
+        if (xQueueSendToBack(queue, &queue_item, 0) != pdPASS) {
+            ESP_LOGE("MOVEMENT", "Failed to insert angle after popping (segment %u)", segment_id);
+        }
+    }
+}
 void set_axis(enum servo_type_t axis, uint8_t segment_id, int8_t angle) {
     if (!is_segment_id_registered(segment_id)) return;
     if (axis >= 2) return;  // prevent out-of-bounds access
 
     angle_queue_item_t queue_item = {
             .segment_id = segment_id,
-            .axis = axis,
-            .angle = angle
+            .pitch = axis == PITCH,
+            .yaw = axis == YAW,
+            .pitch_angle = angle,
+            .yaw_angle = angle
     };
 
     QueueHandle_t queue = angle_queue;
@@ -184,10 +220,9 @@ void slither() {
 
         for (int n = 0; n < module_number; n++) {
             float yaw_angle = sinf(slither_theta + module_offsets[n]) * local_slither_amplitude * amplitude + per_module_turn;
-            set_axis(YAW, n, yaw_angle);
 
             float pitch_angle = sinf(slither_theta + module_offsets[n] + PI/2.0f) * (local_sidewinding <= 1e-6 ? per_module_raise : (sidewinding_amplitude * local_sidewinding));
-            set_axis(PITCH, n, pitch_angle);
+            set_both_axis(n, pitch_angle, yaw_angle);
         }
 
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -205,6 +240,10 @@ void movement_task() {
             .msg_size = (uint8_t) sizeof(struct SetPitch),
             .msg_id = SET_PITCH
     };
+    struct SetPitchYaw pitch_yaw_message = {
+            .msg_size = (uint8_t) sizeof(struct SetPitchYaw),
+            .msg_id = SET_PITCH_YAW
+    };
     struct InfoYaw yaw_info = {
             .msg_size = (uint8_t) sizeof(struct InfoYaw),
             .msg_id = INFO_YAW
@@ -212,6 +251,10 @@ void movement_task() {
     struct InfoPitch pitch_info = {
             .msg_size = (uint8_t) sizeof(struct InfoPitch),
             .msg_id = INFO_PITCH
+    };
+    struct InfoPitchYaw pitch_yaw_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoPitchYaw),
+            .msg_id = INFO_PITCH_YAW
     };
 
     for (;;) {
@@ -225,28 +268,27 @@ void movement_task() {
             if (!is_segment_id_registered(queueItem.segment_id)) continue;
             data_processed = true;
 
-            switch (queueItem.axis) {
-                case PITCH:
-                    pitch_message.angle_degrees = queueItem.angle;
-                    send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_message);
+            if (queueItem.pitch && queueItem.yaw) {
+                pitch_yaw_message.pitch_degrees = queueItem.pitch_angle;
+                send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_yaw_message);
 
-                    pitch_info.segment_id = queueItem.segment_id;
-                    pitch_info.angle_degrees = queueItem.angle;
-                    send_message_to_master((struct Message *) &pitch_info);
-                    break;
+                pitch_yaw_info.segment_id = queueItem.segment_id;
+                pitch_yaw_info.yaw_degrees = queueItem.yaw_angle;
+                send_message_to_master((struct Message *) &pitch_yaw_info);
+            } else if (queueItem.pitch) {
+                pitch_message.angle_degrees = queueItem.pitch_angle;
+                send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_message);
 
-                case YAW:
-                    yaw_message.angle_degrees = queueItem.angle;
-                    send_message_to_module(queueItem.segment_id, (struct Message *) &yaw_message);
+                pitch_info.segment_id = queueItem.segment_id;
+                pitch_info.angle_degrees = queueItem.pitch_angle;
+                send_message_to_master((struct Message *) &pitch_info);
+            } else if (queueItem.yaw) {
+                yaw_message.angle_degrees = queueItem.yaw_angle;
+                send_message_to_module(queueItem.segment_id, (struct Message *) &yaw_message);
 
-                    yaw_info.segment_id = queueItem.segment_id;
-                    yaw_info.angle_degrees = queueItem.angle;
-                    send_message_to_master((struct Message *) &yaw_info);
-                    break;
-
-                default:
-                    ESP_LOGW("MOVEMENT", "Invalid axis value: %d", queueItem.segment_id);
-                    break;
+                yaw_info.segment_id = queueItem.segment_id;
+                yaw_info.angle_degrees = queueItem.yaw_angle;
+                send_message_to_master((struct Message *) &yaw_info);
             }
         }
 

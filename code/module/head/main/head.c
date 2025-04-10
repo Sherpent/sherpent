@@ -304,6 +304,12 @@ void message_callback(uint8_t segment_id, struct Message *message) {
             set_servo_angle(PITCH, (float) set_pitch->angle_degrees);
             break;
         }
+        case SET_PITCH_YAW: {
+            struct SetPitchYaw *set_pitch_yaw = (struct SetPitchYaw *) message;
+            set_servo_angle(PITCH, (float) set_pitch_yaw->pitch_degrees);
+            set_servo_angle(YAW, (float) set_pitch_yaw->yaw_degrees);
+            break;
+        }
         case SET_LIGHT: {
             struct SetLight *set_light = (struct SetLight *) message;
             for (int i = 0; i < PIXEL_COUNT; i++) {

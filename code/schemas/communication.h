@@ -20,6 +20,9 @@ enum MessageID: uint8_t {
     INFO_YAW,
     INFO_PITCH,
     INFO_BATTERY_MASTER,
+
+    SET_PITCH_YAW,
+    INFO_PITCH_YAW,
 };
 
 // General Message Structure
@@ -81,6 +84,13 @@ struct SetYaw {
     int8_t angle_degrees;
 };
 
+struct SetPitchYaw {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    int8_t pitch_degrees;
+    int8_t yaw_degrees;
+};
+
 struct SetLight {
     uint8_t msg_size;
     enum MessageID msg_id;
@@ -112,6 +122,13 @@ struct InfoPitch {
     int8_t angle_degrees;
 };
 
+struct InfoPitchYaw {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    uint8_t segment_id;
+    int8_t pitch_degrees;
+    int8_t yaw_degrees;
+};
 
 // Function Declarations
 //struct Message* packageMessage(enum MessageID message_id, void* data, size_t data_size);
