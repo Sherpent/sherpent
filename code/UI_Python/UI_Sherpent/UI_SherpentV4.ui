@@ -20,13 +20,13 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>100</height>
+        <height>50</height>
        </size>
       </property>
       <property name="font">
        <font>
         <family>Rubik</family>
-        <pointsize>50</pointsize>
+        <pointsize>35</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
