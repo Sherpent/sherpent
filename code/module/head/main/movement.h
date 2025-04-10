@@ -7,11 +7,18 @@
 
 #ifndef HEAD_MOVEMENT_H
 #define HEAD_MOVEMENT_H
+#define MAX_FORWARD_SLITHER_FREQUENCY 0.5f
+#define MAX_TURNING_SLITHER_FREQUENCY 1.0f
+#define AMPLITUDE_DAMPENING 0.75f
+#define MAX_FORWARD_SLITHER_AMPLITUDE 1.0f
+#define MAX_TURNING_SLITHER_AMPLITUDE 0.5f
 
 #define PI 3.141592653589793f
 #define TWO_PI (2.0f * PI)
 
 typedef struct {
+    uint8_t segment_id;
+    enum servo_type_t axis;
     int8_t angle;
 } angle_queue_item_t;
 
@@ -19,9 +26,11 @@ int8_t get_angle(enum servo_type_t axis, uint8_t segment_id);
 
 void set_axis(enum servo_type_t axis, uint8_t segment_id, int8_t angle);
 
+void control_raw(float x1_, float y, float x2_);
 void set_turn_angle(float angle);
 void set_raise_angle(float angle);
 void set_slither_frequency(float frequency);
+void set_slither_amplitude(float amplitude);
 void set_sidewinding(float sidewinding_);
 
 void look_up(float look_pitch, float look_yaw);

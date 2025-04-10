@@ -93,8 +93,9 @@ struct SetLight {
 struct Control {
     uint8_t msg_size;
     enum MessageID msg_id;
-    float x;
+    float x1;
     float y;
+    float x2;
 };
 
 struct InfoYaw {

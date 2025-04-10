@@ -5,8 +5,8 @@
 #ifndef SERVO_H
 #define SERVO_H
 
-#define SERVO_PITCH_PIN 6
-#define SERVO_YAW_PIN 7
+#define SERVO_PITCH_PIN 7
+#define SERVO_YAW_PIN 6
 
 enum servo_type_t {
     PITCH,

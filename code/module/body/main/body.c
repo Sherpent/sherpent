@@ -76,6 +76,8 @@ void app_main(void) {
     init_ble();
     register_msg_callback(message_callback);
 
+    //set_segment_id(4);
+
     led_init();
     servo_init();
 

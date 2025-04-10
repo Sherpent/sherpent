@@ -9,16 +9,32 @@
 #include <math.h>
 #include <esp_log.h>
 
-const uint8_t module_number = 2;
+const uint8_t module_number = 5;
 float turn_angle = 0.0f;
 float raise_angle = 0.0f;
 float slither_frequency = 0.0f;
+float slither_amplitude = 1.0f;
 float sidewinding = 0.0f;
 
 SemaphoreHandle_t slitherMutex;  // Mutex for shared variables
 
-static int8_t angles[MAX_MODULE_NUM][2];
-static QueueHandle_t angle_queues[MAX_MODULE_NUM][2];
+static QueueHandle_t angle_queue;
+
+void control_raw(float x1_, float y, float x2_) {
+    float x1 = asinf(x1_) * 2.0f / PI;
+    float x2 = asinf(x2_) * 2.0f / PI;
+    float normalized_x1 = fabsf(x1);
+
+    float frequency = y * (MAX_TURNING_SLITHER_FREQUENCY * normalized_x1 + MAX_FORWARD_SLITHER_FREQUENCY * (1.0f - normalized_x1));
+    set_slither_frequency(frequency);
+
+    set_turn_angle(x1 * 180);
+
+    float amplitude = MAX_TURNING_SLITHER_AMPLITUDE * normalized_x1 + MAX_FORWARD_SLITHER_AMPLITUDE * (1.0f - normalized_x1);
+    set_slither_amplitude(amplitude);
+
+    set_sidewinding(x2);
+}
 
 void set_turn_angle(float angle) {
     init_slither_task();
@@ -44,40 +60,56 @@ void set_slither_frequency(float frequency) {
     }
 }
 
+void set_slither_amplitude(float amplitude) {
+    init_slither_task();
+    if (slitherMutex != NULL && xSemaphoreTake(slitherMutex, portMAX_DELAY)) {
+        slither_amplitude = fminf(fmaxf(amplitude, -1.0f), 1.0f);
+        xSemaphoreGive(slitherMutex);
+    }
+}
+
 void set_sidewinding(float sidewinding_) {
     init_slither_task();
     if (slitherMutex != NULL && xSemaphoreTake(slitherMutex, portMAX_DELAY)) {
-        sidewinding = sidewinding_;
+        sidewinding = fminf(fmaxf(sidewinding_, -1.0f), 1.0f);
         xSemaphoreGive(slitherMutex);
     }
 }
 
 void set_axis(enum servo_type_t axis, uint8_t segment_id, int8_t angle) {
+    if (!is_segment_id_registered(segment_id)) return;
+    if (axis >= 2) return;  // prevent out-of-bounds access
+
     angle_queue_item_t queue_item = {
+            .segment_id = segment_id,
+            .axis = axis,
             .angle = angle
     };
 
-    QueueHandle_t queue = angle_queues[segment_id][axis];
+    QueueHandle_t queue = angle_queue;
 
-    if (!is_segment_id_registered(segment_id)) {
-        if (queue != NULL) {
-            // Clear the queue and insert the latest value as the only message
-            xQueueReset(queue);
-            xQueueSendToBack(queue, (void *)&queue_item, 0);
-        }
+    if (queue == NULL) {
+        ESP_LOGW("MOVEMENT", "Angle queue not initialized for segment %u, axis %d", segment_id, (int)axis);
         return;
     }
 
-    // Try to send the angle to the queue
-    if (queue != NULL) {
-        if (xQueueSendToBack(queue, (void *)&queue_item, 0) != pdPASS) {
-            ESP_LOGW("MOVEMENT", "Angle queue full, overriding latest value");
-            // Remove oldest entry and push the latest value
-            xQueueReceive(queue, &queue_item, 0);  // Pop oldest
-            xQueueSendToBack(queue, (void *)&queue_item, 0);
+    // Attempt to queue angle
+    if (xQueueSendToBack(queue, &queue_item, 0) != pdPASS) {
+        ESP_LOGW("MOVEMENT", "Angle queue full for segment %u, axis %d. Overriding oldest value.", segment_id, (int)axis);
+        // Drop the oldest entry
+        angle_queue_item_t dummy;
+        if (xQueueReceive(queue, &dummy, 0) != pdPASS) {
+            ESP_LOGE("MOVEMENT", "Failed to dequeue from full queue (segment %u, axis %d)", segment_id, (int)axis);
+            return;
+        }
+
+        // Try sending again
+        if (xQueueSendToBack(queue, &queue_item, 0) != pdPASS) {
+            ESP_LOGE("MOVEMENT", "Failed to insert angle after popping (segment %u, axis %d)", segment_id, (int)axis);
         }
     }
 }
+
 void roll(float roll_angle, float tightness) {
     float per_module_turn = roll_angle * tightness / (float) module_number;
     for (int n = 0; n < module_number; n++) {
@@ -89,20 +121,29 @@ void roll(float roll_angle, float tightness) {
 
 void look_up(float look_pitch, float look_yaw) {
     int separation_index = (module_number / 2) + 1;
-    float per_segment_raise = -look_pitch / (float) (module_number - separation_index);
-    float per_segment_yaw = look_yaw / (float) (module_number - separation_index);
+    int denom = module_number - separation_index;
+
+    if (denom <= 0) return; // Prevent division by zero or negative segment
+
+    float per_segment_raise = -look_pitch / (float)denom;
+    float per_segment_yaw = look_yaw / (float)denom;
+
     for (int n = 0; n < module_number; n++) {
         float pitch_angle = 0;
+
         if (n < separation_index) {
-            pitch_angle = per_segment_raise + (n == separation_index ? PI / 2.0f : 0.0f);
+            pitch_angle = per_segment_raise;
             set_axis(YAW, n, per_segment_yaw);
         }
+
         if (n == separation_index) {
-            pitch_angle += (n == separation_index ? PI / 2.0f : 0.0f);
+            pitch_angle += PI / 2.0f;
             set_axis(YAW, n, 45);
-        } else {
-            set_axis(PITCH, n, 90 * powl(-1, n - separation_index));
+        } else if (n > separation_index) {
+            int sign = ((n - separation_index) % 2 == 0) ? 1 : -1;
+            set_axis(YAW, n, 90.0f * sign);
         }
+
         set_axis(PITCH, n, pitch_angle);
     }
 }
@@ -114,7 +155,7 @@ void slither() {
 
     const uint8_t wave_number = 1;
     const float module_offset = (float) wave_number * TWO_PI / (float) module_number;
-    const float amplitude = 0.5f * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) module_number;
+    const float amplitude = AMPLITUDE_DAMPENING * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) module_number;
     const float sidewinding_amplitude = 0.1f * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) module_number;
 
     float module_offsets[module_number];
@@ -124,17 +165,15 @@ void slither() {
 
     static float slither_theta = 0.0f;
 
-    struct SetYaw yaw_message;   // Allocate once outside the loop
-    struct SetPitch pitch_message;
-
     for (;;) {
-        float local_turn_angle = 0.0f, local_raise_angle = 0.0f, local_slither_frequency = 0.0f, local_sidewinding = 0.0f;
+        float local_turn_angle = 0.0f, local_raise_angle = 0.0f, local_slither_frequency = 0.0f, local_slither_amplitude = 0.0f, local_sidewinding = 0.0f;
 
         // Acquire mutex before reading shared variables
         if (xSemaphoreTake(slitherMutex, portMAX_DELAY)) {
             local_turn_angle = turn_angle;
             local_raise_angle = raise_angle;
             local_slither_frequency = slither_frequency;
+            local_slither_amplitude = slither_amplitude;
             local_sidewinding = sidewinding;
             xSemaphoreGive(slitherMutex);
         }
@@ -144,10 +183,10 @@ void slither() {
         float per_module_raise = local_raise_angle / (float) module_number;
 
         for (int n = 0; n < module_number; n++) {
-            float yaw_angle = sinf(slither_theta + module_offsets[n]) * amplitude + per_module_turn;
+            float yaw_angle = sinf(slither_theta + module_offsets[n]) * local_slither_amplitude * amplitude + per_module_turn;
             set_axis(YAW, n, yaw_angle);
 
-            float pitch_angle = sinf(slither_theta + module_offsets[n] + PI/2.0f) * sidewinding_amplitude * local_sidewinding + per_module_raise * (1.0f - fabsf(local_sidewinding));
+            float pitch_angle = sinf(slither_theta + module_offsets[n] + PI/2.0f) * (local_sidewinding <= 1e-6 ? per_module_raise : (sidewinding_amplitude * local_sidewinding));
             set_axis(PITCH, n, pitch_angle);
         }
 
@@ -157,51 +196,62 @@ void slither() {
 
 void movement_task() {
     angle_queue_item_t queueItem;
-    struct SetYaw yaw_message;   // Allocate once
-    struct SetPitch pitch_message;
-    struct InfoYaw yaw_info;
-    struct InfoPitch pitch_info;
 
-    pitch_message.msg_size = (uint8_t) sizeof(struct SetPitch);
-    pitch_message.msg_id = SET_PITCH;
-
-    yaw_message.msg_size = (uint8_t) sizeof(struct SetYaw);
-    yaw_message.msg_id = SET_YAW;
-
-    pitch_info.msg_size = (uint8_t) sizeof(struct InfoPitch);
-    pitch_info.msg_id = INFO_PITCH;
-
-    yaw_info.msg_size = (uint8_t) sizeof(struct InfoYaw);
-    yaw_info.msg_id = INFO_YAW;
+    struct SetYaw yaw_message = {
+            .msg_size = (uint8_t) sizeof(struct SetYaw),
+            .msg_id = SET_YAW
+    };
+    struct SetPitch pitch_message = {
+            .msg_size = (uint8_t) sizeof(struct SetPitch),
+            .msg_id = SET_PITCH
+    };
+    struct InfoYaw yaw_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoYaw),
+            .msg_id = INFO_YAW
+    };
+    struct InfoPitch pitch_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoPitch),
+            .msg_id = INFO_PITCH
+    };
 
     for (;;) {
-        for (int n = 0; n < MAX_MODULE_NUM; n++) {
-            if (!is_segment_id_registered(n)) continue;
-            for (int axis = 0; axis < 2; axis++) {
-                QueueHandle_t queue = angle_queues[n][axis];
-                if (queue == NULL) {
-                    ESP_LOGW("MOVEMENT", "Angle queue not initialized");
-                } else if (xQueueReceive(queue, &queueItem, 10) == pdPASS) {
-                    switch (axis) {
-                        case PITCH:
-                            pitch_message.angle_degrees = queueItem.angle;
-                            send_message_to_module(n, (struct Message *) &pitch_message);
+        bool data_processed = false;
+        if (angle_queue == NULL) {
+            ESP_LOGW("MOVEMENT", "Angle queue not initialized");
+            continue;
+        }
 
-                            pitch_info.segment_id = n;
-                            pitch_info.angle_degrees = queueItem.angle;
-                            send_message_to_master((struct Message *) &pitch_info);
-                            break;
-                        case YAW:
-                            yaw_message.angle_degrees = queueItem.angle;
-                            send_message_to_module(n, (struct Message *) &yaw_message);
+        if (xQueueReceive(angle_queue, &queueItem, 10) == pdPASS) {
+            if (!is_segment_id_registered(queueItem.segment_id)) continue;
+            data_processed = true;
 
-                            yaw_info.segment_id = n;
-                            yaw_info.angle_degrees = queueItem.angle;
-                            send_message_to_master((struct Message *) &yaw_info);
-                            break;
-                    }
-                }
+            switch (queueItem.axis) {
+                case PITCH:
+                    pitch_message.angle_degrees = queueItem.angle;
+                    send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_message);
+
+                    pitch_info.segment_id = queueItem.segment_id;
+                    pitch_info.angle_degrees = queueItem.angle;
+                    send_message_to_master((struct Message *) &pitch_info);
+                    break;
+
+                case YAW:
+                    yaw_message.angle_degrees = queueItem.angle;
+                    send_message_to_module(queueItem.segment_id, (struct Message *) &yaw_message);
+
+                    yaw_info.segment_id = queueItem.segment_id;
+                    yaw_info.angle_degrees = queueItem.angle;
+                    send_message_to_master((struct Message *) &yaw_info);
+                    break;
+
+                default:
+                    ESP_LOGW("MOVEMENT", "Invalid axis value: %d", queueItem.segment_id);
+                    break;
             }
+        }
+
+        if (!data_processed) {
+            vTaskDelay(pdMS_TO_TICKS(5));  // Let other tasks run
         }
     }
 }
@@ -211,14 +261,7 @@ void init_movement() {
     if (initialized) return;
     initialized = true;
 
-    for (int n = 0; n < MAX_MODULE_NUM; n++) {
-        for (int i = 0; i < 2; i++) {
-            angle_queues[n][i] = xQueueCreate(10, sizeof(angle_queue_item_t));
-            if (angle_queues[n][i] == NULL) {
-                ESP_LOGE("MOVEMENT", "Failed to create angles queue");
-            }
-        }
-    }
+    angle_queue = xQueueCreate(10 * module_number, sizeof(angle_queue_item_t));
 
     xTaskCreate(movement_task, "MovementTask", 2048, NULL, 1, NULL);
 }
@@ -230,6 +273,6 @@ void init_slither_task() {
 
     slitherMutex = xSemaphoreCreateMutex();
     if (slitherMutex != NULL) {
-        xTaskCreate(slither, "SlitherTask", 2048, NULL, 1, NULL);
+        xTaskCreate(slither, "SlitherTask", 4096, NULL, 1, NULL);
     }
 }

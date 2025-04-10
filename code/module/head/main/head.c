@@ -49,8 +49,14 @@ void button_setup() {
 void monitor_battery_task(void *parameters) {
     TaskHandle_t flash_handle = NULL;
 
+    struct InfoBatteryMaster battery_info; // Allocate once
+    battery_info.msg_size = sizeof(struct InfoBatteryMaster);
+    battery_info.msg_id = INFO_BATTERY_MASTER;
+    battery_info.segment_id = 0;
+
     for (;;) {
-        if (get_battery_percentage() < 0.1) { // Under 10%
+        float battery_percentage = get_battery_percentage();
+        if (battery_percentage < 0.1) { // Under 10%
             if (flash_handle == NULL) {
                 flash_handle = flash(255, 0, 0, 1000, 0.1);
             }
@@ -59,6 +65,11 @@ void monitor_battery_task(void *parameters) {
                 stop_effect(flash_handle);
                 flash_handle = NULL;
             }
+        }
+
+        if (is_master_connected()) {
+            battery_info.level = battery_percentage * 255;
+            send_message_to_master((struct Message *) &battery_info);
         }
 
         vTaskDelay(pdMS_TO_TICKS(500));
@@ -88,11 +99,11 @@ void app_main(void)
     //init_uart();
 
     set_pixel_rgb(0, 0, 50, 0);
-    roll(360.0f, 0.95f);
+    //roll(360.0f, 0.95f);
     //look_up(90.0f, 0.0f);
 
-    set_slither_frequency(-0.5f);
-    set_sidewinding(0.0f);
+    //set_slither_frequency(-0.5f);
+    //set_sidewinding(0.0f);
     //set_turn_angle(0.0f);
     //set_raise_angle(-45.0f);
 
@@ -169,6 +180,7 @@ void _message_callback(uint16_t sender_conn_id, struct Message *message) {
 
     if (is_master_conn_id(sender_conn_id)) {
         master_message_callback(message);
+        //burst(140, 0, 255, 500);
         return;
     }
 
@@ -317,15 +329,14 @@ void send_message_to_master(struct Message *message) {
 }
 
 void master_message_callback(struct Message *message) {
-    burst(140, 0, 255, 500);
 
     switch (message->msg_id) {
         case CONTROL: {
             struct Control *control = (struct Control *) message;
-            set_slither_frequency(0.5f * control->y);
-            set_sidewinding(control->x);
-            //set_turn_angle(0.0f);
-            //set_raise_angle(-45.0f);
+            control_raw(control->x1, control->y, control->x2);
+            ESP_LOGI("CONTROL", "x1: %lf", control->x1);
+            ESP_LOGI("CONTROL", "y: %lf", control->y);
+            ESP_LOGI("CONTROL", "x2: %lf", control->x2);
             break;
         }
         default:
