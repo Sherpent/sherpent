@@ -67,6 +67,12 @@ class BluetoothManager(QtCore.QThread):
                     self.sherpent.get_modules()[segment_ID].set_angle(1, valeur)
                     print(f"Angle #{segment_ID} : {valeur}")
 
+                elif msg_ID == 12:
+                    # Les deux angles
+                    pitch, yaw = struct.unpack("bb", data[3:5])[0]
+                    self.sherpent.get_modules()[segment_ID].set_angle(1, yaw)
+                    self.sherpent.get_modules()[segment_ID].set_angle(2, pitch)
+
                 return data
 
             except Exception as e:

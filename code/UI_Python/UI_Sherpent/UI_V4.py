@@ -126,7 +126,7 @@ class SherpentControl(QMainWindow):
         self.characteristic_uuid = "0000ff01-0000-1000-8000-00805f9b34fb"  # UUID de la caractéristique
         self.bt_manager = BluetoothManager(self.sherpent, self.address)
 
-        self.update_nbr_modules(5)
+        self.update_nbr_modules(10)
         self.show()
 
         # Timer pour update l'affichage du sherpent
@@ -155,6 +155,14 @@ class SherpentControl(QMainWindow):
         self.button_group.addButton(self.ui.startBtn)
         self.button_group.addButton(self.ui.stopBtn)
         self.button_group.buttonClicked.connect(self.start_stop_btn_toggled)
+
+        self.ui.frame.setStyleSheet("""
+            QFrame#frame {
+                border: 2px solid black;
+                border-radius: 6px;
+                background-color: white;
+            }
+        """)
 
     def btnSim_toggled(self, etat):
         if etat:
