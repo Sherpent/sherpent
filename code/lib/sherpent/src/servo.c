@@ -58,8 +58,8 @@ void servo_init() {
     ESP_ERROR_CHECK(ledc_channel_config(&ledc_channel[YAW]));
 
     // Explicitly set LEDC duty cycle to 0 to prevent spikes
-    set_servo_angle(YAW, 0);
-    set_servo_angle(PITCH, 0);
+    //set_servo_angle(YAW, 0);
+    //set_servo_angle(PITCH, 0);
 }
 
 void set_servo_angle(enum servo_type_t servo_type, float angle) {
@@ -70,4 +70,8 @@ void set_servo_angle(enum servo_type_t servo_type, float angle) {
 
     ledc_set_duty(ledc_channel[servo_type].speed_mode, ledc_channel[servo_type].channel, (uint32_t) (duty * 1023));
     ledc_update_duty(ledc_channel[servo_type].speed_mode, ledc_channel[servo_type].channel);
+}
+
+void soften_servo(enum servo_type_t servo_type) {
+    ledc_stop(ledc_channel[servo_type].speed_mode, ledc_channel[servo_type].channel, 0);
 }

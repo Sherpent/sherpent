@@ -9,7 +9,6 @@
 #include <math.h>
 #include <esp_log.h>
 
-const uint8_t module_number = 5;
 float turn_angle = 0.0f;
 float raise_angle = 0.0f;
 float slither_frequency = 0.0f;
@@ -20,7 +19,9 @@ SemaphoreHandle_t slitherMutex;  // Mutex for shared variables
 
 static QueueHandle_t angle_queue;
 
-void control_raw(float x1_, float y, float x2_) {
+static int8_t angles[MAX_MODULE_NUM][2];
+
+void control_raw(float x1_, float y, float x2_, float mouth) {
     float x1 = asinf(x1_) * 2.0f / PI;
     float x2 = asinf(x2_) * 2.0f / PI;
     float normalized_x1 = fabsf(x1);
@@ -28,12 +29,19 @@ void control_raw(float x1_, float y, float x2_) {
     float frequency = y * (MAX_TURNING_SLITHER_FREQUENCY * normalized_x1 + MAX_FORWARD_SLITHER_FREQUENCY * (1.0f - normalized_x1));
     set_slither_frequency(frequency);
 
-    set_turn_angle(x1 * 180);
+    set_turn_angle(x1 * 360);
 
     float amplitude = MAX_TURNING_SLITHER_AMPLITUDE * normalized_x1 + MAX_FORWARD_SLITHER_AMPLITUDE * (1.0f - normalized_x1);
     set_slither_amplitude(amplitude);
 
     set_sidewinding(x2);
+
+    float mouth_angle = MOUTH_OPENED_ANGLE * mouth + MOUTH_CLOSED_ANGLE * (1.0f  - mouth);
+    set_axis_direct(PITCH, 0, mouth_angle);
+}
+
+int8_t get_angle(enum servo_type_t axis, uint8_t segment_id) {
+    return angles[segment_id][axis];
 }
 
 void set_turn_angle(float angle) {
@@ -146,9 +154,84 @@ void set_axis(enum servo_type_t axis, uint8_t segment_id, int8_t angle) {
     }
 }
 
+void set_both_axis_direct(uint8_t segment_id, int8_t pitch_angle, int8_t yaw_angle) {
+    struct SetPitchYaw pitch_yaw_message = {
+            .msg_size = (uint8_t) sizeof(struct SetPitchYaw),
+            .msg_id = SET_PITCH_YAW
+    };
+    /*
+    struct InfoYaw yaw_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoYaw),
+            .msg_id = INFO_YAW
+    };
+    struct InfoPitch pitch_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoPitch),
+            .msg_id = INFO_PITCH
+    };
+    struct InfoPitchYaw pitch_yaw_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoPitchYaw),
+            .msg_id = INFO_PITCH_YAW
+    };
+    */
+
+    pitch_yaw_message.pitch_degrees = pitch_angle;
+    pitch_yaw_message.yaw_degrees = yaw_angle;
+    send_message_to_module(segment_id, (struct Message *) &pitch_yaw_message);
+
+    //pitch_yaw_info.segment_id = segment_id;
+    //pitch_yaw_info.pitch_degrees = pitch_angle;
+    //pitch_yaw_info.yaw_degrees = yaw_angle;
+    //send_message_to_master((struct Message *) &pitch_yaw_info);
+    angles[segment_id][PITCH] = pitch_angle;
+    angles[segment_id][YAW] = yaw_angle;
+}
+void set_axis_direct(enum servo_type_t axis, uint8_t segment_id, int8_t angle) {
+    struct SetYaw yaw_message = {
+            .msg_size = (uint8_t) sizeof(struct SetYaw),
+            .msg_id = SET_YAW
+    };
+    struct SetPitch pitch_message = {
+            .msg_size = (uint8_t) sizeof(struct SetPitch),
+            .msg_id = SET_PITCH
+    };
+    /*
+    struct InfoYaw yaw_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoYaw),
+            .msg_id = INFO_YAW
+    };
+    struct InfoPitch pitch_info = {
+            .msg_size = (uint8_t) sizeof(struct InfoPitch),
+            .msg_id = INFO_PITCH
+    };
+    */
+
+    switch (axis) {
+        case PITCH: {
+            pitch_message.angle_degrees = angle;
+            send_message_to_module(segment_id, (struct Message *) &pitch_message);
+
+            //pitch_info.segment_id = segment_id;
+            //pitch_info.angle_degrees = angle;
+            //send_message_to_master((struct Message *) &pitch_info);
+            angles[segment_id][PITCH] = angle;
+            break;
+        }
+        case YAW: {
+            yaw_message.angle_degrees = angle;
+            send_message_to_module(segment_id, (struct Message *) &yaw_message);
+
+            //yaw_info.segment_id = segment_id;
+            //yaw_info.angle_degrees = angle;
+            //send_message_to_master((struct Message *) &yaw_info);
+            angles[segment_id][YAW] = angle;
+            break;
+        }
+    }
+}
+
 void roll(float roll_angle, float tightness) {
-    float per_module_turn = roll_angle * tightness / (float) module_number;
-    for (int n = 0; n < module_number; n++) {
+    float per_module_turn = roll_angle * tightness / (float) MAX_MODULE_NUM;
+    for (int n = 0; n < MAX_MODULE_NUM; n++) {
         float yaw_angle = per_module_turn;
         set_axis(YAW, n, yaw_angle);
         set_axis(PITCH, n, 0);
@@ -156,53 +239,58 @@ void roll(float roll_angle, float tightness) {
 }
 
 void look_up(float look_pitch, float look_yaw) {
-    int separation_index = (module_number / 2) + 1;
-    int denom = module_number - separation_index;
+    int separation_index = (MAX_MODULE_NUM / 2);
+    int denom = MAX_MODULE_NUM - separation_index;
 
     if (denom <= 0) return; // Prevent division by zero or negative segment
 
     float per_segment_raise = -look_pitch / (float)denom;
     float per_segment_yaw = look_yaw / (float)denom;
 
-    for (int n = 0; n < module_number; n++) {
+    for (int n = 0; n < MAX_MODULE_NUM; n++) {
         float pitch_angle = 0;
 
         if (n < separation_index) {
-            pitch_angle = per_segment_raise;
-            set_axis(YAW, n, per_segment_yaw);
+            pitch_angle = -per_segment_raise;
+            set_axis_direct(YAW, n, per_segment_yaw);
         }
 
         if (n == separation_index) {
-            pitch_angle += PI / 2.0f;
-            set_axis(YAW, n, 45);
-        } else if (n > separation_index) {
+            pitch_angle += 90.0f;
+            set_axis_direct(YAW, n, 45);
+        } else if (n - 1 > separation_index) {
             int sign = ((n - separation_index) % 2 == 0) ? 1 : -1;
-            set_axis(YAW, n, 90.0f * sign);
+            set_axis_direct(YAW, n, 90.0f * sign);
         }
 
-        set_axis(PITCH, n, pitch_angle);
+        if (n != 0) {
+            set_axis_direct(PITCH, n, pitch_angle);
+        }
     }
 }
 
 void slither() {
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const float dt = 100;
-    const TickType_t xFrequency = pdMS_TO_TICKS(dt);
+    TickType_t last_tick = xTaskGetTickCount();
+    TickType_t xFrequency = 50 / portTICK_PERIOD_MS;
+    float slither_theta = 0.0f;
 
     const uint8_t wave_number = 1;
-    const float module_offset = (float) wave_number * TWO_PI / (float) module_number;
-    const float amplitude = AMPLITUDE_DAMPENING * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) module_number;
-    const float sidewinding_amplitude = 0.1f * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) module_number;
+    const float module_offset = (float) wave_number * TWO_PI / (float) MAX_MODULE_NUM;
+    const float amplitude = AMPLITUDE_DAMPENING * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) MAX_MODULE_NUM;
+    const float sidewinding_amplitude = 0.1f * (180.0f / PI) * 9.92899664374f * (float) wave_number / (float) MAX_MODULE_NUM;
 
-    float module_offsets[module_number];
-    for (int n = 0; n < module_number; n++) {
+    float module_offsets[MAX_MODULE_NUM];
+    for (int n = 0; n < MAX_MODULE_NUM; n++) {
         module_offsets[n] = module_offset * (float) n;
     }
 
-    static float slither_theta = 0.0f;
-
     for (;;) {
-        float local_turn_angle = 0.0f, local_raise_angle = 0.0f, local_slither_frequency = 0.0f, local_slither_amplitude = 0.0f, local_sidewinding = 0.0f;
+        TickType_t now = xTaskGetTickCount();
+        float dt = (float)(now - last_tick) * portTICK_PERIOD_MS;  // ms
+        last_tick = now;
+
+        float local_turn_angle = 0.0f, local_raise_angle = 0.0f;
+        float local_slither_frequency = 0.0f, local_slither_amplitude = 0.0f, local_sidewinding = 0.0f;
 
         // Acquire mutex before reading shared variables
         if (xSemaphoreTake(slitherMutex, portMAX_DELAY)) {
@@ -214,18 +302,25 @@ void slither() {
             xSemaphoreGive(slitherMutex);
         }
 
-        slither_theta = fmodf(slither_theta + (dt / 1000.0f) * TWO_PI * local_slither_frequency, TWO_PI);
-        float per_module_turn = local_turn_angle / (float) module_number;
-        float per_module_raise = local_raise_angle / (float) module_number;
+        // Advance theta using actual elapsed time
+        slither_theta = fmodf(slither_theta + (dt / 1000.0f) * TWO_PI * -local_slither_frequency, TWO_PI);
+        float per_module_turn = local_turn_angle / (float) MAX_MODULE_NUM;
+        float per_module_raise = local_raise_angle / (float) MAX_MODULE_NUM;
 
-        for (int n = 0; n < module_number; n++) {
+        for (int n = 0; n < MAX_MODULE_NUM; n++) {
             float yaw_angle = sinf(slither_theta + module_offsets[n]) * local_slither_amplitude * amplitude + per_module_turn;
+            float pitch_angle = sinf(slither_theta + module_offsets[n] + PI / 2.0f) *
+                                (fabsf(local_sidewinding) <= 1e-6f ? per_module_raise : (sidewinding_amplitude * -local_sidewinding));
 
-            float pitch_angle = sinf(slither_theta + module_offsets[n] + PI/2.0f) * (local_sidewinding <= 1e-6 ? per_module_raise : (sidewinding_amplitude * local_sidewinding));
-            set_both_axis(n, pitch_angle, yaw_angle);
+            if (n == 0) {
+                set_axis_direct(YAW, n, yaw_angle);
+            } else {
+                set_both_axis_direct(n, pitch_angle, yaw_angle);
+            }
         }
 
-        vTaskDelayUntil(&xLastWakeTime, xFrequency);
+        // Yield to allow lower-priority tasks some CPU time
+        vTaskDelay(xFrequency);
     }
 }
 
@@ -258,43 +353,45 @@ void movement_task() {
     };
 
     for (;;) {
-        bool data_processed = false;
         if (angle_queue == NULL) {
             ESP_LOGW("MOVEMENT", "Angle queue not initialized");
             continue;
         }
 
-        if (xQueueReceive(angle_queue, &queueItem, 10) == pdPASS) {
-            if (!is_segment_id_registered(queueItem.segment_id)) continue;
-            data_processed = true;
+        for (int i = 0; i < 10; i++) {
+            if (xQueueReceive(angle_queue, &queueItem, 10) == pdPASS) {
+                if (!is_segment_id_registered(queueItem.segment_id)) continue;
 
-            if (queueItem.pitch && queueItem.yaw) {
-                pitch_yaw_message.pitch_degrees = queueItem.pitch_angle;
-                send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_yaw_message);
+                if (queueItem.pitch && queueItem.yaw) {
+                    pitch_yaw_message.pitch_degrees = queueItem.pitch_angle;
+                    pitch_yaw_message.yaw_degrees = queueItem.yaw_angle;
+                    send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_yaw_message);
 
-                pitch_yaw_info.segment_id = queueItem.segment_id;
-                pitch_yaw_info.yaw_degrees = queueItem.yaw_angle;
-                send_message_to_master((struct Message *) &pitch_yaw_info);
-            } else if (queueItem.pitch) {
-                pitch_message.angle_degrees = queueItem.pitch_angle;
-                send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_message);
+                    pitch_yaw_info.segment_id = queueItem.segment_id;
+                    pitch_yaw_info.pitch_degrees = queueItem.pitch_angle;
+                    pitch_yaw_info.yaw_degrees = queueItem.yaw_angle;
+                    send_message_to_master((struct Message *) &pitch_yaw_info);
+                } else if (queueItem.pitch) {
+                    pitch_message.angle_degrees = queueItem.pitch_angle;
+                    send_message_to_module(queueItem.segment_id, (struct Message *) &pitch_message);
 
-                pitch_info.segment_id = queueItem.segment_id;
-                pitch_info.angle_degrees = queueItem.pitch_angle;
-                send_message_to_master((struct Message *) &pitch_info);
-            } else if (queueItem.yaw) {
-                yaw_message.angle_degrees = queueItem.yaw_angle;
-                send_message_to_module(queueItem.segment_id, (struct Message *) &yaw_message);
+                    pitch_info.segment_id = queueItem.segment_id;
+                    pitch_info.angle_degrees = queueItem.pitch_angle;
+                    send_message_to_master((struct Message *) &pitch_info);
+                } else if (queueItem.yaw) {
+                    yaw_message.angle_degrees = queueItem.yaw_angle;
+                    send_message_to_module(queueItem.segment_id, (struct Message *) &yaw_message);
 
-                yaw_info.segment_id = queueItem.segment_id;
-                yaw_info.angle_degrees = queueItem.yaw_angle;
-                send_message_to_master((struct Message *) &yaw_info);
+                    yaw_info.segment_id = queueItem.segment_id;
+                    yaw_info.angle_degrees = queueItem.yaw_angle;
+                    send_message_to_master((struct Message *) &yaw_info);
+                }
+            } else {
+                break;
             }
         }
 
-        if (!data_processed) {
-            vTaskDelay(pdMS_TO_TICKS(5));  // Let other tasks run
-        }
+        taskYIELD();
     }
 }
 
@@ -303,9 +400,9 @@ void init_movement() {
     if (initialized) return;
     initialized = true;
 
-    angle_queue = xQueueCreate(10 * module_number, sizeof(angle_queue_item_t));
+    angle_queue = xQueueCreate(10 * MAX_MODULE_NUM, sizeof(angle_queue_item_t));
 
-    xTaskCreate(movement_task, "MovementTask", 2048, NULL, 1, NULL);
+    //xTaskCreate(movement_task, "MovementTask", 2048, NULL, 1, NULL);
 }
 
 void init_slither_task() {

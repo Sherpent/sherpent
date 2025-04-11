@@ -34,6 +34,6 @@ void vSafetyCheckerTask() {
             }
         }
 
-        vTaskDelay(1000);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }

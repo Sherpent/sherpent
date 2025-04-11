@@ -10,6 +10,7 @@
 #include "esp_intr_alloc.h"
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
+#include <effect.h>
 
 void rgb_task(void *pvParameters);
 
@@ -65,7 +66,7 @@ void monitor_battery_task(void *parameters) {
 
 
 void app_main(void) {
-    safety_init();
+    //safety_init();
     power_init();
     set_powered(true);
 
@@ -76,10 +77,10 @@ void app_main(void) {
     init_ble();
     register_msg_callback(message_callback);
 
-    //set_segment_id(4);
-
+    //set_segment_id(1);
     led_init();
     servo_init();
+    start_rainbow();
 
     button_setup();
     xTaskCreate(monitor_battery_task, "MonitorCharge", 4096, NULL, 2, NULL);
@@ -107,6 +108,8 @@ void on_connected() {
 }
 
 void on_disconnected() {
+    soften_servo(PITCH);
+    soften_servo(YAW);
     start_scan(5);
     burst(255, 0, 0, 500);
 }
@@ -165,6 +168,11 @@ void message_callback(struct Message *message) {
             for (int i = 0; i < PIXEL_COUNT; i++) {
                 set_pixel_rgb(i, set_light->red, set_light->green, set_light->blue);
             }
+            break;
+        }
+        case SET_LIGHT_GRADIENT: {
+            struct SetLightGradient *set_light_gradient = (struct SetLightGradient *) message;
+            set_pixel_gradient(set_light_gradient->type, set_light_gradient->start_red, set_light_gradient->start_green, set_light_gradient->start_blue, set_light_gradient->end_red, set_light_gradient->end_green, set_light_gradient->end_blue);
             break;
         }
         default:

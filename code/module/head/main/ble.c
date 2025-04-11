@@ -643,12 +643,13 @@ void message_task(void *pvParameters) {
     for (;;) {
         if (message_queue == NULL) {
             ESP_LOGW(GATTS_TAG, "Message queue not initialized");
-        } else if (xQueueReceive(message_queue, &queueItem, 10) == pdPASS) {
+        } else if (xQueueReceive(message_queue, &queueItem, 1) == pdPASS) {
             if (message_callback != NULL) {
                 message_callback(queueItem.conn_id, queueItem.message);
             }
             free(queueItem.message);
         }
+        taskYIELD();
     }
 }
 
@@ -673,7 +674,7 @@ void init_ble()
     if (message_queue == NULL) {
         ESP_LOGE(GATTS_TAG, "Failed to create message queue");
     } else {
-        xTaskCreate(message_task, "MessageTask", 2048, NULL, 1, NULL);
+        xTaskCreate(message_task, "MessageTask", 2048, NULL, 5, NULL);
     }
 
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();

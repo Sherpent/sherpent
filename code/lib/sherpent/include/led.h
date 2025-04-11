@@ -2,6 +2,8 @@
 // Created by Mathieu Durand on 2025-02-24.
 //
 
+#define SHERPENT_V2
+
 #ifndef LED_H
 #define LED_H
 
@@ -13,8 +15,12 @@
 #define COLOR_QUEUE_SIZE 5
 #define PIXEL_COUNT 10
 
+#ifdef SHERPENT_V2
+#define NEOPIXEL_PIN 0
+#else
 #define NEOPIXEL_PIN 21
-#define LED_BUILTIN_PIN 10
+#endif
+
 #define BUTTON_PIN 3
 
 #define NP_ARGB(a, r, g, b)   ( ((uint32_t)(a) & 0xFF) << 24 \
@@ -22,17 +28,30 @@
                         | ((uint32_t)(g) & 0xFF) << 8   \
                         | ((uint32_t)(b) & 0xFF) )
 
+#define GAMMA_RED 2.5f
+#define GAMMA_GREEN 2.3f
+#define GAMMA_BLUE 2.7f
+
 typedef struct {
     uint32_t color;            // Your data
     ListItem_t listItem;  // Required FreeRTOS list item
 } effect_item_t;
 
+enum gradient_type_t: uint8_t {
+    SIMPLE,
+    LONGITUDINAL,
+    SPIRAL,
+};
+
 void led_init();
+
+uint32_t gamma_correct_rgb(uint32_t color);
 
 /**
  * Sets the pixel at pixel_num to color.
  */
 void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue);
+void set_pixel_gradient(enum gradient_type_t type, uint8_t start_red, uint8_t start_green, uint8_t start_blue, uint8_t end_red, uint8_t end_green, uint8_t end_blue);
 
 struct xLIST_ITEM *set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue);
 struct xLIST_ITEM *set_pixel_effect_argb(uint32_t pixel_num, uint8_t alpha, uint8_t red, uint8_t green, uint8_t blue);

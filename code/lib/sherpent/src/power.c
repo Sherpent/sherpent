@@ -11,11 +11,21 @@
 #include "power.h"
 #include "esp_log.h"
 
+#define SHERPENT_V2
+
 #define CHARGE_STATE_PIN 4
+#ifdef SHERPENT_V2
 #define STAY_ON_PIN 5
+#else
+#define STAY_ON_PIN 5
+#endif
 #define DIVIDER_RATIO (2.0f/3.0f)
 
-#define ADC_CHANNEL ADC_CHANNEL_4   // ADC1 Channel 4 corresponds to GPIO4
+#ifdef SHERPENT_V2
+#define ADC_CHANNEL ADC_CHANNEL_1
+#else
+#define ADC_CHANNEL ADC_CHANNEL_4
+#endif
 #define ADC_ATTEN ADC_ATTEN_DB_12   // 11dB attenuation (0-3.6V range)
 
 static const char *TAG = "POWER";
@@ -24,6 +34,15 @@ static const char *TAG = "POWER";
 static adc_oneshot_unit_handle_t adc1_handle;
 static adc_cali_handle_t adc_cali_handle = NULL;
 static bool powered = false;
+
+VoltageSoC voltageSoCTable[] = {
+        {4.2f, 100}, {4.15f, 95}, {4.11f, 90}, {4.08f, 85},
+        {4.02f, 80}, {3.98f, 75}, {3.95f, 70}, {3.91f, 65},
+        {3.87f, 60}, {3.82f, 55}, {3.78f, 50}, {3.74f, 45},
+        {3.70f, 40}, {3.66f, 35}, {3.62f, 30}, {3.58f, 25},
+        {3.54f, 20}, {3.49f, 15}, {3.42f, 10}, {3.30f, 5},
+        {3.00f, 0}
+};
 
 // Function prototypes
 static bool adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);
@@ -132,7 +151,29 @@ bool is_battery_voltage_safe(float voltage) {
 }
 
 float get_battery_percentage() {
-    return fminf(fmaxf((get_battery_voltage() - BATTERY_VOLTAGE_MIN) / (BATTERY_VOLTAGE_MAX - BATTERY_VOLTAGE_MIN), 0.0f), 1.0f);
+    float voltage = get_battery_voltage();
+    int tableSize = sizeof(voltageSoCTable) / sizeof(voltageSoCTable[0]);
+
+    // If the voltage is below the minimum, return 0%
+    if (voltage <= voltageSoCTable[tableSize - 1].voltage) {
+        return 0.0f;
+    }
+    // If the voltage is above the maximum, return 100%
+    if (voltage >= voltageSoCTable[0].voltage) {
+        return 1.0f;
+    }
+
+    // Find the range where the voltage falls
+    for (int i = 0; i < tableSize - 1; i++) {
+        if (voltage <= voltageSoCTable[i].voltage && voltage > voltageSoCTable[i + 1].voltage) {
+            float voltageRange = voltageSoCTable[i].voltage - voltageSoCTable[i + 1].voltage;
+            float socRange = voltageSoCTable[i].soc - voltageSoCTable[i + 1].soc;
+            float voltageOffset = voltage - voltageSoCTable[i + 1].voltage;
+            return (voltageSoCTable[i + 1].soc + (voltageOffset / voltageRange) * socRange) / 100.0f;
+        }
+    }
+
+    return 0.0f; // Fallback case, shouldn't reach here
 }
 
 bool is_battery_charging() {

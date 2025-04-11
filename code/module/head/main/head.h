@@ -6,7 +6,8 @@
 #ifndef HEAD_H
 #define HEAD_H
 
-#define MAX_MODULE_NUM 9
+#define MAX_MODULE_NUM 6
+
 
 /**
  * Verify if a modules with a specific ID is registered

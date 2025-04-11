@@ -11,6 +11,11 @@
 #define BATTERY_VOLTAGE_MAX 4.5f   // Example maximum voltage (4.2V)
 #define BATTERY_VOLTAGE_MAX_CRITICAL 6.0f   // Example maximum voltage (6.0V)
 
+typedef struct {
+    float voltage;
+    int soc;
+} VoltageSoC;
+
 void power_init();
 
 float get_battery_voltage();

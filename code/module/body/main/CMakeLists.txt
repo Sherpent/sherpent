@@ -1,4 +1,4 @@
-idf_component_register(SRCS "body.c" "ble.c" "storage.c"
+idf_component_register(SRCS "body.c" "ble.c" "storage.c" "effect.c"
                         INCLUDE_DIRS "." "../../../schemas" "../../../utils"
                         REQUIRES bt sherpent nvs_flash)
 

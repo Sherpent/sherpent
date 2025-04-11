@@ -13,6 +13,7 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include <movement.h>
+#include <effect.h>
 
 static bool modules_registered[MAX_MODULE_NUM] = {false};
 static uint16_t modules_conn_id[MAX_MODULE_NUM] = {0};
@@ -54,6 +55,11 @@ void monitor_battery_task(void *parameters) {
     battery_info.msg_id = INFO_BATTERY_MASTER;
     battery_info.segment_id = 0;
 
+    uint8_t size = (uint8_t) sizeof(struct InfoAllPitchYaw) + sizeof(int8_t) * MAX_MODULE_NUM * 2;
+    struct InfoAllPitchYaw *pitch_all_yaw_info = (struct InfoAllPitchYaw*) malloc(size);
+    pitch_all_yaw_info->msg_size = (uint8_t) sizeof(struct InfoAllPitchYaw) + sizeof(int8_t) * MAX_MODULE_NUM * 2;
+    pitch_all_yaw_info->msg_id = INFO_ALL_PITCH_YAW;
+
     for (;;) {
         float battery_percentage = get_battery_percentage();
         if (battery_percentage < 0.1) { // Under 10%
@@ -67,10 +73,19 @@ void monitor_battery_task(void *parameters) {
             }
         }
 
+        ESP_LOGI("BATTERY", "%lf", battery_percentage * 100.0f);
+
         if (is_master_connected()) {
             battery_info.level = battery_percentage * 255;
             send_message_to_master((struct Message *) &battery_info);
         }
+
+        for (int n = 0; n < MAX_MODULE_NUM; n++) {
+            pitch_all_yaw_info->angles[n][PITCH] = get_angle(PITCH, n);
+            pitch_all_yaw_info->angles[n][YAW] = get_angle(YAW, n);
+        }
+
+        send_message_to_master((struct Message *) &pitch_all_yaw_info);
 
         vTaskDelay(pdMS_TO_TICKS(500));
     }
@@ -99,6 +114,8 @@ void app_main(void)
     //init_uart();
 
     set_pixel_rgb(0, 0, 50, 0);
+    //control_raw(0, 1, 0, 1);
+    //start_rainbow();
     //roll(360.0f, 0.95f);
     //look_up(90.0f, 0.0f);
 
@@ -111,6 +128,9 @@ void app_main(void)
     //set_sidewinding(0.0f);
     //set_turn_angle(0.0f);
     //set_raise_angle(-45.0f);
+
+    //vTaskDelay(5000 / portTICK_PERIOD_MS);
+    //look_up(90.0f, 0.0f);
 }
 
 void ble_main(void) {
@@ -317,6 +337,11 @@ void message_callback(uint8_t segment_id, struct Message *message) {
             }
             break;
         }
+        case SET_LIGHT_GRADIENT: {
+            struct SetLightGradient *set_light_gradient = (struct SetLightGradient *) message;
+            set_pixel_gradient(set_light_gradient->type, set_light_gradient->start_red, set_light_gradient->start_green, set_light_gradient->start_blue, set_light_gradient->end_red, set_light_gradient->end_green, set_light_gradient->end_blue);
+            break;
+        }
         default:
             break;
     }
@@ -339,10 +364,11 @@ void master_message_callback(struct Message *message) {
     switch (message->msg_id) {
         case CONTROL: {
             struct Control *control = (struct Control *) message;
-            control_raw(control->x1, control->y, control->x2);
+            control_raw(control->x1, control->y, control->x2, control->mouth);
             ESP_LOGI("CONTROL", "x1: %lf", control->x1);
             ESP_LOGI("CONTROL", "y: %lf", control->y);
             ESP_LOGI("CONTROL", "x2: %lf", control->x2);
+            ESP_LOGI("CONTROL", "mouth: %lf", control->mouth);
             break;
         }
         default:

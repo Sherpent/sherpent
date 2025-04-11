@@ -23,6 +23,8 @@ enum MessageID: uint8_t {
 
     SET_PITCH_YAW,
     INFO_PITCH_YAW,
+    SET_LIGHT_GRADIENT,
+    INFO_ALL_PITCH_YAW,
 };
 
 // General Message Structure
@@ -99,6 +101,19 @@ struct SetLight {
     uint8_t blue;
 };
 
+struct SetLightGradient {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    uint8_t type;
+    uint8_t start_red;
+    uint8_t start_green;
+    uint8_t start_blue;
+
+    uint8_t end_red;
+    uint8_t end_green;
+    uint8_t end_blue;
+};
+
 // MASTER ONLY
 struct Control {
     uint8_t msg_size;
@@ -106,6 +121,7 @@ struct Control {
     float x1;
     float y;
     float x2;
+    float mouth;
 };
 
 struct InfoYaw {
@@ -128,6 +144,12 @@ struct InfoPitchYaw {
     uint8_t segment_id;
     int8_t pitch_degrees;
     int8_t yaw_degrees;
+};
+
+struct InfoAllPitchYaw {
+    uint8_t msg_size;
+    enum MessageID msg_id;
+    int8_t angles[][2];
 };
 
 // Function Declarations

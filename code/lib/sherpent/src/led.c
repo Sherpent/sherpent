@@ -33,6 +33,15 @@ void led_init() {
     xTaskNotifyGive(led_task); // Update LEDs
 }
 
+
+uint32_t gamma_correct_rgb(uint32_t color) {
+    uint8_t red = powf((float) ((color >> 16) & 0xFF) / 255.0f, GAMMA_RED) * 255;
+    uint8_t green = powf((float) ((color >> 8) & 0xFF) / 255.0f, GAMMA_GREEN) * 255;
+    uint8_t blue = powf((float) (color & 0xFF) / 255.0f, GAMMA_BLUE) * 255;
+
+    return NP_RGB(red, green, blue);
+}
+
 void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
     if (pixel_num >= PIXEL_COUNT) {
         ESP_LOGW("LED", "Trying to set color for invalid pixel index, %d, Valid pixel index are in the range [0, %d]", (int) pixel_num, PIXEL_COUNT - 1);
@@ -41,6 +50,31 @@ void set_pixel_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue)
 
     main_color[pixel_num] = NP_RGB(red, green, blue);
     xTaskNotifyGive(led_task);
+}
+
+void set_pixel_gradient(enum gradient_type_t type, uint8_t start_red, uint8_t start_green, uint8_t start_blue, uint8_t end_red, uint8_t end_green, uint8_t end_blue) {
+    // SPIRAL : 3 6 5 4 2 7 9 1 0 8
+    // LONGITUDINAL : 3 2 0 6 7 8 4 1 5 9
+
+    //3 2 0
+    //6 7 8
+
+    // 4 1
+    // 5 9
+
+    static const uint8_t table[3][PIXEL_COUNT] = {
+            [SIMPLE] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            [LONGITUDINAL] = {3, 2, 0, 6, 7, 8, 4,1, 5, 9},
+            [SPIRAL] = {3, 6, 5, 4, 2, 7, 9, 1, 0, 8}
+    };
+
+    for (int i = 0; i < PIXEL_COUNT; i++) {
+        float t = (float) i / (PIXEL_COUNT - 1);
+        uint8_t red = (uint8_t) ((float) start_red * (1.0f - t) + (float) end_red * t);
+        uint8_t green = (uint8_t) ((float) start_green * (1.0f - t) + (float) end_green * t);
+        uint8_t blue = (uint8_t) ((float) start_blue * (1.0f - t) + (float) end_blue * t);
+        set_pixel_rgb(i, red, green, blue);
+    }
 }
 
 struct xLIST_ITEM *set_pixel_effect_rgb(uint32_t pixel_num, uint8_t red, uint8_t green, uint8_t blue) {
@@ -129,11 +163,11 @@ void task_led(void *parameters) {
                 ListItem_t *item = listGET_HEAD_ENTRY(&effect_queue[i]);
                 effect_item_t *effect = (effect_item_t *) listGET_LIST_ITEM_OWNER(item);
                 color = blend_colors(main_color[i], effect->color);  // Cleaner blending logic
-
             } else {
                 color = main_color[i];
             }
 
+            color = gamma_correct_rgb(color);
             tNeopixel pixel = {i, color};
             if (!neopixel_SetPixel(neopixel, &pixel, 1)) {
                 ESP_LOGE("LED", "Failed to control LEDs");

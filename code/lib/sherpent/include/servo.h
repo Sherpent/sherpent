@@ -17,4 +17,6 @@ void servo_init();
 
 void set_servo_angle(enum servo_type_t servo_type, float angle);
 
+void soften_servo(enum servo_type_t servo_type);
+
 #endif //SERVO_H
