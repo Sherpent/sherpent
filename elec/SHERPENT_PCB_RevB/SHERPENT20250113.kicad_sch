@@ -12358,7 +12358,7 @@
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
-		(dnp yes)
+		(dnp no)
 		(uuid "2bbe3b01-dcad-4201-8ed9-4771c684f25e")
 		(property "Reference" "C6"
 			(at 114.3 203.2 0)
