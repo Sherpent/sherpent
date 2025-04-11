@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import QSlider, QLabel
 
 class Modules:
+    """
+    Classe qui contient tous les infos relatifs à chaque module du Sherpent
+    """
     def __init__(self, no_module):
         self.module_angle_1 = 0.0
         self.module_angle_2 = 0.0
@@ -27,6 +30,7 @@ class Modules:
         print(f"Nom du module : {self.module_name}")
 
     def set_angle(self, angle_ID, angle_value):
+        """ Enregistre la valeur des angles des servos """
         if angle_ID == 1:
             self.module_angle_1 = angle_value
 
@@ -34,6 +38,7 @@ class Modules:
             self.module_angle_2 = angle_value
 
     def get_angle(self, angle_ID):
+        """" Retourne la valeur des servos"""
         if angle_ID == 1:
             return self.module_angle_1
 

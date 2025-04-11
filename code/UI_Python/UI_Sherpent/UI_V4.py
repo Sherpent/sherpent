@@ -37,6 +37,10 @@ class ModulesSherpentWidget(QWidget):
 
         list_modules = self.sherpent.get_modules()
         nbr_modules = self.sherpent.get_nbr_modules()
+
+        angles_acc = list(sum(module.get_angle(1) for module in list_modules[0:i]) for i in range(0, nbr_modules))
+        average_angle = sum(angles_acc) / nbr_modules
+
         for i in range(0, nbr_modules):
             module = list_modules[i]
 
@@ -56,10 +60,10 @@ class ModulesSherpentWidget(QWidget):
             width = module.module_width
             length = module.module_length
 
-            angle_acc += module.get_angle(1) # Angle en degré
-            if i==0:
-                angle_acc += 90
-            angle_rad = math.radians(angle_acc)
+            ##angle_acc += module.get_angle(1) # Angle en degré
+            #angle_acc = module.get_angle(1) # Angle en degré
+
+            angle_rad = math.radians(angles_acc[i] - average_angle + 90)
 
             x_new = x - length * math.cos(angle_rad)
             y_new = y + length * math.sin(angle_rad)
@@ -82,21 +86,6 @@ class ModulesSherpentWidget(QWidget):
     def update_modules(self):
         self.update()
 
-    def update_color_module(self, qp):
-        for module in self.sherpent.get_modules():
-            charge = module.get_charge()
-            if charge >= 75.0:
-                qp.setBrush(QBrush(Qt.green))
-
-            elif charge < 75.0 and charge >= 50.0:
-                qp.setBrush(QBrush(QColor("yellow")))
-
-            elif charge < 50.0 and charge >= 25.0:
-                qp.setBrush(QBrush(QColor("orange")))
-
-            elif charge < 25.0:
-                qp.setBrush(QBrush(Qt.red))
-
 
 class SherpentControl(QMainWindow):
     """ Interface principale utilisant l'UI de Qt Designer """
@@ -111,6 +100,7 @@ class SherpentControl(QMainWindow):
         self.sherpent = Sherpent()
 
         self.module_widget = ModulesSherpentWidget(self.ui.widgetAffichageSherpent, self.sherpent)
+        self.update_nbr_modules(5)
 
         self.button_group = QButtonGroup()
         self.init_ui()
@@ -126,7 +116,7 @@ class SherpentControl(QMainWindow):
         self.characteristic_uuid = "0000ff01-0000-1000-8000-00805f9b34fb"  # UUID de la caractéristique
         self.bt_manager = BluetoothManager(self.sherpent, self.address)
 
-        self.update_nbr_modules(10)
+
         self.show()
 
         # Timer pour update l'affichage du sherpent
@@ -163,6 +153,20 @@ class SherpentControl(QMainWindow):
                 background-color: white;
             }
         """)
+        for i in range(0,10):
+            module_widget = getattr(self.ui, f"module{i}_widget", None)
+            module_widget.setStyleSheet(f"""
+                            QWidget#module{i}_widget {{
+                                border: 1px solid black;
+                                border-radius: 5px;
+                            }}
+                        """)
+
+        print(f"Nbr modules : {self.sherpent.get_nbr_modules()}")
+        for i in range(self.sherpent.get_nbr_modules(), 10):
+            module_widget = getattr(self.ui, f"module{i}_widget", None)
+            module_widget.setEnabled(False)
+
 
     def btnSim_toggled(self, etat):
         if etat:
@@ -194,8 +198,8 @@ class SherpentControl(QMainWindow):
         print(f"Nbr de modules = {self.sherpent.get_nbr_modules()}")
 
         module0 = self.sherpent.get_modules()[0]
-        module0.set_front_position(300,50)
-        module0.set_angle(1,90)
+        module0.set_front_position(300,200)
+        #module0.set_angle(1,90)
 
     def update_value_module(self):
         list_modules = self.sherpent.get_modules()
@@ -208,24 +212,26 @@ class SherpentControl(QMainWindow):
             list_modules[i].label_servo2.setText(f"{servo2} °")
             list_modules[i].label_charge.setText(f"{charge} °")
 
+            """
             # On enlève tous les borders des widgets
             module_widget = getattr(self.ui, f"module{i}_widget", None)
-            module_widget.setStyleSheet(f"""
+            module_widget.setStyleSheet(f"
                 QWidget#module{i}_widget {{
                     border: 1px solid black;
                     border-radius: 5px;
                 }}
-            """)
+            ")
 
         # On met un border sur le widget actif
         index = self.controller.index_module
         module_ON = getattr(self.ui, f"module{index}_widget", None)
-        module_ON.setStyleSheet(f"""
+        module_ON.setStyleSheet(f"
                 QWidget#module{index}_widget {{
                     border: 3px solid black;
                     border-radius: 5px;
                 }}
-            """)
+            ")
+            """
 
         self.module_widget.update_modules()
 
@@ -254,6 +260,11 @@ class SherpentControl(QMainWindow):
             valeur = struct.unpack("b", data[3:4])[0]
             self.sherpent.get_modules()[segment_ID].set_angle(1, valeur)
             #print(f"Angle #{segment_ID} : {valeur}")
+        elif msg_ID == 12:
+            # Les deux angles
+            (pitch, yaw) = struct.unpack("bb", data[3:5])
+            self.sherpent.get_modules()[segment_ID].set_angle(1, yaw)
+            self.sherpent.get_modules()[segment_ID].set_angle(2, pitch)
 
 
     def defer_start_bluetooth(self):
@@ -266,7 +277,7 @@ class SherpentControl(QMainWindow):
                 self.handle_notification
             )
             # Start le timer
-            self.joystick_timer.start(1000)
+            self.joystick_timer.start(200)
 
     def send_joystick_to_ble(self):
         asyncio.create_task(self.bt_manager.send_joystick_vectors(self.characteristic_uuid))

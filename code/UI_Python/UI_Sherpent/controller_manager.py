@@ -16,7 +16,6 @@ class ControllerManager(QtCore.QThread):
         pygame.init()
         pygame.joystick.init()
 
-
         self.index_module = 0
 
         if pygame.joystick.get_count() > 0:
@@ -34,19 +33,23 @@ class ControllerManager(QtCore.QThread):
 
                 pygame.event.pump()  # Met à jour les événements pygame
                 if self.joystick:
+                    # Récupération des boutons d'intérêts
                     x_axis = self.joystick.get_axis(0)  # Axe X (gauche-droite)
                     y_axis = self.joystick.get_axis(1)*-1  # Axe Y (haut-bas)
                     r2_trigger = self.joystick.get_axis(5)  # Gâchette droite R2
                     l2_trigger = self.joystick.get_axis(4)  # Gâchette gauche L2
-                    r1_trigger = self.joystick.get_button(10)  # Gâchette droite R2
-                    l1_trigger = self.joystick.get_button(9)  # Gâchette gauche L2
+                    r1_trigger = self.joystick.get_button(5)  # Gâchette droite R2
+                    l1_trigger = self.joystick.get_button(4)  # Gâchette gauche L2
+                    x_btn = self.joystick.get_button(0)
 
+                    # Définition de la zone morte
                     if x_axis < 0.15 and x_axis > -0.15:
                         x_axis = 0
                     if y_axis < 0.15 and y_axis > -0.15:
                         y_axis = 0
 
                     if self.sherpent.simulation_activated:
+                        # Code de Simulation : Pas utile pour l'instant (10 avril)
                         nbr_modules = self.sherpent.get_nbr_modules()
 
                         # Récupère le premier module
@@ -78,13 +81,20 @@ class ControllerManager(QtCore.QThread):
                             module_x.set_angle(1, round(angle,1))
 
                     else:
-
+                        # Envoie des vecteurs de direction
                         self.sherpent.vecteur_x = round(x_axis,1)
                         self.sherpent.vecteur_y = round(y_axis,1)
+                        self.sherpent.etat_bouche = x_btn
 
-                        self.sherpent.side_winding = round( ((l2_trigger*-1)+r2_trigger) ,1)
+                        #print(f"L1 : {l1_trigger}, R1 : {r1_trigger}")
+                        if l1_trigger:
+                            self.sherpent.side_winding = -1
+                        elif r1_trigger:
+                            self.sherpent.side_winding = 1
+                        else:
+                            self.sherpent.side_winding = 0
 
-                pygame.time.wait(100)  # Évite d'utiliser 100% du CPU
+                pygame.time.wait(300)  # Évite d'utiliser 100% du CPU
 
 
     def stop(self):

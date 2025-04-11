@@ -2,6 +2,9 @@ from module_class import Modules
 import gc
 
 class Sherpent:
+    """
+    Classe qui gère l'ensemble des modules et de l'état général du Sherpent complet
+    """
     def __init__(self):
         self.modules_list = []
         self.nbr_modules = 0
@@ -10,6 +13,7 @@ class Sherpent:
         self.vecteur_x = 0
         self.vecteur_y = 0
         self.side_winding = 0.0
+        self.etat_bouche = 0.0
 
     def add_module(self):
         """Add module to the list"""
