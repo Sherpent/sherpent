@@ -13,7 +13,7 @@
 #define COLOR_QUEUE_SIZE 5
 #define PIXEL_COUNT 10
 
-#define NEOPIXEL_PIN 21
+#define NEOPIXEL_PIN 0
 #define LED_BUILTIN_PIN 10
 #define BUTTON_PIN 3
 
