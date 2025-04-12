@@ -100,7 +100,7 @@ class SherpentControl(QMainWindow):
         self.sherpent = Sherpent()
 
         self.module_widget = ModulesSherpentWidget(self.ui.widgetAffichageSherpent, self.sherpent)
-        self.update_nbr_modules(5)
+        self.update_nbr_modules(8)
 
         self.button_group = QButtonGroup()
         self.init_ui()
@@ -198,7 +198,7 @@ class SherpentControl(QMainWindow):
         print(f"Nbr de modules = {self.sherpent.get_nbr_modules()}")
 
         module0 = self.sherpent.get_modules()[0]
-        module0.set_front_position(300,200)
+        module0.set_front_position(300,100)
         #module0.set_angle(1,90)
 
     def update_value_module(self):
@@ -245,13 +245,29 @@ class SherpentControl(QMainWindow):
 
     def handle_notification(self, sender, data):
         #print(f"Notif : {data}")
-        msg_size, msg_ID, segment_ID = struct.unpack("BBB", data[:3])
+        #msg_size, msg_ID, segment_ID = struct.unpack("BBB", data[:3])
+        msg_size, msg_ID = struct.unpack("BB", data[:2])
+
+        if msg_ID == 14:
+            print("Servo value")
+            idx = 2
+            for i in range(0, self.sherpent.nbr_modules):
+                unpack_data = struct.unpack("BB", data[idx:idx+2])
+                valeur1 = round(unpack_data[0]/255*100, 1)
+                valeur2 = round(unpack_data[0] / 255 * 100, 1)
+                self.sherpent.get_modules()[i].set_charge(valeur1)
+                self.sherpent.get_modules()[i].set_charge(valeur2)
+                idx+=2
+
 
         if msg_ID == 10:
+            segment_ID = struct.unpack("B", data[2:3])[0]
+            #print(f"Segment ID : {segment_ID}")
+
             valeur = round(struct.unpack("B", data[3:4])[0] / 255*100, 1)
             self.sherpent.get_modules()[segment_ID].set_charge(valeur)
             #print(f"Segment ID : {segment_ID} Valeur : {valeur}")
-
+        """
         elif msg_ID == 9:
             valeur = struct.unpack("b", data[3:4])[0]
             self.sherpent.get_modules()[segment_ID].set_angle(2, valeur)
@@ -265,7 +281,7 @@ class SherpentControl(QMainWindow):
             (pitch, yaw) = struct.unpack("bb", data[3:5])
             self.sherpent.get_modules()[segment_ID].set_angle(1, yaw)
             self.sherpent.get_modules()[segment_ID].set_angle(2, pitch)
-
+        """
 
     def defer_start_bluetooth(self):
         asyncio.create_task(self.start_bluetooth())
@@ -277,7 +293,7 @@ class SherpentControl(QMainWindow):
                 self.handle_notification
             )
             # Start le timer
-            self.joystick_timer.start(200)
+            self.joystick_timer.start(500)
 
     def send_joystick_to_ble(self):
         asyncio.create_task(self.bt_manager.send_joystick_vectors(self.characteristic_uuid))

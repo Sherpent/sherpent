@@ -92,5 +92,5 @@ class BluetoothManager(QtCore.QThread):
                 #print(f"📤 Envoyé joystick : x={x}, y={y} → {data.hex()}")
                 self.previous_command = data
             except Exception as e:
-                print(f"❌ Erreur envoi joystick : {e}")
+                print(f"❌ Erreur envoi data : {e}")
 
