@@ -212,26 +212,6 @@ class SherpentControl(QMainWindow):
             list_modules[i].label_servo2.setText(f"{servo2} °")
             list_modules[i].label_charge.setText(f"{charge} °")
 
-            """
-            # On enlève tous les borders des widgets
-            module_widget = getattr(self.ui, f"module{i}_widget", None)
-            module_widget.setStyleSheet(f"
-                QWidget#module{i}_widget {{
-                    border: 1px solid black;
-                    border-radius: 5px;
-                }}
-            ")
-
-        # On met un border sur le widget actif
-        index = self.controller.index_module
-        module_ON = getattr(self.ui, f"module{index}_widget", None)
-        module_ON.setStyleSheet(f"
-                QWidget#module{index}_widget {{
-                    border: 3px solid black;
-                    border-radius: 5px;
-                }}
-            ")
-            """
 
         self.module_widget.update_modules()
 
